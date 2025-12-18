@@ -1,0 +1,138 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smct"
+version = "1.0.0"
+description = "System Manager Configuration Tool for NXP SM firmware"
+readme = "readme.md"
+authors = [{ name = "NXP", email = "mcux_config_tools_data_core@NXP1.onmicrosoft.com" }]
+license = { text = "BSD-3-Clause" }
+requires-python = ">=3.10"
+dependencies = [
+    "fastjsonschema>=2.18.0",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Embedded Systems",
+    "Topic :: System :: Hardware",
+    "Topic :: Utilities",
+]
+
+[project.scripts]
+smct = "smct:main"
+
+[tool.setuptools]
+package-dir = {"" = "smct"}
+py-modules = ["smct"]
+
+[tool.setuptools.packages.find]
+where = ["smct"]
+exclude = ["tests*", "test_resources*"]
+
+[project.optional-dependencies]
+dev = [
+    "black>=24.3.0",
+    "isort>=5.13.2",
+    "mypy>=1.10",
+    "ruff>=0.6.0",
+    "nxp_codecheck<1,>=0.3.1",
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.1",
+    "pytest-xdist>=3.5.0",
+]
+
+[project.urls]
+Code = "https://bitbucket.sw.nxp.com/scm/mpexc/smct.git"
+"Documentation" = "https://github.com/nxp-imx/imx-smct/readme.md"
+
+[tool.black]
+line-length = 160
+target-version = ["py310"]
+
+[tool.isort]
+profile = "black"
+line_length = 160
+force_alphabetical_sort_within_sections = true
+src_paths = ["smct", "tests"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_unused_configs = false
+warn_incomplete_stub = true
+disallow_untyped_defs = true
+mypy_path = "stubs"
+ignore_missing_imports = true
+cache_dir = ".cache/.mypy_cache"
+implicit_reexport = false
+strict_equality = true
+strict_optional = true
+no_implicit_optional = true
+
+[tool.ruff]
+line-length = 160
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.nxp_codecheck]
+git_parent_branch = "origin/25.12/integration"
+output_directory = "reports"
+default_check_paths = ["smct"]
+
+checkers = [
+    { "pytest" = { timeout = 2000 } },
+    { "pylint" = { timeout = 300 } },
+    { "mypy" = { timeout = 300 } },
+    # "dependencies",
+    "ruff",
+    { "radon_c" = { info_only = true, timeout = 60 } },
+    { "radon_d" = { timeout = 60, info_only = true } },
+    { "black" = { timeout = 120 } },
+    { "isort" = { timeout = 60 } },
+    "copyright",
+    "py_headers",
+]
+ 
+[tool.copyright]
+excluded_files = [".*/*", "reports/*"]
+
+[tool.checker_dependencies]
+root_package = "smct"
+
+[tool.checker_dependencies.spdx]
+"Apache-2.0" = [
+    "Apache 2.0",
+    "Apache-2.0 License",
+    "Apache Software License 2.0",
+    "Apache License, Version 2.0",
+    "Apache License 2.0",
+    "Apache Software License",
+]
+"BSD-2-Clause" = ["BSD 2-Clause License"]
+"BSD-3-Clause" = [
+    "BSD License",
+    "BSD 3-Clause",
+    "BSD (3 clause)",
+    "BSD 3-Clause License",
+    "Modified BSD License",
+]
+"MIT" = ["MIT License", "MIT license"]
+"MPL-2.0" = ["MPL 2.0", "Mozilla Public License 2.0 (MPL 2.0)"]
+"NLPL" = ["Public domain", "Public Domain"]
+"PSF-2.0" = ["PSF", "PSFL", "Python Software Foundation License"]
+"LGPL-3.0" = []
+"LGPL-2.0" = ["GPL-2.0-or-later"]
+"LGPL-2.1" = ["LGPL-2.1-or-later"]
+"ISC" = ["ISC license"]
+"Unlicense" = ["The Unlicense", "The Unlicense (Unlicense)"]

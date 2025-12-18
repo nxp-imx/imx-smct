@@ -1,0 +1,85 @@
+[MAIN]
+# Files or directories to be skipped. They should be base names, not paths.
+ignore=.gitignore,
+       .git
+       tests
+
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use, and will cap the count on Windows to
+# avoid hangs.
+jobs=0
+[BASIC]
+argument-naming-style=snake_case
+attr-naming-style=snake_case
+
+# Bad variable names regexes, separated by a comma. If names match any regex,
+# they will always be refused
+bad-names-rgxs=
+class-attribute-naming-style=any
+class-const-naming-style=UPPER_CASE
+class-naming-style=PascalCase
+const-naming-style=UPPER_CASE
+docstring-min-length=-1
+function-naming-style=snake_case
+
+good-names=i,
+           j,
+           k,
+           ex,
+           Run,
+           _
+
+include-naming-hint=no
+inlinevar-naming-style=any
+method-naming-style=snake_case
+module-naming-style=snake_case
+variable-naming-style=snake_case
+[DESIGN]
+
+max-args=15
+max-attributes=15
+max-bool-expr=5
+max-branches=12
+max-locals=30
+max-parents=7
+max-public-methods=99
+max-returns=6
+max-statements=100
+min-public-methods=1
+max-nested-blocks=10
+
+[FORMAT]
+
+indent-after-paren=4
+indent-string='    '
+max-line-length=160
+max-module-lines=1300
+
+[MESSAGES CONTROL]
+
+disable=raw-checker-failed,
+        bad-inline-option,
+        locally-disabled,
+        file-ignored,
+        suppressed-message,
+        useless-suppression,
+        deprecated-pragma,
+        use-symbolic-message-instead,
+        use-implicit-booleaness-not-comparison-to-string,
+        use-implicit-booleaness-not-comparison-to-zero,
+        fixme,
+        unused-argument,
+        line-too-long,
+        too-many-locals,
+        consider-using-dict-items,
+        consider-using-enumerate,
+        too-many-branches,
+        too-few-public-methods,
+        too-many-positional-arguments
+
+[MISCELLANEOUS]
+
+# List of note tags to take in consideration, separated by a comma.
+notes=FIXME,
+      XXX,
+      TODO

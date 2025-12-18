@@ -1,0 +1,215 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "type": "object",
+ "description": "Schema for Security Monitor model configuration",
+ "properties": {
+  "info": {
+   "type": "object", 
+   "description": "Information about the schema (required). Optional properties: none",
+   "properties": {
+    "version": {
+     "type": "integer",
+     "description": "Schema version number (required)"
+    }
+   },
+   "required": [
+    "version"
+   ]
+  },
+  "param_types": {
+   "type": "array",
+   "description": "Parameter type configurations (required)",
+   "items": {
+    "type": "object",
+    "description": "Parameter type configuration item",
+    "properties": {
+     "key": {
+      "type": "string",
+      "description": "Parameter type key (required)"
+     },
+     "value": {
+      "type": "string",
+      "description": "Parameter type value (required)"
+     },
+     "params": {
+      "type": "array",
+      "description": "Parameters for this type (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "param": {
+         "type": "string",
+         "description": "Parameter name (required)"
+        },
+        "id": {
+         "type": "string",
+         "description": "Parameter ID reference"
+        },
+        "json_file": {
+         "type": "string",
+         "description": "JSON file reference for parameter definition"
+        }
+       },
+       "required": ["param"]
+      }
+     },
+     "infos": {
+      "type": "array",
+      "description": "Information fields for this type",
+      "items": {
+       "type": "object",
+       "properties": {
+        "key": {
+         "type": "string",
+         "description": "Info key (required)"
+        },
+        "label": {
+         "type": "string",
+         "description": "Display label (required)"
+        },
+        "description": {
+         "type": "string",
+         "description": "Info description (required)"
+        }
+       },
+       "required": ["key", "label", "description"]
+      }
+     },
+     "param_types": {
+      "type": "array",
+      "description": "Nested parameter types",
+      "items": {
+       "$ref": "#/properties/param_types/items"
+      }
+     }
+    },
+    "required": ["key", "value", "params"]
+   }
+  },
+  "protocols": {
+   "type": "object",
+   "description": "Protocol configurations (required)",
+   "properties": {
+    "label": {
+     "type": "string",
+     "description": "Protocol section label"
+    },
+    "description": {
+     "type": "string",
+     "description": "Protocol section description"
+    },
+    "items": {
+     "type": "array",
+     "description": "Protocol items (required)",
+     "items": {
+      "type": "object",
+      "description": "Protocol configuration item",
+      "properties": {
+       "id": {
+        "type": "string",
+        "description": "Protocol identifier (required)"
+       },
+       "label": {
+        "type": "string",
+        "description": "Display label for the protocol (required)"
+       },
+       "description": {
+        "type": "string",
+        "description": "Detailed description of the protocol (required)"
+       },
+       "prefix": {
+        "type": "string",
+        "description": "Protocol prefix identifier (required)"
+       },
+       "test": {
+        "type": "string",
+        "description": "Test identifier for the protocol (required)"
+       },
+       "static": {
+        "type": "boolean",
+        "description": "Whether protocol is static (required)"
+       }
+      },
+      "required": [
+       "description",
+       "id",
+       "label",
+       "prefix",
+       "static",
+       "test"
+      ]
+     }
+    }
+   },
+   "required": ["items"]
+  },
+  "setting_types": {
+   "type": "array",
+   "description": "Setting type definitions (required)",
+   "items": {
+    "type": "object",
+    "description": "Setting type configuration",
+    "properties": {
+     "id": {
+      "type": "string",
+      "description": "Setting type identifier (required)"
+     },
+     "type": {
+      "type": "string",
+      "description": "Setting data type (required)",
+      "enum": ["enum", "integer"]
+     },
+     "label": {
+      "type": "string",
+      "description": "Display label (required)"
+     },
+     "description": {
+      "type": "string",
+      "description": "Setting description (required)"
+     },
+     "items": {
+      "type": "array",
+      "description": "Enumeration items (required for enum types)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "id": {
+         "type": "string",
+         "description": "Item identifier (required)"
+        },
+        "label": {
+         "type": "string",
+         "description": "Display label (required)"
+        },
+        "description": {
+         "type": "string",
+         "description": "Item description (required)"
+        },
+        "value": {
+         "type": "string",
+         "description": "Item value (required)"
+        }
+       },
+       "required": ["id", "label", "description", "value"]
+      }
+     }
+    },
+    "required": ["id", "type", "label", "description"],
+    "if": {
+     "properties": {
+      "type": { "const": "enum" }
+     }
+    },
+    "then": {
+     "required": ["items"]
+    }
+   }
+  }
+ },
+ "required": [
+  "info",
+  "param_types",
+  "protocols",
+  "setting_types"
+ ]
+}

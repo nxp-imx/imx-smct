@@ -1,0 +1,24 @@
+{
+  "packages": [
+    {
+      "home_page": "https://github.com/horejsek/python-fastjsonschema",
+      "name": "fastjsonschema",
+      "package": {
+        "name": "fastjsonschema",
+        "license": "BSD"
+      },
+      "github": {
+        "project_name": "horejsek/python-fastjsonschema",
+        "license": "BSD-3-Clause"
+      }
+    },
+    {
+      "home_page": "https://smct.readthedocs.io",
+      "name": "smct",
+      "package": {
+        "name": "smct",
+        "license": "BSD-3-Clause"
+      }
+    }
+  ]
+}

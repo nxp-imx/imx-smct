@@ -1,0 +1,60 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "SMCT generate output from cfg",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "smct.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "mx95evk.cfg",
+                "-o",
+                "mx95evk",
+                "-f"
+                //"--sm_dir",
+                //"..\\imx-sm"
+            ]
+        },
+        {
+            "name": "SMCT generate output from cfg and store database",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "smct.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "mx95evk.cfg",
+                "-o",
+                "mx95evk",
+                "-f",
+                "--store_db",
+                "mx95evk",
+                "--store_conf",
+                "mx95evk"
+                //"--sm_dir",
+                //"..\\imx-sm"
+            ]
+        },
+        {
+            "name": "SMCT generate output from database",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "smct.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "mx95evk",
+                "-o",
+                "mx95evk",
+                "-f"
+                //"--sm_dir",
+                //"..\\imx-sm"
+            ]
+        },
+    ]
+}

@@ -1,0 +1,716 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "type": "object",
+ "description": "Schema for user configuration data",
+ "properties": {
+  "SMCT_version": {
+   "type": "array",
+   "description": "Version of the SMCT tool [major, minor, patch] (required)",
+   "items": {
+    "type": "integer",
+    "minimum": 0
+   },
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "SM_FW_compatibility_version": {
+   "type": "integer",
+   "description": "SM firmware compatibility version (required)",
+   "minimum": 0
+  },
+  "Config": {
+   "type": "object",
+   "description": "General configuration settings (required)",
+   "properties": {
+    "name": {
+     "type": "string",
+     "description": "Configuration name (required)",
+     "minLength": 1
+    },
+    "doxygen_name": {
+     "type": "string",
+     "description": "Name used in Doxygen documentation (required)",
+     "minLength": 1
+    },
+    "description": {
+     "type": "string",
+     "description": "Configuration description (required)"
+    },
+    "device": {
+     "type": "string",
+     "description": "Target device identifier (required)",
+     "minLength": 1
+    },
+    "board": {
+     "type": "string",
+     "description": "Target board identifier (required)",
+     "minLength": 1
+    },
+    "build_tool": {
+     "type": "string",
+     "description": "Build tool to use (required)"
+    },
+    "board_configs": {
+     "type": "array",
+     "description": "Board-specific configuration parameters (required)",
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "description": "Configuration parameter name (required)",
+        "minLength": 1
+       },
+       "value": {
+        "description": "Configuration parameter value (required) - can be string, number, or boolean"
+       }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false
+     }
+    },
+    "board_configs_custom": {
+     "type": "array",
+     "description": "Custom board configuration parameters (required)",
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "description": "Configuration parameter name (required)",
+        "minLength": 1
+       },
+       "value": {
+        "description": "Configuration parameter value (required) - can be string, number, or boolean"
+       }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false
+     }
+    },
+    "mak_variables": {
+     "type": "array",
+     "description": "Makefile variables (required)",
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "description": "Configuration parameter name (required)",
+        "minLength": 1
+       },
+       "value": {
+        "description": "Configuration parameter value (required) - can be string, number, or boolean"
+       }
+      },
+      "required": ["name", "value"],
+      "additionalProperties": false
+     }
+    },
+    "fusa": {
+     "type": "object",
+     "description": "Functional Safety (FuSa) configuration (optional)",
+     "properties": {
+      "defines": {
+       "type": "array",
+       "description": "FuSa-specific macro definitions (required)",
+       "items": {
+        "type": "object",
+        "properties": {
+         "name": {
+          "type": "string",
+          "description": "Define name (required)",
+          "minLength": 1
+         },
+         "value": {
+          "type": ["string", "integer"],
+          "description": "Define value (required)",
+          "minLength": 1
+         },
+         "comment": {
+          "type": ["string", "null"],
+          "description": "Optional comment for the define"
+         }
+        },
+        "required": ["name", "value"],
+        "additionalProperties": false
+       }
+      },
+      "tasks": {
+       "type": "array",
+       "description": "FuSa task configurations (required)",
+       "items": {
+        "type": "object",
+        "properties": {
+         "name": {
+          "type": "string",
+          "description": "Task name (required)",
+          "minLength": 1
+         },
+         "period": {
+          "type": ["string", "integer"],
+          "description": "Task period (required)",
+          "minLength": 1
+         },
+         "type": {
+          "type": "string",
+          "description": "Task type (required)",
+          "enum": ["thread", "handler"],
+          "minLength": 1
+         },
+         "comment": {
+          "type": ["string", "null"],
+          "description": "Optional comment for the task"
+         }
+        },
+        "required": ["name", "period", "type"],
+        "additionalProperties": false
+       }
+      }
+     },
+     "required": ["defines", "tasks"],
+     "additionalProperties": false
+    },
+    "common_defines": {
+     "type": "array",
+     "description": "Common macro definitions (required)",
+     "items": {
+      "type": "object",
+      "properties": {
+       "name": {
+        "type": "string",
+        "description": "Macro name (required)",
+        "minLength": 1
+       },
+       "params": {
+        "type": "object",
+        "description": "Macro parameters (required)",
+        "additionalProperties": true
+       }
+      },
+      "required": ["name", "params"],
+      "additionalProperties": false
+     }
+    }
+   },
+   "required": [
+    "board",
+    "board_configs",
+    "board_configs_custom",
+    "build_tool",
+    "common_defines",
+    "description",
+    "device",
+    "doxygen_name",
+    "mak_variables",
+    "name"
+   ],
+   "additionalProperties": false
+  },
+  "LMs": {
+   "type": "array",
+   "description": "List of Logical Machine configurations (required)",
+   "items": {
+    "type": "object",
+    "properties": {
+     "type": {
+      "type": "string",
+      "description": "Type identifier, must be \"LM\" (required)"
+     },
+     "dirty_flag": {
+      "type": "boolean",
+      "description": "Flag to indicate if object is changed in user configuration"
+     },
+     "name": {
+      "type": "string",
+      "description": "Name of the Logical Machine (required)",
+      "minLength": 1
+     },
+     "did": {
+      "type": "integer",
+      "description": "Domain ID for this LM (required)",
+      "minimum": 0
+     },
+     "debug": {
+      "type": "boolean",
+      "description": "Enable debug mode (required)"
+     },
+     "rtime": {
+      "type": ["integer", "string", "null"],
+      "description": "Runtime configuration (required)",
+      "minimum": 0
+     },
+     "group": {
+      "type": ["integer", "string", "null"],
+      "description": "Group assignment (required)",
+      "minimum": 0
+     },
+     "auto": {
+      "type": ["string", "null"],
+      "description": "Auto-start configuration (required)",
+      "minimum": 0
+     },
+     "default": {
+      "type": "boolean",
+      "description": "Is this the default LM (required)"
+     },
+     "rpc": {
+      "type": "string",
+      "description": "RPC mechanism (required)"
+     },
+     "safe": {
+      "type": "string",
+      "description": "Safety environment type (required)",
+      "minLength": 1
+     },
+     "defines": {
+      "type": "array",
+      "description": "LM-specific macro definitions (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string",
+         "description": "Macro name (required)",
+         "minLength": 1
+        },
+        "params": {
+         "type": "object",
+         "description": "Macro parameters (required)",
+         "additionalProperties": true
+        }
+       },
+       "required": ["name", "params"],
+       "additionalProperties": false
+      }
+     },
+     "resources": {
+      "type": "array",
+      "description": "Resources assigned to this LM (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string",
+         "description": "Resource name (required)",
+         "minLength": 1
+        },
+        "defines": {
+         "type": "array",
+         "description": "Resource-specific defines (required)",
+         "items": {
+          "type": "string"
+         }
+        },
+        "params": {
+         "type": "object",
+         "description": "Resource parameters (required)",
+         "additionalProperties": true
+        },
+        "dirty_flag": {
+          "type": "boolean",
+          "description": "Flag to indicate if object is changed in user configuration"
+        }
+       },
+       "required": ["defines", "name", "params"],
+       "additionalProperties": false
+      }
+     },
+     "ss_sequences": {
+      "type": "array",
+      "description": "Start/stop sequences (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "ss": {
+         "type": "integer",
+         "description": "Sequence number (required)",
+         "minimum": 0
+        },
+        "ss_name": {
+         "type": "string",
+         "description": "Sequence name (required)",
+         "minLength": 1
+        },
+        "resources": {
+         "type": "array",
+         "description": "Resources in this sequence (required)",
+         "items": {
+          "type": "object",
+          "properties": {
+           "rsrc": {
+            "type": "string",
+            "description": "Resource identifier (required)",
+            "minLength": 1
+           },
+           "args": {
+            "type": "array",
+            "description": "Arguments for resource operation (optional)",
+            "items": {
+             "type": "integer"
+            }
+           },
+           "test": {
+            "type": "boolean",
+            "description": "Test flag (optional)"
+           }
+          },
+          "required": ["rsrc"],
+          "additionalProperties": false
+         }
+        }
+       },
+       "required": ["resources", "ss", "ss_name"],
+       "additionalProperties": false
+      }
+     },
+     "msels": {
+      "type": "array",
+      "description": "Mode select configurations (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "msel": {
+         "type": "integer",
+         "description": "Mode select value (required)",
+         "minimum": 0
+        },
+        "boot": {
+         "type": ["integer",  "null"],
+         "description": "Boot configuration (required)"
+        },
+        "skip": {
+         "type": ["boolean",  "null"],
+         "description": "Skip configuration (required)"
+        },
+        "start": {
+         "type": ["integer",  "null"],
+         "description": "Start sequence reference (required)"
+        },
+        "stop": {
+         "type": ["integer",  "null"],
+         "description": "Stop sequence reference (required)"
+        }
+       },
+       "required": ["boot", "msel", "skip", "start", "stop"],
+       "additionalProperties": false
+      }
+     },
+     "agents": {
+      "type": "array",
+      "description": "SCMI agents for this LM (optional)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "type": {
+         "type": "string",
+         "description": "Agent type (required)"
+        },
+        "name": {
+         "type": "string",
+         "description": "Agent name (required)",
+         "minLength": 1
+        },
+        "dirty_flag": {
+          "type": "boolean",
+          "description": "Flag to indicate if object is changed in user configuration"
+        },
+        "secure": {
+         "type": "boolean",
+         "description": "Security status (required)"
+        },
+        "defines": {
+         "type": "array",
+         "description": "Agent-specific defines (required)",
+         "items": {
+          "type": "object",
+          "properties": {
+           "name": {
+            "type": "string",
+            "description": "Define name (required)",
+            "minLength": 1
+           },
+           "params": {
+            "type": "object",
+            "description": "Define parameters (required)",
+            "additionalProperties": true
+           }
+          },
+          "required": ["name", "params"],
+          "additionalProperties": false
+         }
+        },
+        "resources": {
+         "type": "array",
+         "description": "Resources accessible by this agent (required)",
+         "items": {
+          "type": "object",
+          "properties": {
+           "name": {
+            "type": "string",
+            "description": "Resource name (required)",
+            "minLength": 1
+           },
+           "defines": {
+            "type": "array",
+            "description": "Resource-specific defines (required)",
+            "items": {
+             "type": "string"
+            }
+           },
+            "dirty_flag": {
+              "type": "boolean",
+              "description": "Flag to indicate if object is changed in user configuration"
+            },
+           "params": {
+            "type": "object",
+            "description": "Resource parameters (required)",
+            "additionalProperties": true
+           }
+          },
+          "required": ["defines", "name", "params"],
+          "additionalProperties": false
+         }
+        },
+        "channels": {
+         "type": "array",
+         "description": "Communication channels (required)",
+         "items": {
+          "type": "object",
+          "properties": {
+           "type": {
+            "type": "string",
+            "description": "Channel type (required)",
+            "minLength": 1
+           },
+           "chtype": {
+            "type": "string",
+            "description": "Channel subtype (required)",
+            "minLength": 1
+           },
+           "sequence": {
+            "type": ["integer", "null"],
+            "description": "Sequence configuration (required)"
+           },
+           "test": {
+            "type": ["string", "null"],
+            "description": "Test configuration (required)"
+           },
+           "notify": {
+            "type": ["string", "integer"],
+            "description": "Notification configuration (required)"
+           },
+           "xport": {
+            "type": "object",
+            "description": "Transport configuration (required)",
+            "properties": {
+             "type": {
+              "type": "string",
+              "description": "Transport type (required)",
+              "minLength": 1
+             },
+             "doorbell": {
+              "type": "integer",
+              "description": "Doorbell index (required)",
+              "minimum": 0
+             },
+             "check": {
+              "type": ["string", "null"],
+              "description": "Check type (required)"
+             }
+            },
+            "required": ["check", "doorbell", "type"],
+            "additionalProperties": false
+           }
+          },
+          "required": ["chtype", "notify", "sequence", "test", "type", "xport"],
+          "additionalProperties": false
+         }
+        },
+        "mailbox": {
+         "type": "object",
+         "description": "Mailbox configuration (required)",
+         "properties": {
+          "type": {
+           "type": "string",
+           "description": "Mailbox type (required)",
+           "minLength": 1
+          },
+          "test": {
+           "type": "integer",
+           "description": "Test configuration (required)"
+          },
+          "priority": {
+           "type": ["string", "null"],
+           "description": "Priority level (required)"
+          },
+          "mu": {
+           "type": ["integer", "null"],
+           "description": "MU instance (required)",
+           "minimum": 0
+          },
+          "sma": {
+           "type": ["integer", "null", "string"],
+           "description": "SMA configuration (required)"
+          }
+         },
+         "required": ["mu", "priority", "sma", "test", "type"],
+         "additionalProperties": false
+        }
+       },
+       "required": ["channels", "defines", "mailbox", "name", "resources", "secure", "type"],
+       "additionalProperties": false
+      }
+     }
+    },
+    "required": [
+     "auto",
+     "debug",
+     "default",
+     "defines",
+     "did",
+     "group",
+     "msels",
+     "name",
+     "resources",
+     "rpc",
+     "rtime",
+     "safe",
+     "ss_sequences",
+     "type"
+    ],
+    "additionalProperties": false
+   }
+  },
+  "DOMs": {
+   "type": "array",
+   "description": "List of Domain configurations (required)",
+   "items": {
+    "type": "object",
+    "properties": {
+     "type": {
+      "type": "string",
+      "description": "Type identifier, must be \"DOM\" (required)"
+     },
+     "name": {
+      "type": "string",
+      "description": "Domain name (required)",
+      "minLength": 1
+     },
+     "dirty_flag": {
+      "type": "boolean",
+      "description": "Flag to indicate if object is changed in user configuration"
+     },
+     "did": {
+      "type": "integer",
+      "description": "Domain ID (required)",
+      "minimum": 0
+     },
+     "debug": {
+      "type": "boolean",
+      "description": "Debug mode (required)"
+     },
+     "defines": {
+      "type": "array",
+      "description": "Domain-specific defines (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string",
+         "description": "Define name (required)",
+         "minLength": 1
+        },
+        "params": {
+         "type": "object",
+         "description": "Define parameters (required)",
+         "additionalProperties": true
+        }
+       },
+       "required": ["name", "params"],
+       "additionalProperties": false
+      }
+     },
+     "resources": {
+      "type": "array",
+      "description": "Resources assigned to this domain (required)",
+      "items": {
+       "type": "object",
+       "properties": {
+        "name": {
+         "type": "string",
+         "description": "Resource name (required)",
+         "minLength": 1
+        },
+        "dirty_flag": {
+          "type": "boolean",
+          "description": "Flag to indicate if object is changed in user configuration"
+        },
+        "defines": {
+         "type": "array",
+         "description": "Resource-specific defines (required)",
+         "items": {
+          "type": "string"
+         }
+        },
+        "params": {
+         "type": "object",
+         "description": "Resource parameters (required)",
+         "additionalProperties": true
+        }
+       },
+       "required": ["defines", "name", "params"],
+       "additionalProperties": false
+      }
+     }
+    },
+    "required": [
+     "debug",
+     "defines",
+     "did",
+     "name",
+     "resources",
+     "type"
+    ],
+    "additionalProperties": false
+   }
+  },
+  "AutomaticResources":{
+   "type": "array",
+   "items": {
+    "type": "object",
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "type": {
+       "type": "string"
+      },
+      "cat": {
+       "type": "string"
+      },
+      "api": {
+       "type": "string"
+      }
+    }
+   }
+  },
+  "UserResources":{
+   "type": "array",
+   "items": {
+    "type": "object",
+    "additionalItems": true
+   }
+  }
+ },
+ "required": [
+  "Config",
+  "DOMs",
+  "LMs",
+  "SMCT_version",
+  "SM_FW_compatibility_version",
+  "AutomaticResources",
+  "UserResources"
+ ],
+ "additionalProperties": true
+}

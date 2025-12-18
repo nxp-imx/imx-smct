@@ -1,0 +1,94 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "creationInfo": {
+    "created": "2025-12-17T14:10:46Z",
+    "creators": [
+      "Organization: NXP"
+    ],
+    "licenseListVersion": "3.26"
+  },
+  "name": "System Manager Config Tool CLI-25.12.0",
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://nxp.com/spdx/08231691-cfd5-4c8e-a724-34094c4a29a6",
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
+      "name": "System Manager Config Tool CLI",
+      "versionInfo": "25.12.0",
+      "licenseConcluded": "(BSD-3-Clause)",
+      "licenseDeclared": "(BSD-3-Clause)",
+      "downloadLocation": "github.com/nxp-imx/imx-smct",
+      "originator": "Organization: NXP",
+      "supplier": "NOASSERTION",
+      "externalRefs": [],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
+      "name": "fastjsonschema",
+      "versionInfo": "2.21.2",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "homepage": "https://github.com/seznam/python-fastjsonschema",
+      "downloadLocation": "https://pypi.org/project/fastjsonschema/2.21.2",
+      "originator": "Organization: pypi",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "OTHER",
+          "referenceLocator": "2741b088-7f99-4e2b-a3cd-ba75389f2e77",
+          "referenceType": "BlackDuck-ComponentOrigin"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:pypi/fastjsonschema@2.21.2",
+          "referenceType": "purl"
+        }
+      ],
+      "filesAnalyzed": false
+    },
+    {
+      "SPDXID": "SPDXRef-package-37d54577-8a2c-4d78-8b0e-01cad87ae847",
+      "name": "nxp-imx/imx-sm",
+      "versionInfo": "android-16.0.0_1.0.0",
+      "licenseConcluded": "BSD-3-Clause",
+      "licenseDeclared": "BSD-3-Clause",
+      "homepage": "https://github.com/nxp-imx/imx-sm",
+      "downloadLocation": "NOASSERTION",
+      "originator": "Organization: nxp-imx",
+      "supplier": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "OTHER",
+          "referenceLocator": "1aa733fc-4962-444f-bf86-d2bafa2a9d55",
+          "referenceType": "BlackDuck-ComponentOrigin"
+        },
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:github/nxp-imx/imx-sm@android-16.0.0_1.0.0",
+          "referenceType": "purl"
+        }
+      ],
+      "filesAnalyzed": false
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
+      "relationshipType": "OTHER",
+      "relatedSpdxElement": "SPDXRef-package-37d54577-8a2c-4d78-8b0e-01cad87ae847",
+      "comment": "Separate Work"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
+      "relationshipType": "DYNAMIC_LINK",
+      "relatedSpdxElement": "SPDXRef-package-8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
+    }
+  ]
+}

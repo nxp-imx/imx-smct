@@ -1,0 +1,240 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Schema for MPU configuration",
+  "properties": {
+    "sm_did": {
+      "type": "integer",
+      "description": "Security Monitor Domain ID (required)"
+    },
+    "MU_count": {
+      "type": "integer", 
+      "description": "Number of Message Units (required)"
+    },
+    "security_peripherals": {
+      "type": "array",
+      "description": "List of security peripheral configurations (required)",
+      "items": {
+        "type": "object",
+        "description": "Security peripheral configuration",
+        "properties": {
+          "peripheral": {
+            "type": "string",
+            "description": "Name of the security peripheral (required)"
+          },
+          "debug_domain_permission": {
+            "type": "string",
+            "description": "Debug domain permission value (required)"
+          },
+          "MDAC": {
+            "type": "object",
+            "description": "Memory Domain Access Controller configuration",
+            "properties": {
+              "registers": {
+                "type": "array",
+                "description": "MDAC register configurations",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Register name"
+                    },
+                    "bitfields": {
+                      "type": "array",
+                      "description": "Register bitfield definitions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Bitfield name"
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "description": "Bit offset"
+                          },
+                          "width": {
+                            "type": "integer",
+                            "description": "Bitfield width"
+                          }
+                        },
+                        "required": ["name", "offset", "width"]
+                      }
+                    }
+                  },
+                  "required": ["name", "bitfields"]
+                }
+              }
+            },
+            "required": ["registers"]
+          },
+          "MBC": {
+            "type": "object",
+            "description": "Memory Block Controller configuration",
+            "properties": {
+              "registers": {
+                "type": "array",
+                "description": "MBC register configurations",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Register name"
+                    },
+                    "width": {
+                      "type": "integer",
+                      "description": "Register width in bits"
+                    },
+                    "bitfields": {
+                      "type": "array",
+                      "description": "Register bitfield definitions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Bitfield name"
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "description": "Bit offset"
+                          },
+                          "width": {
+                            "type": "integer",
+                            "description": "Bitfield width"
+                          }
+                        },
+                        "required": ["name", "offset", "width"]
+                      }
+                    }
+                  },
+                  "required": ["name"]
+                }
+              }
+            },
+            "required": ["registers"]
+          },
+          "MRC": {
+            "type": "object",
+            "description": "Memory Region Controller configuration",
+            "properties": {
+              "registers": {
+                "type": "array",
+                "description": "MRC register configurations",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Register name"
+                    },
+                    "bitfields": {
+                      "type": "array",
+                      "description": "Register bitfield definitions",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Bitfield name"
+                          },
+                          "offset": {
+                            "type": "integer",
+                            "description": "Bit offset"
+                          },
+                          "width": {
+                            "type": "integer",
+                            "description": "Bitfield width"
+                          }
+                        },
+                        "required": ["name", "offset", "width"]
+                      }
+                    }
+                  },
+                  "required": ["name", "bitfields"]
+                }
+              }
+            },
+            "required": ["registers"]
+          },
+          "setting_types": {
+            "type": "array",
+            "description": "Setting type definitions",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Setting type identifier"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Setting data type",
+                  "enum": ["enum", "integer"]
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Display label"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Setting description"
+                },
+                "override_type": {
+                  "type": "boolean",
+                  "description": "Whether this setting can override type"
+                },
+                "items": {
+                  "type": "array",
+                  "description": "Enumeration items (for enum types)",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Item identifier"
+                      },
+                      "label": {
+                        "type": "string",
+                        "description": "Display label"
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "Item description"
+                      },
+                      "value": {
+                        "type": ["string", "integer"],
+                        "description": "Item value"
+                      }
+                    },
+                    "required": ["id", "label", "description", "value"]
+                  }
+                }
+              },
+              "required": ["id", "type", "label", "description"],
+              "if": {
+                "properties": {
+                  "type": { "const": "enum" }
+                }
+              },
+              "then": {
+                "required": ["items"]
+              }
+            }
+          }
+        },
+        "required": [
+          "peripheral",
+          "debug_domain_permission"
+        ]
+      }
+    }
+  },
+  "required": [
+    "MU_count",
+    "security_peripherals",
+    "sm_did"
+  ]
+}

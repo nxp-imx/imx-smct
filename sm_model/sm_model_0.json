@@ -1,0 +1,972 @@
+{
+    "info": {
+        "version": 0
+    },
+    "param_types": [
+        {
+            "key": "type",
+            "value": "API",
+            "params": [
+                {
+                    "param": "api",
+                    "id": "scmi_perms",
+                    "category": "API"
+                },
+                {
+                    "param": "test",
+                    "id": "scmi_unit_test",
+                    "category": "API"
+                }
+            ],
+            "param_types": [
+                {
+                    "key": "api",
+                    "value": "CPU",
+                    "params": [
+                        {
+                            "param": "sema",
+                            "id": "semaphore",
+                            "category": "DEVICE"
+                        }
+                    ]
+                },
+                {
+                    "key": "api",
+                    "value": "FAULT",
+                    "params": [
+                        {
+                            "param": "reaction",
+                            "id": "lmm_react_types",
+                            "category": "FAULTS"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "type",
+            "value": "MDAC",
+            "params": [
+                {
+                    "param": "sa",
+                    "json_file": "soc_model",
+                    "id": "sa",
+                    "category": "MDAC"
+                },
+                {
+                    "param": "sid",
+                    "json_file": "soc_model",
+                    "id": "sid",
+                    "category": "MDAC"
+                },
+                {
+                    "param": "mdid",
+                    "json_file": "soc_model",
+                    "id": "mdid",
+                    "category": "MDAC"
+                },
+                {
+                    "param": "kpa",
+                    "json_file": "soc_model",
+                    "id": "kpa",
+                    "category": "MDAC"
+                }
+            ],
+            "infos": [
+                {
+                    "key": "trdc",
+                    "label": "TRDC Letter",
+                    "description": "TRDC Letter of the MDAC"
+                },
+                {
+                    "key": "master",
+                    "label": "MDAC Number",
+                    "description": "Number of the Master"
+                },
+                {
+                    "key": "core",
+                    "label": "Core (1) or Non-Core (0) Master",
+                    "description": "Number of the Master"
+                }
+            ],
+            "param_types": [
+                {
+                    "key": "core",
+                    "value": "0",
+                    "params": [
+                        {
+                            "param": "pa",
+                            "json_file": "soc_model",
+                            "id": "pa",
+                            "category": "MDAC"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "type",
+            "value": "MBC",
+            "params": [
+                {
+                    "param": "perm",
+                    "json_file": "soc_model",
+                    "id": "access_templates",
+                    "category": "MBC/MRC"
+                }
+            ],
+            "infos": [
+                {
+                    "key": "trdc",
+                    "label": "TRDC Letter",
+                    "description": "TRDC Letter of the MBC"
+                },
+                {
+                    "key": "mbc",
+                    "label": "MBC Number",
+                    "description": "Memory block checker number"
+                },
+                {
+                    "key": "mem",
+                    "label": "MBC Memory Region",
+                    "description": "Memory Block Checker's Region number"
+                }
+            ],
+            "param_types": [
+                {
+                    "key": "write_type",
+                    "value": "mem",
+                    "params": [
+                        {
+                            "param": "begin",
+                            "json_file": "soc_model",
+                            "id": "begin",
+                            "category": "MBC/MRC"
+                        },
+                        {
+                            "param": "size",
+                            "json_file": "soc_model",
+                            "id": "size",
+                            "category": "MBC/MRC"
+                        }
+                    ]
+                },
+                {
+                    "key": "write_type",
+                    "value": "block",
+                    "params": [],
+                    "infos": [
+                        {
+                            "key": "blk",
+                            "label": "Block Number",
+                            "description": "Block number"
+                        }
+                    ]
+                },
+                {
+                    "key": "write_type",
+                    "value": "range",
+                    "params": [],
+                    "infos": [
+                        {
+                            "key": "blk",
+                            "label": "Start Block Number",
+                            "description": "Block number"
+                        },
+                        {
+                            "key": "bcnt",
+                            "label": "Block Count",
+                            "description": "Number of blocks assigned"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "key": "type",
+            "value": "MRC",
+            "params": [
+                {
+                    "param": "perm",
+                    "json_file": "soc_model",
+                    "id": "access_templates",
+                    "category": "MBC/MRC"
+                },
+                {
+                    "param": "nodbg",
+                    "json_file": "soc_model",
+                    "id": "nodbg",
+                    "category": "MRC DEBUG"
+                },
+                {
+                    "param": "begin",
+                    "json_file": "soc_model",
+                    "id": "begin",
+                    "category": "MBC/MRC"
+                },
+                {
+                    "param": "size",
+                    "json_file": "soc_model",
+                    "id": "size",
+                    "category": "MBC/MRC"
+                }
+            ],
+            "infos": [
+                {
+                    "key": "trdc",
+                    "label": "TRDC letter",
+                    "description": "TRDC Letter of the MRC"
+                },
+                {
+                    "key": "mrc",
+                    "label": "MRC number",
+                    "description": "MRC number"
+                }
+            ]
+        },
+        {
+            "key": "type",
+            "value": "BCTRL_IPG_DEBUG",
+            "params": [],
+            "infos": [
+                {
+                    "key": "bctrl",
+                    "label": "BCTRL name",
+                    "description": "Block Control Name Letter"
+                },
+                {
+                    "key": "regn",
+                    "label": "BCTRL register number",
+                    "description": "Block Control Register Number to enable IPG debug"
+                },
+                {
+                    "key": "mask",
+                    "label": "BCTRL mask",
+                    "description": "Block Control mask to enable IPG debug"
+                }
+            ]
+        }
+    ],
+    "protocols": {
+        "label": "Protocols",
+        "description": "System Manager API protocols",
+        "items": [
+            {
+                "id": "base",
+                "label": "Agent Base",
+                "description": "Agent used to configure base protocol access to agents",
+                "prefix": "BASE",
+                "test": "TEST_BASE",
+                "static": true
+            },
+            {
+                "id": "pd",
+                "label": "Power Domain",
+                "description": "Device/board power domain",
+                "prefix": "PD",
+                "test": "TEST_PD",
+                "static": false
+            },
+            {
+                "id": "sys",
+                "label": "System Power Protocol",
+                "description": "system power protocol access rights",
+                "prefix": "SYS",
+                "test": "TEST_SYS",
+                "static": true
+            },
+            {
+                "id": "perf",
+                "label": "Performance Domain",
+                "description": "Device/board performance domain",
+                "prefix": "PERF",
+                "test": "TEST_PERF",
+                "static": false
+            },
+            {
+                "id": "clk",
+                "label": "Clock",
+                "description": "Device/board clock",
+                "prefix": "CLK",
+                "test": "TEST_CLK",
+                "static": false
+            },
+            {
+                "id": "sensor",
+                "label": "Sensor",
+                "description": "Device/board sensor",
+                "prefix": "SENSOR",
+                "test": "TEST_SENSOR",
+                "static": false
+            },
+            {
+                "id": "rst",
+                "label": "Reset Domain",
+                "description": "Device/board reset domain",
+                "prefix": "RST",
+                "test": "TEST_RST",
+                "static": false
+            },
+            {
+                "id": "volt",
+                "label": "Voltage Domain",
+                "description": "Device/board voltage domain",
+                "prefix": "VOLT",
+                "test": "TEST_VOLT",
+                "static": false
+            },
+            {
+                "id": "lmm",
+                "label": "LM Access",
+                "description": "Logical Machine used to configure LMM protocol access to LM",
+                "prefix": "LMM",
+                "test": "TEST_LMM",
+                "static": true
+            },
+            {
+                "id": "gpr",
+                "label": "GPR",
+                "description": "Device/board GPR",
+                "prefix": "GPR",
+                "test": "TEST_GPR",
+                "static": false
+            },
+            {
+                "id": "rtc",
+                "label": "RTC",
+                "description": "Device/board RTC",
+                "prefix": "RTC",
+                "test": "TEST_RTC",
+                "static": false
+            },
+            {
+                "id": "button",
+                "label": "Button",
+                "description": "Device button",
+                "prefix": "BUTTON",
+                "test": "TEST_BUTTON",
+                "static": false
+            },
+            {
+                "id": "cpu",
+                "label": "CPU",
+                "description": "Device CPU",
+                "prefix": "CPU",
+                "test": "TEST_CPU",
+                "static": false
+            },
+            {
+                "id": "perlpi",
+                "label": "LPI",
+                "description": "Device peripheral LPI",
+                "prefix": "PERLPI",
+                "test": "TEST_PERLPI",
+                "static": false
+            },
+            {
+                "id": "pin",
+                "label": "Pin Control",
+                "description": "Device pin control",
+                "prefix": "PIN",
+                "test": "TEST_PIN",
+                "static": false
+            },
+            {
+                "id": "daisy",
+                "label": "Pin Daisy",
+                "description": "Device pin daisy",
+                "prefix": "DAISY",
+                "test": "TEST_DAISY",
+                "static": false
+            },
+            {
+                "id": "ctrl",
+                "label": "Device/Board Control",
+                "description": "Device/board control",
+                "prefix": "CTRL",
+                "test": "TEST_CTRL",
+                "static": false
+            },
+            {
+                "id": "fault",
+                "label": "FuSa Fault",
+                "description": ">Device/board fault (for FuSa)",
+                "prefix": "FAULT",
+                "test": "TEST_FAULT",
+                "static": false
+            },
+            {
+                "id": "fusa",
+                "label": "FuSa Access",
+                "description": "Used to define access rights to the F-EENV functions (for FuSa)",
+                "prefix": "FUSA",
+                "test": "TEST_FUSA",
+                "static": true
+            }
+        ]
+    },
+    "setting_types": [
+        {
+            "id": "fusa_task_type",
+            "type": "enum",
+            "label": "FuSa Task Type",
+            "description": "Functional Safety task type",
+            "items": [
+                {
+                    "id": "handler",
+                    "label": "Handler",
+                    "description": "Handler task type (default)",
+                    "value": "handler"
+                },
+                {
+                    "id": "thread",
+                    "label": "Thread",
+                    "description": "Thread task type",
+                    "value": "thread"
+                }
+            ]
+        },
+        {
+            "id": "lmm_safe_type",
+            "type": "enum",
+            "label": "Safety Class",
+            "description": "Safety class of the SCMI Agent",
+            "items": [
+                {
+                    "id": "nseenv",
+                    "label": "NS-EENV",
+                    "description": "Non-Safe Agent (NS-EENV)",
+                    "value": "LMM_SAFE_TYPE_NSEENV"
+                },
+                {
+                    "id": "feenv",
+                    "label": "F-EENV",
+                    "description": "Foundation agent (F-EENV)",
+                    "value": "LMM_SAFE_TYPE_FEENV"
+                },
+                {
+                    "id": "seenv",
+                    "label": "S-EENV",
+                    "description": "Safe Agent (S-EENV)",
+                    "value": "LMM_SAFE_TYPE_SEENV"
+                }
+            ]
+        },
+        {
+            "id": "lmm_ss_type",
+            "type": "enum",
+            "label": "Start-Stop Command",
+            "description": "Start-stop command",
+            "items": [
+                {
+                    "id": "pd",
+                    "label": "Power",
+                    "description": "Power command - Start: Power on domain; Stop: Power off domain",
+                    "value": "LMM_SS_PD"
+                },
+                {
+                    "id": "perf",
+                    "label": "Performance",
+                    "description": "Performance command - Start/Stop: Set performance level to arg[0]",
+                    "value": "LMM_SS_PERF"
+                },
+                {
+                    "id": "clk",
+                    "label": "Clock",
+                    "description": "Clock command - Start: Set clock parent to arg[0] rate to arg[1] and enable; Stop: disable clock",
+                    "value": "LMM_SS_CLK"
+                },
+                {
+                    "id": "cpu",
+                    "label": "CPU",
+                    "description": "CPU command - Start: Start CPU; Stop: Stop CPU",
+                    "value": "LMM_SS_CPU"
+                },
+                {
+                    "id": "volt",
+                    "label": "Voltage",
+                    "description": "Voltage command - Start/Stop: Set voltage mode to arg[0]",
+                    "value": "LMM_SS_VOLT"
+                },
+                {
+                    "id": "rst",
+                    "label": "Reset",
+                    "description": "Reset command - Start/Stop: Reset domain, toggle/negate to argv[0], state to argv[1]. Note: bit[0] of arg[0] = toggle, bit[1] of arg[0] = assertNegate, arg[1] = resetState (default COLD)",
+                    "value": "LMM_SS_RST"
+                },
+                {
+                    "id": "ctrl",
+                    "label": "Control",
+                    "description": "Control command - Start/Stop: Set control to arg[]",
+                    "value": "LMM_SS_CTRL"
+                }
+            ]
+        },
+        {
+            "id": "lmm_react_types",
+            "type": "enum",
+            "label": "Reaction",
+            "description": "Fault reaction type",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized / Set up by Define",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "none",
+                    "label": "No Reaction",
+                    "description": "No reaction",
+                    "value": "LMM_REACT_NONE"
+                },
+                {
+                    "id": "sys_reset",
+                    "label": "System Reset",
+                    "description": "Reset the system",
+                    "value": "LMM_REACT_SYS_RESET"
+                },
+                {
+                    "id": "sys_shutdown",
+                    "label": "System Shutdown",
+                    "description": "Shutdown (power off) the system",
+                    "value": "LMM_REACT_SYS_SHUTDOWN"
+                },
+                {
+                    "id": "grp_reset",
+                    "label": "LM Group Reset",
+                    "description": "Reset an LM group",
+                    "value": "LMM_REACT_GRP_RESET"
+                },
+                {
+                    "id": "grp_shutdown",
+                    "label": "LM Group Shutdown",
+                    "description": "Shutdown (power off) an LM group",
+                    "value": "LMM_REACT_GRP_SHUTDOWN"
+                },
+                {
+                    "id": "lm_reset",
+                    "label": "LM Reset",
+                    "description": "Reset an LM",
+                    "value": "LMM_REACT_LM_RESET"
+                },
+                {
+                    "id": "lm_shutdown",
+                    "label": "LM Shutdown",
+                    "description": "Shutdown (power off) an LM",
+                    "value": "LMM_REACT_LM_SHUTDOWN"
+                },
+                {
+                    "id": "board",
+                    "label": "Board",
+                    "description": "Custom board handling",
+                    "value": "LMM_REACT_BOARD"
+                },
+                {
+                    "id": "fusa",
+                    "label": "FuSa",
+                    "description": "Clear via FuSa notifications",
+                    "value": "LMM_REACT_FUSA"
+                }
+            ]
+        },
+        {
+            "id": "lmm_auto_boot",
+            "type": "enum",
+            "label": "Auto Boot Condition",
+            "description": "Automatic boot condition",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "none",
+                    "label": "None",
+                    "description": "No LM auto boot",
+                    "value": "LMM_AUTO_NONE"
+                },
+                {
+                    "id": "button",
+                    "label": "Button",
+                    "description": "Auto boot from ON/OFF button",
+                    "value": "LMM_AUTO_BUTTON"
+                },
+                {
+                    "id": "rtc",
+                    "label": "RTC Alarm",
+                    "description": "Auto boot from RTC alarm",
+                    "value": "LMM_AUTO_RTC"
+                },
+                {
+                    "id": "both",
+                    "label": "Button and RTC Alarm",
+                    "description": "Always boot from button and RTC alarm",
+                    "value": "LMM_AUTO_BOTH"
+                }
+            ]
+        },
+        {
+            "id": "rpc_types",
+            "type": "enum",
+            "label": "RPC Type",
+            "description": "Remote Procedure Call Type",
+            "items": [
+                {
+                    "id": "none",
+                    "label": "None",
+                    "description": "No Remote Procedure Call",
+                    "value": "SM_RPC_NONE"
+                },
+                {
+                    "id": "scmi",
+                    "label": "SCMI",
+                    "description": "System Control and Management Interface",
+                    "value": "SM_RPC_SCMI"
+                }
+            ]
+        },
+        {
+            "id": "scmi_channel_types",
+            "type": "enum",
+            "label": "SCMI Channel Type",
+            "description": "SCMI channel type",
+            "items": [
+                {
+                    "id": "a2p",
+                    "label": "A2P Channel",
+                    "description": "Agent to Platform Channel",
+                    "value": "SM_SCMI_CHN_A2P"
+                },
+                {
+                    "id": "a2p_fast",
+                    "label": "A2P Fast Channel",
+                    "description": "Agent to Platform fast Channel",
+                    "value": "SM_SCMI_CHN_A2P_FAST"
+                },
+                {
+                    "id": "p2a",
+                    "label": "P2A Channel",
+                    "description": "Platform to Agent Channel",
+                    "value": "SM_SCMI_CHN_P2A"
+                },
+                {
+                    "id": "p2a_notify",
+                    "label": "P2A Notify Channel",
+                    "description": "Platform to Agent Notify Channel",
+                    "value": "SM_SCMI_CHN_P2A_NOTIFY"
+                },
+                {
+                    "id": "p2a_priority",
+                    "label": "P2A Priority Channel",
+                    "description": "Platform to Agent Priority Channel",
+                    "value": "SM_SCMI_CHN_P2A_PRIORITY"
+                }
+            ]
+        },
+        {
+            "id": "scmi_sequence",
+            "type": "enum",
+            "label": "Sequence Type",
+            "description": "SCMI sequence type",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "none",
+                    "label": "No Sequence",
+                    "description": "No sequence required",
+                    "value": "SM_SCMI_SEQ_NONE"
+                },
+                {
+                    "id": "token",
+                    "label": "Token Sequence",
+                    "description": "Sequence required in token",
+                    "value": "SM_SCMI_SEQ_TOKEN"
+                }
+            ]
+        },
+        {
+            "id": "scmi_perms",
+            "type": "enum",
+            "label": "API Permission",
+            "description": "System Manager API permission for resources",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized / Set up by Define",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "0",
+                    "label": "No Access (default)",
+                    "description": "No Access (default)",
+                    "value": "SM_SCMI_PERM_NONE"
+                },
+                {
+                    "id": "none",
+                    "label": "No Access",
+                    "description": "No Access",
+                    "value": "SM_SCMI_PERM_NONE"
+                },
+                {
+                    "id": "get",
+                    "label": "Read",
+                    "description": "Permission to read",
+                    "value": "SM_SCMI_PERM_GET"
+                },
+                {
+                    "id": "notify",
+                    "label": "Request Notifications",
+                    "description": "Permission to request notifications",
+                    "value": "SM_SCMI_PERM_NOTIFY"
+                },
+                {
+                    "id": "set",
+                    "label": "Set",
+                    "description": "Permission to set (setting per agent, aggregated across agents and LM)",
+                    "value": "SM_SCMI_PERM_SET"
+                },
+                {
+                    "id": "priv",
+                    "label": "Privileged Access",
+                    "description": "Privileged access (one setting per LM, aggregated across LM)",
+                    "value": "SM_SCMI_PERM_PRIV"
+                },
+                {
+                    "id": "exclusive",
+                    "label": "Exclusive Access",
+                    "description": "Exclusive access (one setting for the entire system)",
+                    "value": "SM_SCMI_PERM_EXCLUSIVE"
+                },
+                {
+                    "id": "all",
+                    "label": "Full Access",
+                    "description": "Full access",
+                    "value": "SM_SCMI_PERM_ALL"
+                }
+            ]
+        },
+        {
+            "id": "xport_types",
+            "type": "enum",
+            "label": "XPORT Type",
+            "description": "XPORT (transport) type",
+            "items": [
+                {
+                    "id": "none",
+                    "label": "None",
+                    "description": "No transport",
+                    "value": "SM_XPORT_NONE"
+                },
+                {
+                    "id": "smt",
+                    "label": "SMT",
+                    "description": "Shared Memory Transport",
+                    "value": "SM_XPORT_SMT"
+                }
+            ]
+        },
+        {
+            "id": "smt_crc_types",
+            "type": "enum",
+            "label": "Channel Check Type",
+            "description": "SMT channel check type",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "none",
+                    "label": "None",
+                    "description": "No CRC",
+                    "value": "SM_SMT_CRC_NONE"
+                },
+                {
+                    "id": "xor",
+                    "label": "XOR",
+                    "description": "Simple and fast 32-bit exclusive-OR sum",
+                    "value": "SM_SMT_CRC_XOR"
+                },
+                {
+                    "id": "j1850",
+                    "label": "J1850",
+                    "description": "J1850 standard CRC",
+                    "value": "SM_SMT_CRC_J1850"
+                },
+                {
+                    "id": "crc32",
+                    "label": "CRC32",
+                    "description": "CRC32 standard CRC",
+                    "value": "SM_SMT_CRC_CRC32"
+                }
+            ]
+        },
+        {
+            "id": "mailbox_types",
+            "type": "enum",
+            "label": "Mailbox Type",
+            "description": "Mailbox type",
+            "items": [
+                {
+                    "id": "none",
+                    "label": "None",
+                    "description": "No Mailbox",
+                    "value": "SM_MB_NONE"
+                },
+                {
+                    "id": "loopback",
+                    "label": "Loopback",
+                    "description": "Loopback Mailbox",
+                    "value": "SM_MB_LOOPBACK"
+                },
+                {
+                    "id": "mu",
+                    "label": "MU",
+                    "description": "Message Unit Mailbox",
+                    "value": "SM_MB_MU"
+                }
+            ]
+        },
+        {
+            "id": "mailbox_np_priority",
+            "type": "enum",
+            "label": "Mailbox Priority",
+            "description": "Mailbox priority",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "critical",
+                    "label": "Critical",
+                    "description": "Critical Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_CRITICAL"
+                },
+                {
+                    "id": "very_high",
+                    "label": "Very High",
+                    "description": "Very High Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_VERY_HIGH"
+                },
+                {
+                    "id": "high",
+                    "label": "High",
+                    "description": "High Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_HIGH"
+                },
+                {
+                    "id": "above_normal",
+                    "label": "Above Normal",
+                    "description": "Above Normal Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_ABOVE_NORMAL"
+                },
+                {
+                    "id": "normal",
+                    "label": "Normal",
+                    "description": "Normal Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_NORMAL"
+                },
+                {
+                    "id": "below_normal",
+                    "label": "Below Normal",
+                    "description": "Below Normal Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_BELOW_NORMAL"
+                },
+                {
+                    "id": "low",
+                    "label": "Low",
+                    "description": "Low Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_LOW"
+                },
+                {
+                    "id": "very_low",
+                    "label": "Very Low",
+                    "description": "Very Low Nonpreemptive IRQ Priority",
+                    "value": "IRQ_PRIO_NOPREEMPT_VERY_LOW"
+                }
+            ]
+        },
+        {
+            "id": "scmi_unit_test",
+            "type": "enum",
+            "label": "Unit Test",
+            "description": "Perform SCMI unit tests on resource",
+            "items": [
+                {
+                    "id": "",
+                    "label": "Not Initialized / Set up by Define",
+                    "description": "Value is not initialized, default value is used instead.",
+                    "value": ""
+                },
+                {
+                    "id": "false",
+                    "label": "Disable",
+                    "description": "Do not perform SCMI unit tests on selected resource.",
+                    "value": "false"
+                },
+                {
+                    "id": "true",
+                    "label": "Enable",
+                    "description": "Perform SCMI unit tests on selected resource.",
+                    "value": "true"
+                }
+            ]
+        },
+        {
+            "id": "semaphore",
+            "type": "integer",
+            "label": "Semaphore address",
+            "description": "The semaphore address is the memory address where a semaphore will be stored between the SM and another CPU. It needs to be in memory both the SM and other CPU can access. It is most often stored in an MU SRAM buffer and currently is used to work around a GIC access problem when resetting the AP platform."
+        },
+        {
+            "id": "lm_group",
+            "type": "integer",
+            "label": "LB Group",
+            "description": "Logical machine group number."
+        },
+        {
+            "id": "lm_rtime",
+            "type": "integer",
+            "label": "Relative Boot Time",
+            "description": "Boot time of LM in uS, relative to start of LM boot loop"
+        },
+        {
+            "id": "notify_buffer_depth",
+            "type": "integer",
+            "label": "Notification Buffer Depth",
+            "description": "Notification Buffer Depth"
+        },
+        {
+            "id": "sma",
+            "type": "integer",
+            "label": "Shared Memory Address",
+            "description": "Shared Memory Address"
+        },
+        {
+            "id": "arg1",
+            "type": "integer",
+            "label": "Argument 1",
+            "description": "First argument of start/stop command associated with resource"
+        },
+        {
+            "id": "arg2",
+            "type": "integer",
+            "label": "Argument 2",
+            "description": "Second argument of start/stop command associated with resource"
+        }
+    ]
+}

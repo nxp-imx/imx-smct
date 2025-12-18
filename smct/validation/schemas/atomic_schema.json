@@ -1,0 +1,268 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "description": "Schema for atomic resources configuration",
+  "definitions": {
+    "permission_block": {
+      "type": "object",
+      "properties": {
+        "begin": {
+          "type": ["integer", "string"],
+          "description": "Starting address of the permission block"
+        },
+        "size": {
+          "type": ["integer", "string"],
+          "description": "Size of the permission block"
+        },
+        "domains": {
+          "type": "object",
+          "description": "Domain range configuration",
+          "properties": {
+            "from": {
+              "type": "integer",
+              "description": "Starting domain number",
+              "minimum": 0
+            },
+            "to": {
+              "type": "integer",
+              "description": "Ending domain number",
+              "minimum": 0
+            }
+          },
+          "required": ["from", "to"]
+        },
+        "permission": {
+          "type": "string",
+          "description": "Access permission type"
+        }
+      },
+      "required": ["begin", "domains", "permission", "size"]
+    },
+    "base_resource": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the resource",
+          "pattern": "^[A-Za-z0-9_]+$"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of the resource"
+        },
+        "desc": {
+          "type": "string",
+          "description": "Description of the resource"
+        }
+      },
+      "required": ["name", "type"]
+    }
+  },
+  "properties": {
+    "AtomicResources": {
+      "type": "object",
+      "description": "Container for all atomic resource configurations",
+      "properties": {
+        "API": {
+          "type": "array",
+          "description": "List of API configurations",
+          "items": {
+            "allOf": [
+              {"$ref": "#/definitions/base_resource"},
+              {
+                "properties": {
+                  "cat": {
+                    "type": "string",
+                    "description": "Category of the API"
+                  },
+                  "api": {
+                    "type": "string",
+                    "description": "API identifier or path"
+                  },
+                  "auto": {
+                    "type": "boolean",
+                    "description": "Flag indicating if the API is automatically configured"
+                  }
+                },
+                "required": ["api", "cat"]
+              }
+            ]
+          }
+        },
+        "MDAC": {
+          "type": "array",
+          "description": "Memory Domain Access Controller configurations",
+          "items": {
+            "allOf": [
+              {"$ref": "#/definitions/base_resource"},
+              {
+                "properties": {
+                  "trdc": {
+                    "type": "string",
+                    "description": "TRDC instance identifier",
+                    "pattern": "^[A-Z]$"
+                  },
+                  "master": {
+                    "type": "integer",
+                    "description": "Master ID number",
+                    "minimum": 0
+                  },
+                  "core": {
+                    "type": "integer",
+                    "description": "Core number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "reg": {
+                    "type": "integer",
+                    "description": "Register number",
+                    "minimum": 0
+                  },
+                  "rcnt": {
+                    "type": "integer",
+                    "description": "Register count",
+                    "minimum": 1
+                  }
+                },
+                "required": ["core", "desc", "master", "reg", "trdc"]
+              }
+            ]
+          }
+        },
+        "MBC": {
+          "type": "array",
+          "description": "Memory Block Controller configurations",
+          "items": {
+            "allOf": [
+              {"$ref": "#/definitions/base_resource"},
+              {
+                "properties": {
+                  "trdc": {
+                    "type": "string",
+                    "description": "TRDC instance identifier",
+                    "pattern": "^[A-Z]$"
+                  },
+                  "mbc": {
+                    "type": "integer",
+                    "description": "MBC instance number",
+                    "minimum": 0
+                  },
+                  "mem": {
+                    "type": "integer",
+                    "description": "Memory region number",
+                    "minimum": 0
+                  },
+                  "blk": {
+                    "type": "integer",
+                    "description": "Block number",
+                    "minimum": 0
+                  },
+                  "write_type": {
+                    "type": "string",
+                    "enum": ["block", "range", "mem"],
+                    "description": "Type of write access"
+                  },
+                  "default_permissions": {
+                    "type": "array",
+                    "description": "Default permission configurations",
+                    "items": {"$ref": "#/definitions/permission_block"}
+                  },
+                  "bcnt": {
+                    "type": "integer",
+                    "description": "Block count",
+                    "minimum": 1
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "write_type": {"const": "block"}
+                      }
+                    },
+                    "then": {
+                      "required": ["blk"]
+                    }
+                  },
+                  {
+                    "if": {
+                      "properties": {
+                        "write_type": {"const": "range"}
+                      }
+                    },
+                    "then": {
+                      "required": ["blk", "bcnt"]
+                    }
+                  }
+                ],
+                "required": ["desc", "mbc", "mem", "trdc", "write_type"]
+              }
+            ]
+          }
+        },
+        "BCTRL_IPG_DEBUG": {
+          "type": "array",
+          "description": "Debug Bus Control configurations",
+          "items": {
+            "allOf": [
+              {"$ref": "#/definitions/base_resource"},
+              {
+                "properties": {
+                  "bctrl": {
+                    "type": "string",
+                    "description": "Bus control identifier",
+                    "pattern": "^[A-Z]$"
+                  },
+                  "regn": {
+                    "type": "integer",
+                    "description": "Register number",
+                    "minimum": 0
+                  },
+                  "mask": {
+                    "type": ["integer", "string"],
+                    "description": "Bit mask for the control register"
+                  }
+                },
+                "required": ["bctrl", "desc", "mask", "regn"]
+              }
+            ]
+          }
+        },
+        "MRC": {
+          "type": "array",
+          "description": "Memory Region Controller configurations",
+          "items": {
+            "allOf": [
+              {"$ref": "#/definitions/base_resource"},
+              {
+                "properties": {
+                  "trdc": {
+                    "type": "string",
+                    "description": "TRDC instance identifier",
+                    "pattern": "^[A-Z]$"
+                  },
+                  "mrc": {
+                    "type": "integer",
+                    "description": "MRC instance number",
+                    "minimum": 0
+                  },
+                  "default_permissions": {
+                    "type": "array",
+                    "description": "Default permission configurations",
+                    "items": {"$ref": "#/definitions/permission_block"}
+                  }
+                },
+                "required": ["desc", "mrc", "trdc"]
+              }
+            ]
+          }
+        }
+      },
+      "additionalProperties": {
+        "type": "array",
+        "description": "Additional resource types can be added dynamically"
+      }
+    }
+  },
+  "required": ["AtomicResources"]
+}

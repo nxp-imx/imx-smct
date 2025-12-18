@@ -1,0 +1,54 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "type": "object",
+ "description": "Schema for macro resources configuration",
+ "properties": {
+  "MacroResources": {
+   "type": "array",
+   "description": "List of macro resource configurations",
+   "minItems": 1,
+   "items": {
+    "type": "object",
+    "description": "Macro resource configuration",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "Name of the macro resource (required)",
+      "minLength": 1
+     },
+     "atoms": {
+      "type": "array",
+      "description": "List of atomic resource names that compose this macro (required)",
+      "minItems": 1,
+      "items": {
+       "type": "string",
+       "description": "Name of an atomic resource",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     },
+     "params": {
+      "type": "array", 
+      "description": "List of required templates for this macro (optional)",
+      "items": {
+       "type": "string",
+       "description": "Name of a parameter",
+       "minLength": 1
+      },
+      "uniqueItems": true
+     }
+    },
+    "required": [
+     "atoms",
+     "name"
+    ],
+    "additionalProperties": false
+   },
+   "uniqueItems": true
+  }
+ },
+ "required": [
+  "MacroResources"
+ ],
+ "additionalProperties": false
+}

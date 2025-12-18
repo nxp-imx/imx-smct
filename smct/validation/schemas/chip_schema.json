@@ -1,0 +1,218 @@
+{
+ "$schema": "http://json-schema.org/draft-07/schema#",
+ "type": "object",
+ "description": "Schema for chip-level configuration",
+ "properties": {
+  "TRDCs": {
+   "type": "array",
+   "description": "List of TRDC (Trust Domain Controller) configurations (required)",
+   "items": {
+    "type": "object",
+    "description": "TRDC configuration object",
+    "properties": {
+     "trdc": {
+      "type": "string",
+      "description": "TRDC instance identifier (required)"
+     },
+     "name": {
+      "type": "string", 
+      "description": "Name of the TRDC instance (required)"
+     },
+     "ndid": {
+      "type": "integer",
+      "description": "Number of domains in this TRDC (required)",
+      "minimum": 0
+     },
+     "nmbc": {
+      "type": "integer",
+      "description": "Number of Memory Block Controllers (required)",
+      "minimum": 0
+     },
+     "nmrc": {
+      "type": "integer",
+      "description": "Number of Memory Region Controllers (required)",
+      "minimum": 0
+     },
+     "nmstr": {
+      "type": "integer",
+      "description": "Number of masters (required)",
+      "minimum": 0
+     },
+     "kpaen": {
+      "type": "integer",
+      "description": "KPA enable (not required)",
+      "minimum": 0
+     },
+     "sidsz": {
+      "type": "integer",
+      "description": "SID size (not required)",
+      "minimum": 0
+     },
+     "MBCs": {
+      "type": "array",
+      "description": "Memory Block Controller configurations (required)",
+      "items": {
+       "type": "object",
+       "description": "MBC configuration",
+       "properties": {
+        "mbc": {
+         "type": "integer",
+         "description": "MBC instance number (required)",
+         "minimum": 0
+        },
+        "mem": {
+         "type": "array",
+         "description": "Memory region configurations (required)",
+         "items": {
+          "type": "object",
+          "description": "Memory region configuration (can be empty)",
+          "properties": {
+           "origin": {
+            "type": ["string", "integer"],
+            "description": "Base address of the memory region (optional)"
+           },
+           "nblks": {
+            "type": "integer",
+            "description": "Number of blocks in this memory region (optional)",
+            "minimum": 1
+           },
+           "blksize": {
+            "type": ["string", "integer"],
+            "description": "Size of each memory block (optional)"
+           }
+          },
+          "additionalProperties": false,
+          "dependencies": {
+           "origin": ["nblks", "blksize"],
+           "nblks": ["origin", "blksize"],
+           "blksize": ["origin", "nblks"]
+          }
+         }
+        }
+       },
+       "required": [
+        "mbc",
+        "mem"
+       ],
+       "additionalProperties": false
+      }
+     },
+     "MRCs": {
+      "type": "array",
+      "description": "Memory Region Controller configurations (required)",
+      "items": {
+       "type": "object",
+       "description": "MRC configuration",
+       "properties": {
+        "mrc": {
+         "type": "integer",
+         "description": "MRC instance number (required)",
+         "minimum": 0
+        },
+        "nrgns": {
+         "type": "integer",
+         "description": "Number of regions in this MRC (required)",
+         "minimum": 0
+        },
+        "memory_region_offset": {
+         "type": "integer",
+         "description": "Base offset for memory regions (required)",
+         "minimum": 0
+        }
+       },
+       "required": [
+        "memory_region_offset",
+        "mrc",
+        "nrgns"
+       ],
+       "additionalProperties": false
+      }
+     }
+    },
+    "required": [
+     "MBCs",
+     "MRCs", 
+     "name",
+     "ndid",
+     "nmbc",
+     "nmrc",
+     "nmstr",
+     "trdc"
+    ],
+    "additionalProperties": false
+   }
+  },
+  "BCTRLs": {
+   "type": "array",
+   "description": "Bus Controller configurations (required)",
+   "items": {
+    "type": "object",
+    "description": "Bus Controller configuration",
+    "properties": {
+     "bctrl": {
+      "type": "string",
+      "description": "Bus Controller identifier (required)"
+     },
+     "name": {
+      "type": "string",
+      "description": "Name of the Bus Controller (required)"
+     },
+     "regs": {
+      "type": "object",
+      "description": "Register configurations (required)",
+      "properties": {
+       "IPG_DEBUG": {
+        "type": "array",
+        "description": "IPG Debug register configurations (required)",
+        "items": {
+         "type": "object",
+         "description": "IPG Debug configuration",
+         "properties": {
+          "cpu": {
+           "type": "string",
+           "description": "CPU identifier (required)",
+           "pattern": "^CPU_[A-Z0-9]+$"
+          },
+          "offset": {
+           "type": "array",
+           "description": "List of register offsets (required)",
+           "items": {
+            "type": "integer",
+            "description": "Register offset value"
+           }
+          }
+         },
+         "required": [
+          "cpu",
+          "offset"
+         ]
+        }
+       }
+      },
+      "required": [
+       "IPG_DEBUG"
+      ]
+     }
+    },
+    "required": [
+     "bctrl",
+     "name",
+     "regs"
+    ]
+   }
+  },
+  "Mixes": {
+   "type": "array",
+   "description": "List of mix configurations (required)",
+   "items": {
+    "type": "string",
+    "description": "Mix identifier"
+   }
+  }
+ },
+ "required": [
+  "BCTRLs",
+  "Mixes",
+  "TRDCs"
+ ]
+}
