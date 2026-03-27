@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Main module of the System Manager configuration tool"""
+
 import argparse
 import logging
 import os.path
@@ -13,7 +14,7 @@ from typing import List, Optional
 
 from smct import utils
 from smct.configuration.configuration_provider import ConfigurationProvider
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.generation.config_generator import ConfigGenerator
 from smct.generation.export_cfg import CfgExporter
 from smct.model.chip_model_provider import ChipModelProvider
@@ -278,7 +279,7 @@ def _generate_all(output_dir: str, force: bool = False) -> None:
 def _store_cfg_file(output_filename: str, force: bool = False) -> None:
     """Exports configuration to a legacy CFG file format"""
     try:
-        (directory, name) = os.path.split(output_filename)
+        directory, name = os.path.split(output_filename)
         exporter = CfgExporter(name)
         exporter.generate(ConfigurationProvider.get_configuration(), directory, force=force)
     except CATCHABLE_EXCEPTIONS as e:

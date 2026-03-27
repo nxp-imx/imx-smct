@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 from typing import List
 
 from smct.generation.trdc.mbc_block import MbcBlock
@@ -12,11 +13,11 @@ from smct.model.model_trdc import TrdcModel
 from smct.resources.res_mbc import MbcResource
 
 
-def _lists_equals(input_list: List[int], expected_list: List[int]):
+def _lists_equals(input_list: List[int], expected_list: List[int]) -> bool:
     return set(input_list) == set(expected_list)
 
 
-def test_basic():
+def test_basic() -> None:
     # Arrange
     model = MbcGenerationModel()
     raw1 = {"name": "Lorem", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "42", "bcnt": "2"}
@@ -33,7 +34,8 @@ def test_basic():
     expected_blocks = {1: [block1], 5: [block2]}
     assert blocks == expected_blocks
 
-def test_get_permissions():
+
+def test_get_permissions() -> None:
     # Arrange
     model = MbcGenerationModel()
     raw1 = {"name": "Lorem", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "0", "bcnt": "32"}
@@ -58,7 +60,7 @@ def test_get_permissions():
     assert _lists_equals(model.get_permissions(), expected_perms)
 
 
-def test_sort_blocks():
+def test_sort_blocks() -> None:
     # Arrange
     model = MbcGenerationModel()
     raw1 = {"name": "Lorem", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "10", "bcnt": "22"}
@@ -79,13 +81,11 @@ def test_sort_blocks():
     model.add_block(block3)
     model.add_block(block4)
     # Assert
-    expected_blocks = {1: [block1, block2], 2:[block3, block4]}
+    expected_blocks = {1: [block1, block2], 2: [block3, block4]}
     blocks = model.get_blocks()
     assert blocks == expected_blocks
 
     model.sort_blocks()
-    expected_blocks = {1: [block2, block1], 2:[block4, block3]}
+    expected_blocks = {1: [block2, block1], 2: [block4, block3]}
     blocks = model.get_blocks()
     assert blocks == expected_blocks
-
-

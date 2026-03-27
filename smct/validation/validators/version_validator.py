@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module with version related validations"""
+
 import logging
 import os
 from typing import List
@@ -31,23 +33,26 @@ def _validate_sm_fw_compatibility(configuration: ConfigurationData, result: List
     regex_str = r"my \$configVer\s=\s(\d+)"
     parser.add_regex(regex_str)
     file_path = os.path.join(configuration.get_sm_fw_root_directory(), "configs", "configtool.pl")
-    parser.parse(file_path)
-    parser_results = parser.get_results()
-    if regex_str not in parser_results:
-        logger.error("Missing SM FW configuration version in sources", extra={"source": file_path})
-        return
-    lines = parser_results[regex_str]
-    if len(lines) > 1:
-        logger.error("There is more than one line with SM FW configuration version", extra={"source": file_path})
-        return
-    perl_sm_fw_compatibility_version = lines[0].group(1)
-    if str(configuration_sm_fw_compatibility_version) != str(perl_sm_fw_compatibility_version):
-        msg = (
-            f"Incompatible versions of configuration files. "
-            f"SM FW supports version {perl_sm_fw_compatibility_version}"
-            f", but this tool supports version {configuration_sm_fw_compatibility_version}"
-        )
-        result.append(ValidationEntry(logging.ERROR, file_path, msg))
+    if os.path.exists(file_path):
+        parser.parse(file_path)
+        parser_results = parser.get_results()
+        if regex_str not in parser_results:
+            logger.error("Missing SM FW configuration version in sources", extra={"source": file_path})
+            return
+        lines = parser_results[regex_str]
+        if len(lines) > 1:
+            logger.error("There is more than one line with SM FW configuration version", extra={"source": file_path})
+            return
+        perl_sm_fw_compatibility_version = lines[0].group(1)
+        if str(configuration_sm_fw_compatibility_version) != str(perl_sm_fw_compatibility_version):
+            msg = (
+                f"Incompatible versions of configuration files. "
+                f"SM FW supports version {perl_sm_fw_compatibility_version}"
+                f", but this tool supports version {configuration_sm_fw_compatibility_version}"
+            )
+            result.append(ValidationEntry(logging.ERROR, file_path, msg))
+    else:
+        logger.info("SM FW configuration tool (configtool.pl) not found", extra={"source": file_path})
 
 
 class VersionValidator(ValidatorBase):

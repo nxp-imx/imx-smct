@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "smct"
-version = "1.0.0"
+dynamic = ["version"]
 description = "System Manager Configuration Tool for NXP SM firmware"
 readme = "readme.md"
-authors = [{ name = "NXP", email = "mcux_config_tools_data_core@NXP1.onmicrosoft.com" }]
-license = { text = "BSD-3-Clause" }
+authors = [{ name = "NXP Semiconductors", email = "mcux_config_tools_data_core@NXP1.onmicrosoft.com" }]
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 dependencies = [
     "fastjsonschema>=2.18.0",
@@ -24,18 +24,14 @@ classifiers = [
     "Topic :: System :: Hardware",
     "Topic :: Utilities",
 ]
-
 [project.scripts]
-smct = "smct:main"
+smct = "smct.smct:main"
 
-[tool.setuptools]
-package-dir = {"" = "smct"}
-py-modules = ["smct"]
 
 [tool.setuptools.packages.find]
-where = ["smct"]
-exclude = ["tests*", "test_resources*"]
-
+where = ["."]
+include = ["smct*"]
+exclude = ["tests*", "test_resources*", "smct.py"]
 [project.optional-dependencies]
 dev = [
     "black>=24.3.0",
@@ -50,9 +46,15 @@ test = [
     "pytest-xdist>=3.5.0",
 ]
 
+[tool.setuptools.package-data]
+smct = ["../sm_model/**/*.json"]
+
+[tool.setuptools.dynamic]
+version = {attr = "smct._version.__version__"}
+
 [project.urls]
-Code = "https://bitbucket.sw.nxp.com/scm/mpexc/smct.git"
-"Documentation" = "https://github.com/nxp-imx/imx-smct/readme.md"
+Code = "https://github.com/nxp-imx/imx-smct/"
+Documentation = "https://github.com/nxp-imx/imx-smct/blob/main/readme.md"
 
 [tool.black]
 line-length = 160
@@ -66,17 +68,20 @@ src_paths = ["smct", "tests"]
 
 [tool.mypy]
 python_version = "3.10"
-warn_unused_configs = false
+warn_unused_configs = true
 warn_incomplete_stub = true
 disallow_untyped_defs = true
 mypy_path = "stubs"
-ignore_missing_imports = true
 cache_dir = ".cache/.mypy_cache"
 implicit_reexport = false
 strict_equality = true
 strict_optional = true
 no_implicit_optional = true
-
+[[tool.mypy.overrides]]
+module = [
+    "fastjsonschema.*",
+]
+ignore_missing_imports = true
 [tool.ruff]
 line-length = 160
 target-version = "py310"
@@ -85,13 +90,26 @@ target-version = "py310"
 select = ["E", "F", "W"]
 ignore = ["E501"]
 
+[tool.gitcov]
+skip-files = ""
+repo-path = "."
+module = "codecheck"
+coverage-report = "reports/coverage.xml"
+coverage-cutoff = 0.8
+parent-branch = "origin/26.03/integration"
+include-merges = 0
+verbose = 0
+debug = 0
+full-file-test = 0
+
 [tool.nxp_codecheck]
-git_parent_branch = "origin/25.12/integration"
+git_parent_branch = "origin/26.03/integration"
 output_directory = "reports"
 default_check_paths = ["smct"]
 
 checkers = [
     { "pytest" = { timeout = 2000 } },
+    { "gitcov" = { info_only = true } },
     { "pylint" = { timeout = 300 } },
     { "mypy" = { timeout = 300 } },
     # "dependencies",

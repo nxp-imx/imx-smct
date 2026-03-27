@@ -32,7 +32,7 @@ SMCT provides a complete workflow for managing System Manager configurations:
 - Create and activate a virtual environment (venv, pipenv) to avoid conflicts with other packages (recommended)
 - Upgrade pip to the latest version
 - Get the System Manager Firmware (SM FW) project, it can be downloaded from https://github.com/nxp-imx/imx-sm
-- Place the SMCT CLI tool either within the SM FW project root directory or at the same hierarchical level (recommeneded)
+- Place the SMCT CLI tool either within the SM FW project root directory or at the same hierarchical level (recommended)
   - Default SM FW root directory path is `../` (can be overridden with `--sm_dir`)
 
 ## Installation
@@ -41,16 +41,30 @@ SMCT provides a complete workflow for managing System Manager configurations:
 To install SMCT from the GitHub repository sources:
 ```bash
 git clone https://github.com/nxp-imx/imx-smct.git
+```
+
+```bash
 cd imx-smct
 ```
+
 ### Virtual environment setup
 Create and activate the virtual environment and install the dependencies using the TOML configuration:
 ```bash
 python3 -m venv venv
+```
+
+```bash
 source venv/bin/activate
+```
+
+```bash
 python -m pip install --upgrade pip
+```
+
+```bash
 pip install -U -e .
 ```
+
 Alternatively, install dependencies:
 ```bash
 pip install -r requirements.txt
@@ -116,12 +130,13 @@ The SM FW Makefile uses the **SMCT** environment variable to locate the SMCT CLI
 
 Using Makefile, compile the SM firmware application with the specified configuration in CFG using the SMCT CLI:
 
-```bash 
-make cfg config=mx95evk SMCT=../smct`
+```bash
+make cfg config=mx95evk SMCT=../smct
 ```
+
 Alternatively:
-```bash 
-make all config=mx95evk SMCT=../smct`
+```bash
+make all config=mx95evk SMCT=../smct
 ```
 
 For more details, see the SM FW documentation.
@@ -196,7 +211,7 @@ The following options can be used to run SMCT CLI
                                         Example: --store_cfg_file output/board_config.cfg
 ```
 
-### Device/board selection (for the SM GUI tool) 
+### Device/board selection (internal use - SM GUI tool)
 ```
 -l, --load_device           Load SM FW files related to a specific device. This option requires additional options -d/--device and -b/--board to be specified.
                                 The purpose is to parse device files in the SM GUI tool.   

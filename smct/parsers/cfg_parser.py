@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to parser of the CFG files"""
+
 import logging
 import os.path
 import re
@@ -12,7 +13,7 @@ import typing
 from typing import Any, Dict, List, Sequence
 
 from smct import utils
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.model.model_trdc import TrdcModel
 from smct.owners.owner_agent import MailboxLoopback, MailboxMu, ScmiAgent, ScmiChannel, SmtChannel
 from smct.owners.owner_dom import DOM
@@ -257,7 +258,7 @@ class CfgFileParser:
             (re.compile(r"\bBCTRL_CONFIG_(\w)\b"), CfgCommandParser.parse_command_bctrl_config_a),
             (re.compile(r"\bDOM(\d+)\b"), CfgCommandParser.parse_command_dom_n),
             (re.compile(r"\bLM(\d+)\b"), CfgCommandParser.parse_command_lm_n),
-            (re.compile(r"\bSCMI_AGENT(\d+)\b"), CfgCommandParser.parse_command_scmi_agent_n),
+            (re.compile(r"\bSCMI_AGENT(\d*)\b"), CfgCommandParser.parse_command_scmi_agent_n),
             (re.compile(r"\bDEBUG\b"), CfgCommandParser.parse_command_debug),
             (re.compile(r"\bMIX\b"), CfgCommandParser.parse_command_mix),
             (re.compile(r"\bMAKE\b"), CfgCommandParser.parse_command_make),
@@ -459,7 +460,9 @@ class CfgFileParser:
             file_path: Original file path
         """
         self._current_file = absolute_file_path
-
+        if not os.path.exists(absolute_file_path):
+            logger.error("File not found: %s", absolute_file_path, extra={"source": absolute_file_path})
+            return
         with open(absolute_file_path, "r", encoding="utf-8") as f:
             line = ""
             line_num = 0
@@ -830,7 +833,7 @@ class CfgCommandParser:
             while utils.contains_attribute_in_list(atoms, "var"):
                 mak_var = utils.get_variable_from_list(atoms, remove=True)
                 if mak_var:
-                    (variable_string, *value_string) = mak_var.split("|")
+                    variable_string, *value_string = mak_var.split("|")
                     if not value_string:
                         ConfigurationProvider.get_configuration().set_mak_variable(variable_string, 1)
                     elif len(value_string) == 1:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module for generating configuration file in backward-compatible .cfg format"""
@@ -91,6 +91,11 @@ class CfgExporter(GeneratorBase):
             make_macro.append(f"soc={conf.get_device_name()}")
             make_macro.append(f"board={conf.get_board_name()}")
             make_macro.append(f"build={conf.get_build_tool()}")
+            for mak_variable, mak_value in conf.get_mak_variables():
+                if mak_value == 1:
+                    make_macro.append(f"var={mak_variable}")
+                else:
+                    make_macro.append(f"var={mak_variable}|{mak_value}")
             self._print(make_macro.get())
 
             # DOX     name=MX95EVK, desc="i.MX95 EVK Configuration Data"

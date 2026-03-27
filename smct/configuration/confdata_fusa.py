@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module implementing FUSA-related subset of user configuration"""
@@ -61,7 +61,13 @@ class FusaTask:
         elif task_type is not None:
             source = "/".join(["user_config", self._name])
             validation_id = ".".join(["FUSA_TASK", self._name, "type"])
-            logger.warning("Invalid FUSA periodic task type '%s' for FUSA task '%s'", task_type, name, extra={"source": source, "validation_id": validation_id})
+            logger.warning(
+                "Invalid FUSA periodic task type '%s' for FUSA task '%s', use one of '%s'",
+                task_type,
+                name,
+                "|".join(FusaTask.task_types.keys()),
+                extra={"source": source, "validation_id": validation_id},
+            )
         self._comment: str = comment if comment else ""
 
     def get_name(self) -> str:

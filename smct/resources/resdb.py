@@ -1,21 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module with resource database"""
+
 import json
+import logging
 import os
 import typing
 from typing import Any, Dict, Generator, List
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.owners.owner_base import AssignedDefine
 from smct.resources.res_api import ApiResource
 from smct.resources.resfactory import atomic_resource_from_raw
 from smct.resources.resource_base import AtomicResource, MacroResource
 from smct.utils import validate_json
+
+logger = logging.getLogger()
 
 
 class ResourceDbException(CfgToolException):
@@ -333,29 +338,25 @@ class ResourceDb:
         Returns:
             bool: True if loading was successful, False otherwise
         """
-        file_name = os.path.join(smct_configs_folder, "atomic_resources.json")
-        json_object = None
-        with open(file_name, "r", encoding="utf-8") as file:
-            json_object = json.load(file)
-        if json_object is None:
-            return False
-        validate_json(json_object, file_name, "atomic_schema.json", "warning")
-        self._parse_atoms(json_object["AtomicResources"])
-        json_object = None
-        file_name = os.path.join(smct_configs_folder, "macro_resources.json")
-        with open(file_name, "r", encoding="utf-8") as file:
-            json_object = json.load(file)
-        if json_object is None:
-            return False
-        validate_json(json_object, file_name, "macro_schema.json", "warning")
-        self._parse_macros(json_object["MacroResources"])
-        json_object = None
-        file_name = os.path.join(smct_configs_folder, "user_configuration.json")
-        with open(file_name, "r", encoding="utf-8") as file:
-            json_object = json.load(file)
-        if json_object is None:
-            return False
-        validate_json(json_object, file_name, "user_schema.json", "warning")
-        self._parse_auto_resources(json_object["AutomaticResources"])
-        self._parse_macros(json_object["UserResources"], user_defined=True)
+        for file_name in ["atomic_resources.json", "macro_resources.json", "user_configuration.json"]:
+            file_path = os.path.join(smct_configs_folder, file_name)
+            if not os.path.exists(file_path):
+                logger.error("File not found: %s", file_path, extra={"source": file_path})
+                return False
+            json_object = None
+            with open(file_path, "r", encoding="utf-8") as file:
+                json_object = json.load(file)
+            if json_object is None:
+                return False
+
+            if "atomic" in file_name:
+                validate_json(json_object, file_name, "atomic_schema.json", "warning")
+                self._parse_atoms(json_object["AtomicResources"])
+            elif "macro" in file_name:
+                validate_json(json_object, file_name, "macro_schema.json", "warning")
+                self._parse_macros(json_object["MacroResources"])
+            elif "user" in file_name:
+                validate_json(json_object, file_name, "user_schema.json", "warning")
+                self._parse_auto_resources(json_object["AutomaticResources"])
+                self._parse_macros(json_object["UserResources"], user_defined=True)
         return True

@@ -1,29 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-import pytest
+
 
 from smct.resources.res_api import ApiResource
 from smct.resources.resource_base import AtomicResource, MacroResource
 
 
-def test_get_name():
+def test_get_name() -> None:
     macro = MacroResource("Lorem")
     assert macro.get_name() == "Lorem"
 
 
-def test_is_empty():
+def test_is_empty() -> None:
     macro = MacroResource("Lorem")
     atom = AtomicResource({"name": "Ipsum", "type": "API"})
     assert macro.is_empty()
     macro.add_atomic_resource(atom)
-    assert  not macro.is_empty()
+    assert not macro.is_empty()
 
 
-def test_add_get_atomic_resource():
+def test_add_get_atomic_resource() -> None:
     macro = MacroResource("Lorem")
     atom_1 = AtomicResource({"name": "Ipsum", "type": "API"})
     atom_2 = AtomicResource({"name": "Dolor", "type": "API"})
@@ -43,7 +43,7 @@ def test_add_get_atomic_resource():
     assert atom_2 in atoms
 
 
-def test_add_get_parameters():
+def test_add_get_parameters() -> None:
     macro = MacroResource("Lorem")
     parameters = macro.get_parameters()
     assert len(parameters) == 0
@@ -54,7 +54,7 @@ def test_add_get_parameters():
     assert "DFMT0" in parameters
 
 
-def test_get_assignment_parameters():
+def test_get_assignment_parameters() -> None:
     macro = MacroResource("Lorem")
     assignment_parameters = macro.get_assignment_parameters(["test"])
     assert assignment_parameters is None
@@ -63,4 +63,3 @@ def test_get_assignment_parameters():
     assignment_parameters = macro.get_assignment_parameters(["test"])
     assert assignment_parameters is not None
     assert "test" in assignment_parameters
-

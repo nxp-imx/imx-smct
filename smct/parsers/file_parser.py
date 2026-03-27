@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to parsing generic files"""
+
+import logging
+import os
 import re
 from typing import Dict, List
+
+logger = logging.getLogger()
 
 
 class FileParser:
@@ -30,6 +36,9 @@ class FileParser:
         Args:
             file_path: Path to the file to parse
         """
+        if not os.path.exists(file_path):
+            logger.error("File not found: %s", file_path, extra={"source": file_path})
+            return
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
             for pattern_str in self._patterns:

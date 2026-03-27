@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to user configuration"""
+
 import json
 import logging
 import os
@@ -13,7 +15,7 @@ from typing import Any, Dict, List, Tuple
 
 from smct.configuration.confdata_fusa import FusaConfigurationData, FusaDefine, FusaTask
 from smct.configuration.confdata_loader import ConfigLoader
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.model.chip_model_provider import ChipModelProvider
 from smct.model.model_bctrl import BctrlModel
 from smct.model.model_trdc import TrdcModel
@@ -831,6 +833,9 @@ class ConfigurationData:
         """
         file_name = os.path.join(folder, "user_configuration.json")
         json_object = None
+        if not os.path.exists(file_name):
+            logger.error("File not found: %s", file_name, extra={"source": file_name})
+            return
         with open(file_name, "r", encoding="utf-8") as file:
             json_object = json.load(file)
 

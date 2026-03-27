@@ -12,5 +12,10 @@
         "soc_model": "MIMX95.json",
         "sm_model": "sm_model_0.json",
         "sm_component": "system_manager_0"
+    },
+    "MIMX952": {
+        "soc_model": "MIMX952.json",
+        "sm_model": "sm_model_0.json",
+        "sm_component": "system_manager_0"
     }
 }

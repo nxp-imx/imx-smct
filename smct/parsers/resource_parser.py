@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to loading resource database JSONs"""
+
 import json
+import logging
 import os
 from typing import Any, Dict, List
 
@@ -16,6 +18,8 @@ from smct.owners.owner_base import AssignedResource
 from smct.owners.owner_lm import LM
 from smct.resources.res_api import ApiResource
 from smct.utils import make_enum_int_dictionary, make_enum_str_dictionary
+
+logger = logging.getLogger()
 
 
 class ResourceParser:
@@ -37,6 +41,9 @@ class ResourceParser:
         else:
             self._resources_path = ResourceParser.soc_directory
         soc_json_path = os.path.join(self._resources_path, "soc.json")
+        if not os.path.exists(soc_json_path):
+            logger.error("File not found: %s", soc_json_path, extra={"source": soc_json_path})
+            return
         with open(soc_json_path, "r", encoding="utf-8") as file:
             soc_json = json.load(file)
             if device not in soc_json:
@@ -52,6 +59,9 @@ class ResourceParser:
     def _parse_soc_models(self) -> None:
         """Parses soc model - SM DID, MU count and security peripherals."""
         soc_models_path = os.path.join(self._resources_path, self._soc_model)
+        if not os.path.exists(soc_models_path):
+            logger.error("File not found: %s", soc_models_path, extra={"source": soc_models_path})
+            return
         with open(soc_models_path, "r", encoding="utf-8") as file:
             model_json = json.load(file)
 
@@ -124,6 +134,15 @@ class ResourceParser:
                             elif bitfield["name"] == "END_ADDR":
                                 MrcModel.end_addr_offset = bitfield["offset"]
 
+            mrc_configurations = peripheral_json["MRC"].get("configurations", [])
+            TrdcModel.mrc_configurations = {}
+            for configuration in mrc_configurations:
+                mrc_index = configuration["memory"]
+                if mrc_index not in TrdcModel.mrc_configurations:
+                    TrdcModel.mrc_configurations[mrc_index] = [{"origin": configuration["origin"], "size": configuration["size"]}]
+                else:
+                    TrdcModel.mrc_configurations[mrc_index].append({"origin": configuration["origin"], "size": configuration["size"]})
+
             types_json = peripheral_json["setting_types"]
             for setting_type in types_json:
                 if setting_type["type"] == "enum":
@@ -139,6 +158,9 @@ class ResourceParser:
     def _parse_sm_models(self) -> None:
         """Parses sm models JSON to class enumerations."""
         sm_models_path = os.path.join(self._resources_path, self._sm_model)
+        if not os.path.exists(sm_models_path):
+            logger.error("File not found: %s", sm_models_path, extra={"source": sm_models_path})
+            return
         with open(sm_models_path, "r", encoding="utf-8") as file:
             model_json = json.load(file)
 

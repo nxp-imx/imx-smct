@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to API resources"""
+
 import logging
 from typing import Any, Dict, List
 
 from smct import utils
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 
 from ..utils import FormatedInt
 from .resource_base import AtomicResource
@@ -40,7 +41,7 @@ class ApiResource(AtomicResource):
         Returns:
             str | None: Identifier used in API calls (e.g. in LM start/stop), or None if resource does not have an array index.
         """
-        if self._cat == "DEV":
+        if self._cat in ("DEV", "BASE"):
             return f"DEV_SM_{self._name}"
         if self._cat == "BRD":
             return self._name
@@ -49,8 +50,6 @@ class ApiResource(AtomicResource):
             if len(parts) != 2:
                 raise CfgToolException(f"Cannot determine LMM API permission index for {self._name}")
             return parts[1]
-        if self._cat == "BASE":
-            return self._name
         return None  # this resource does not have an array index (e.g. SYS, FUSA, ...)
 
     def get_start_stop_type(self) -> str | None:

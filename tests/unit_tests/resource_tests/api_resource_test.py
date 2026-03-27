@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 import pytest
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
-from smct.parsers.resource_parser import ResourceParser
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.resources.res_api import ApiResource
 from tests import test_utils
 
@@ -17,13 +16,13 @@ API_RESOURCES = [
     ("IPSUM", "CPU", "DEV", "DEV_SM_IPSUM", "LMM_SS_CPU", "cpuPerms[DEV_SM_IPSUM]", True, False),
     ("LOREM", "CTRL", "BRD", "LOREM", "LMM_SS_CTRL", "ctrlPerms[LOREM]", False, False),
     ("LMM_1", "LMM", "LMM", "1", None, "lmmPerms[1]", False, False),
-    ("LOREM", "BASE", "BASE", "LOREM", None, "basePerms[LOREM]", False, False),
+    ("LOREM", "BASE", "BASE", "DEV_SM_LOREM", None, "basePerms[DEV_SM_LOREM]", False, False),
     ("SYS", "SYS", "SYS", None, None, "sysPerms", False, False),
-    ("FUSA", "FUSA", "FUSA", None, None, "fusaPerms", False, False)
+    ("FUSA", "FUSA", "FUSA", None, None, "fusaPerms", False, False),
 ]
 
 
-def check_auto(api_resource: ApiResource, auto_by_default: bool = False):
+def check_auto(api_resource: ApiResource, auto_by_default: bool = False) -> None:
     if not auto_by_default:
         assert not api_resource.is_auto()
         api_resource.set_auto(True)
@@ -33,8 +32,9 @@ def check_auto(api_resource: ApiResource, auto_by_default: bool = False):
 
 
 @pytest.mark.parametrize("name, api, cat, expected_api_id, expected_start_stop, expected_perms, is_cpu, is_fault", API_RESOURCES)
-def test_api_resource(name: str, api: str, cat: str, expected_api_id: str | None, expected_start_stop: str | None,
-                      expected_perms: str | None, is_cpu: bool, is_fault: bool):
+def test_api_resource(
+    name: str, api: str, cat: str, expected_api_id: str | None, expected_start_stop: str | None, expected_perms: str | None, is_cpu: bool, is_fault: bool
+) -> None:
     test_utils.set_up()
     attributes = {"name": name, "type": "API", "api": api, "cat": cat}
     api_resource = ApiResource(attributes)

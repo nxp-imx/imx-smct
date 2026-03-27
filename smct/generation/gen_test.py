@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module for generating file config_test.h"""
+
 import logging
 from typing import Any, Dict, List
 
@@ -54,6 +55,7 @@ class GeneratorTest(GeneratorBase):
         channel_counter = 0
         default_a2p_value = -1
         a2p = default_a2p_value
+        rsrc_overwrite = {"TEST_SYS", "TEST_FUSA", "TEST_LMM"}
 
         for lm in self._get_configuration().get_all_scmi_lms():
             for msel in lm.get_all_msels():
@@ -61,13 +63,26 @@ class GeneratorTest(GeneratorBase):
                 for has_test, rsrc in starts_stops:
                     for protocol, test in lm.protocols:
                         rsrc_name = rsrc.get_name().upper()
-                        if rsrc_name.startswith(protocol) and has_test:
-                            struct = GenStructInitInline("")
-                            struct.add_entry("testId", test)
-                            struct.add_entry("channel", f"{a2p}U")
-                            struct.add_entry("rsrc", f"DEV_SM_{rsrc_name}")
-                            struct.print_members()
-                            result.append("{" + struct.get_members_string() + "}")
+                        if rsrc_name.startswith((protocol, "BRD_SM_" + protocol)) and has_test:
+                            if a2p == default_a2p_value:
+                                source = "/".join(["user_config", lm.get_id(), "MSEL" + str(msel.get_msel()), rsrc.get_name().upper()])
+                                validation_id = ".".join([lm.get_id(), "SS_RESOURCES", rsrc.get_name().upper(), "TEST"])
+                                logger.error(
+                                    "Test resource '%s' of %s is ignored. LM is not set to default debugging monitor.",
+                                    rsrc.get_name().upper(),
+                                    lm.get_id(),
+                                    extra={"source": source, "validation_id": validation_id},
+                                )
+                            else:
+                                struct = GenStructInitInline("")
+                                struct.add_entry("testId", test)
+                                struct.add_entry("channel", f"{a2p}U")
+                                if test in rsrc_overwrite:
+                                    struct.add_entry("rsrc", f"{rsrc_name[4:]}U" if test == "TEST_LMM" else "0U")
+                                else:
+                                    struct.add_entry("rsrc", rsrc_name if rsrc_name.startswith("BRD_SM_") else f"DEV_SM_{rsrc_name}")
+                                struct.print_members()
+                                result.append("{" + struct.get_members_string() + "}")
             for scmi_agent in lm.get_all_agents():
                 for scmi_channel in scmi_agent.get_all_scmi_channels():
                     if scmi_channel.get_channel_type() == "a2p":
@@ -78,7 +93,7 @@ class GeneratorTest(GeneratorBase):
                         atomic_resources = assignment.get_atomic_resources()
                         for atomic in atomic_resources:
                             if (
-                                atomic.get_name().upper().startswith(protocol)
+                                atomic.get_name().upper().startswith((protocol, "BRD_SM_" + protocol))
                                 and assignment.should_generate_test()
                                 and (isinstance(atomic, ApiResource) and not atomic.is_auto())
                             ):
@@ -91,10 +106,12 @@ class GeneratorTest(GeneratorBase):
                                 struct = GenStructInitInline("")
                                 struct.add_entry("testId", test)
                                 struct.add_entry("channel", f"{a2p}U")
-                                struct.add_entry("rsrc", f"DEV_SM_{name}")
+                                if test in rsrc_overwrite:
+                                    struct.add_entry("rsrc", f"{name[4:]}U" if test == "TEST_LMM" else "0U")
+                                else:
+                                    struct.add_entry("rsrc", name if name.startswith("BRD_SM_") else f"DEV_SM_{name}")
                                 struct.print_members()
                                 result.append("{" + struct.get_members_string() + "}")
-
         return result
 
     def _generate_test_configs(self, test_structures_macro: GenMacroList) -> None:

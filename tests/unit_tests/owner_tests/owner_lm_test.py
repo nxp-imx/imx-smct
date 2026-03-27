@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
-# SPDX-License-Identifier: BSD-3-Clause.
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from typing import List, Dict, Any
+# SPDX-License-Identifier: BSD-3-Clause
 
-from smct.owners.owner_lm import LM, MSEL, StartStop, StartStopSequence
-from smct.owners.owner_agent import ScmiAgent, Channel
-from smct.resources.res_api import ApiResource
-from smct.resources.resource_base import AtomicResource, MacroResource
+from unittest.mock import Mock, patch
+
+import pytest
+
+from smct.exceptions.cfg_tool_exception import CfgToolException
+from smct.owners.owner_agent import Channel, ScmiAgent
 from smct.owners.owner_base import AssignedResource
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.owners.owner_lm import LM
+from smct.resources.res_api import ApiResource
+from smct.resources.resource_base import MacroResource
 
 
 def test_lm_init_valid_parameters() -> None:
@@ -32,7 +33,7 @@ def test_lm_init_valid_parameters() -> None:
     assert lm.get_safe() == "nseenv"
     assert lm.get_group() == 2
     assert lm.get_auto() == "auto"
-    assert lm.get_default() == True
+    assert lm.get_default()
 
 
 def test_lm_init_invalid_rpc_type() -> None:
@@ -41,7 +42,7 @@ def test_lm_init_invalid_rpc_type() -> None:
     LM.auto_boot_types = {"none": "NONE"}
     Channel.rpc_types = {"none": "NONE", "scmi": "SCMI"}
 
-    with patch('smct.owners.owner_lm.logger') as mock_logger:
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
         lm = LM("lm1", 1, "TestLM", "invalid_rpc", None, None, None, None, False)
         assert lm.get_rpc() == "none"
         mock_logger.error.assert_called_once()
@@ -53,7 +54,7 @@ def test_lm_init_invalid_safety_type() -> None:
     LM.auto_boot_types = {"none": "NONE"}
     Channel.rpc_types = {"none": "NONE"}
 
-    with patch('smct.owners.owner_lm.logger') as mock_logger:
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
         lm = LM("lm1", 1, "TestLM", None, None, "invalid_safe", None, None, False)
         assert lm.get_safe() == "nseenv"
         mock_logger.error.assert_called_once()
@@ -65,7 +66,7 @@ def test_lm_init_invalid_auto_boot_type() -> None:
     LM.auto_boot_types = {"none": "NONE"}
     Channel.rpc_types = {"none": "NONE"}
 
-    with patch('smct.owners.owner_lm.logger') as mock_logger:
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
         lm = LM("lm1", 1, "TestLM", None, None, None, None, "invalid_auto", False)
         assert lm.get_auto() is None
         mock_logger.error.assert_called_once()
@@ -127,10 +128,11 @@ def test_lm_get_msel_redefinition_error() -> None:
 
     lm = LM("lm1", 1, "TestLM", None, None, None, None, None, False)
 
-    with patch('smct.owners.owner_lm.logger') as mock_logger:
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
         lm.get_msel(1, 1, False)
         lm.get_msel(1, 2, False)  # Different boot value
         mock_logger.error.assert_called()
+
 
 def test_lm_handle_start_stops_macro_resource() -> None:
     """Test handling start/stops for macro resource (should be ignored)"""
@@ -225,8 +227,8 @@ def test_lm_is_scmi() -> None:
     lm_scmi = LM("lm1", 1, "TestLM", "scmi", None, None, None, None, False)
     lm_none = LM("lm2", 2, "TestLM2", "none", None, None, None, None, False)
 
-    assert lm_scmi.is_scmi() == True
-    assert lm_none.is_scmi() == False
+    assert lm_scmi.is_scmi()
+    assert not lm_none.is_scmi()
 
 
 def test_lm_get_assignment_json_scmi() -> None:
@@ -250,7 +252,7 @@ def test_lm_get_assignment_json_scmi() -> None:
     assert json_data["rtime"] == 100
     assert json_data["group"] == 2
     assert json_data["auto"] == "auto"
-    assert json_data["default"] == True
+    assert json_data["default"]
     assert json_data["safe"] == "nseenv"
     assert "agents" in json_data
     assert json_data["resources"] == []

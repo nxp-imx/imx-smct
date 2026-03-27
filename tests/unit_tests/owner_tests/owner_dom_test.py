@@ -1,16 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
-# SPDX-License-Identifier: BSD-3-Clause.
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from typing import List, Dict, Any
+# SPDX-License-Identifier: BSD-3-Clause
+
 
 from smct.owners.owner_dom import DOM
-from smct.owners.owner_base import AssignedResource
-from smct.resources.res_api import ApiResource
 
 
 def test_dom_init_valid_parameters() -> None:
@@ -20,7 +16,7 @@ def test_dom_init_valid_parameters() -> None:
     assert dom.get_id() == "dom1"
     assert dom.get_did() == 1
     assert dom.get_name() == "DOM1"
-    assert dom.is_debug() == False
+    assert not dom.is_debug()
 
 
 def test_dom_set_name() -> None:
@@ -43,7 +39,7 @@ def test_dom_set_debug_default() -> None:
     dom = DOM("dom1", 1)
     dom.set_debug()
 
-    assert dom.is_debug() == True
+    assert dom.is_debug()
 
 
 def test_dom_set_debug_explicit() -> None:
@@ -51,11 +47,11 @@ def test_dom_set_debug_explicit() -> None:
     dom = DOM("dom1", 1)
     dom.set_debug(True)
 
-    assert dom.is_debug() == True
+    assert dom.is_debug()
 
     dom.set_debug(False)
 
-    assert dom.is_debug() == False
+    assert not dom.is_debug()
 
 
 def test_dom_get_assignment_json() -> None:
@@ -69,7 +65,7 @@ def test_dom_get_assignment_json() -> None:
     assert json_data["type"] == "DOM"
     assert json_data["name"] == "TestDomain"
     assert json_data["did"] == 1
-    assert json_data["debug"] == True
+    assert json_data["debug"]
     assert json_data["resources"] == []
 
 
@@ -82,7 +78,7 @@ def test_dom_get_assignment_json_default_name() -> None:
     assert json_data["type"] == "DOM"
     assert json_data["name"] == "DOM3"
     assert json_data["did"] == 3
-    assert json_data["debug"] == False
+    assert not json_data["debug"]
 
 
 def test_dom_str() -> None:

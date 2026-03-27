@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to chip model"""
+
 import json
 import logging
 import os
@@ -164,6 +165,10 @@ class ChipModelImx9(ChipModel):
                     continue
                 mrc_model.set_model_number_of_regions(int(mrc_json["nrgns"]))
                 mrc_model.set_model_region_offset(int(mrc_json["memory_region_offset"]))
+                origins = mrc_json.get("origins")
+                if origins:
+                    for origin in origins:
+                        mrc_model.add_origin(origin["origin"], origin["size"])
 
     def _parse_block_controls(self, block_controls: Any) -> None:
         """Parses information about block control from the JSON object.
@@ -197,6 +202,9 @@ class ChipModelImx9(ChipModel):
             True if loading was successful, False otherwise.
         """
         file_name = os.path.join(smct_configs_folder, "chip_data.json")
+        if not os.path.exists(file_name):
+            logger.error("File not found: %s", file_name, extra={"source": file_name})
+            return False
         with open(file_name, "r", encoding="utf-8") as file:
             json_object = json.load(file)
         if json_object is None:

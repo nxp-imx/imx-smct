@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 import pytest
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.resources.resource_base import AtomicResource
 
 
-def test_basic():
+def test_basic() -> None:
     attributes = {"name": "Lorem", "type": "API", "test": "True", "myAttr": 2}
     atom = AtomicResource(attributes)
     assert atom.get_name() == "Lorem"
@@ -21,7 +22,7 @@ def test_basic():
     assert atom.get_raw_json() == attributes
 
 
-def test_advanced():
+def test_advanced() -> None:
     attributes = {"name": "Ipsum", "type": "MRC"}
     atom = AtomicResource(attributes)
     assert not atom.should_generate_test()

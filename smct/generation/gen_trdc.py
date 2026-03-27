@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module for generating file config_trdc.h"""
+
 import logging
 import math
 import typing
@@ -500,8 +501,23 @@ def _process_mrc_assignments(
         if mrc.get_clr() > MrcGenerationModel.DEFAULT_CLEARING:
             for assigned_resource in resources["MRC"][trdc_resource]:
                 if "clr" in assigned_resource.get_params():
+                    trdc_mrc_model = trdc.get_mrc(mrc_index)
+                    if trdc_mrc_model is None:
+                        source = "/".join(["cfg", "mixes", trdc.get_name(), mrc.get_name()])
+                        logger.error("MRC model for MRC%i in TRDC %s is not known", mrc_index, trdc.get_id(), extra={"source": source})
+                        continue
+                    nrgns = trdc_mrc_model.get_model_number_of_regions()
                     did = assigned_resource.get_owner().get_did()
                     clr = assigned_resource.get_param_value_int("clr", MrcGenerationModel.DEFAULT_CLEARING)
+                    if clr > nrgns:
+                        source = "/".join(["cfg", "mixes", trdc.get_name(), mrc.get_name()])
+                        validation_id = ".".join([assigned_resource.get_owner().get_id(), "RESOURCES", assigned_resource.get_resource().get_name(), "CLR"])
+                        logger.warning(
+                            "MRC resource %s sets 'clr' higher than maximum amount of regions",
+                            assigned_resource.get_resource().get_name(),
+                            extra={"source": source, "validation_id": validation_id},
+                        )
+                        clr = nrgns
                     mrc_model.generate_clearing_in_domain(did, clr)
                     if assigned_resource.should_generate_debug():
                         for debug_domain in ConfigurationProvider.get_configuration().get_all_debug_domains():
@@ -597,15 +613,13 @@ def _generate_mdac_registers(dcd: GenDcdInit, trdc: TrdcModel, mdac: MdacResourc
     vld = 1
     sid = assigned_resource.get_param_value_int("sid", 0)
     if sid >= 2 ** trdc.get_sidsz():
-        logger.error(
+        logger.warning(
             "'%s' uses %s with with 'sid' value %s greater that 'sidsz=%i' ", owner.get_id(), mdac.get_name(), sid, trdc.get_sidsz(), extra={"source": source}
         )
-        return
     kpa_default = 0 if sid != 0 else 1
     kpa = assigned_resource.get_param_value_int("kpa", kpa_default)
     if trdc.get_kpaen() == 0 and assigned_resource.get_param_value("kpa", default=None) is not None:
-        logger.error("'%s' uses %s with with 'kpa' value %s while 'kpa' is disabled", owner.get_id(), mdac.get_name(), kpa, extra={"source": source})
-        return
+        logger.warning("'%s' uses %s with with 'kpa' value %s while 'kpa' is disabled", owner.get_id(), mdac.get_name(), kpa, extra={"source": source})
 
     if mdac.is_core():
         dfmt = 0
@@ -631,7 +645,16 @@ def _generate_mdac_registers(dcd: GenDcdInit, trdc: TrdcModel, mdac: MdacResourc
         if trdc.get_kpaen():
             data |= kpa << TrdcModel.DFMT1_register["KPA"]["offset"]
         if trdc.get_sidsz() > 0:
-            data |= sid << TrdcModel.DFMT1_register["SID"]["offset"]
+            sid_field = TrdcModel.DFMT1_register.get("SID")
+            if sid_field is None:
+                logger.warning(
+                    "DFMT1 register model does not contain 'SID' field for TRDC %s in resource %s",
+                    trdc.get_id(),
+                    assigned_resource.get_resource().get_name(),
+                    extra={"source": source, "validation_id": validation_id},
+                )
+                return
+            data |= sid << sid_field["offset"]
 
     for r in range(mdac.get_register(), mdac.get_register() + mdac.get_registers_count()):
         reg = f"TRDC_{trdc.get_id()}_MDA_W{r}_{mdac.get_master()}_DFMT{dfmt}"

@@ -156,6 +156,63 @@
                             }
                         ]
                     }
+                ],
+                "configurations" :[
+                    {
+                        "memory": "MRC_A0",
+                        "origin": "0x100000", 
+                        "size": "256KB"
+                    },
+                    {
+                        "memory": "MRC_W0",
+                        "origin": "0x0", 
+                        "size": "256KB"
+                    },
+                    {
+                        "memory": "MRC_W1",
+                        "origin": "0x28000000", 
+                        "size": "128MB"
+                    },
+                    {
+                        "memory": "MRC_W1",
+                        "origin": "0x47420000", 
+                        "size": "128MB"
+                    },
+                    {
+                        "memory": "MRC_W2",
+                        "origin": "0x20380000", 
+                        "size": "512KB"
+                    },
+                    {
+                        "memory": "MRC_W2",
+                        "origin": "0x4A000000", 
+                        "size": "512KB"
+                    },
+                    {
+                        "memory": "MRC_W3",
+                        "origin": "0x20280000", 
+                        "size": "512KB"
+                    },
+                    {
+                        "memory": "MRC_W3",
+                        "origin": "0x49C00000", 
+                        "size": "512KB"
+                    },
+                    {
+                        "memory": "MRC_W4",
+                        "origin": "0x24000000", 
+                        "size": "64MB"
+                    },
+                    {
+                        "memory": "MRC_W4",
+                        "origin": "0x47440000", 
+                        "size": "64MB"
+                    },
+                    {
+                        "memory": "MRC_N0",
+                        "origin": "0x80000000", 
+                        "size": "16GB"
+                    }
                 ]
             },
             "setting_types": [
@@ -167,8 +224,8 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": 2
                         },
                         {
@@ -199,8 +256,8 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": 2
                         },
                         {
@@ -231,13 +288,13 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": "0"
                         },
                         {
                             "id": "0",
-                            "label": "None (default)",
+                            "label": "None (0)",
                             "description": "No Permissions (default)",
                             "value": "0x0000"
                         },
@@ -331,18 +388,18 @@
                     "id": "mdid",
                     "type": "enum",
                     "label": "Master DID Overwrite",
-                    "description": "Master Domain ID (MDID) overwirte",
+                    "description": "Configuration of master (MDAC) Domain ID. It can be left as default or configured to specified number. In case it is not initialized, DID is configured from owner DID (LM/DOM).",
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized - owner DID",
+                            "description": "Domain ID value is set to owner (LM/DOM) DID.",
                             "value": ""
                         },
                         {
                             "id": "none",
                             "label": "No overwrite",
-                            "description": "Domain ID is not overwritten, it is the same as the Owner.",
+                            "description": "Domain ID value is NOT configured to owner (LM/DOM) DID, it is left as default.",
                             "value": "none"
                         },
                         {
@@ -447,18 +504,18 @@
                     "id": "sid",
                     "type": "integer",
                     "label": "Stream ID",
-                    "description": "Stream ID bus transaction attribute (SID)"
+                    "description": "MDAC Stream ID bus transaction attribute (SID)"
                 },
                 {
                     "id": "kpa",
                     "type": "enum",
                     "label": "Known Physical Address",
-                    "description": "Known Physical Address (KPA)",
+                    "description": "Known Physical Address (KPA) of MDAC",
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": ""
                         },
                         {
@@ -483,8 +540,8 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": ""
                         },
                         {
@@ -514,6 +571,12 @@
                     "label": "Size",
                     "description": "Size of a block",
                     "override_type": true
+                },
+                {
+                    "id": "clr",
+                    "type": "integer",
+                    "label": "Clearing Registers Count",
+                    "description": "The value determines how many empty or clearing regions should be generated in the MRC configuration. This is used to ensure that unused MRC registers are properly cleared to a safe default state."
                 }
             ]
         }

@@ -1,22 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module with base generator implementation"""
+
 import logging
 import os.path
 import typing
+from datetime import datetime
 from typing import Any, Dict, IO, List, Optional, Tuple
 
 from smct import utils
 from smct.configuration.confdata import ConfigurationData
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.generation.c_define_generator_base import CDefineGeneratorBase
 from smct.utils import DictOrdered
 
 logger = logging.getLogger()
+
+COPYRIGHT_YEAR = datetime.now().year
 
 
 class GeneratorBase:
@@ -141,7 +145,7 @@ class GeneratorBase:
             self._print(self._get_copyright_comment_beginning())
         self._print_copyright_comment_line("###################################################################")
         self._print_copyright_comment_line("")
-        self._print_copyright_comment_line("Copyright 2023-2025 NXP")
+        self._print_copyright_comment_line(f"Copyright {COPYRIGHT_YEAR} NXP")
         self._print_copyright_comment_line("")
         self._print_copyright_comment_line("Redistribution and use in source and binary forms, with or without modification,")
         self._print_copyright_comment_line("are permitted provided that the following conditions are met:")

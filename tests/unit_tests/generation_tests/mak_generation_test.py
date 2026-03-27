@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
+"""Unit tests for Makefile generation"""
+
 import os.path
 from tempfile import TemporaryDirectory
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_mak import GeneratorMakeFile
-from smct.owners.owner_agent import ScmiAgent, MailboxMu, ScmiChannel, MailboxLoopback
+from smct.owners.owner_agent import MailboxLoopback, MailboxMu, ScmiAgent, ScmiChannel
 from smct.owners.owner_lm import LM
-from smct.parsers.resource_parser import ResourceParser
 from tests import test_utils
 
-def test_board_device_build():
+
+def test_board_device_build() -> None:
     """Tests that config.mak will contain board define, and device and build makefile includes"""
     directory = TemporaryDirectory()
     generator = GeneratorMakeFile()
@@ -29,7 +32,7 @@ def test_board_device_build():
     generator.generate(conf, directory.name)
     file_name = os.path.join(directory.name, "config.mak")
     content = ""
-    with open(file_name, "r") as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
     assert f"BOARD ?= {board}" in content
     assert f"include ./devices/{device}/sm/Makefile" in content
@@ -39,14 +42,13 @@ def test_board_device_build():
     assert "include ./sm/rpc/mb_loopback/Makefile" not in content
 
 
-def test_mu():
+def test_mu() -> None:
     """Tests that config.mak will contain only mu makefile include"""
     directory = TemporaryDirectory()
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
-    lm = LM("id", 0, "name", None,
-            None, None, None, None, True)
+    lm = LM("id", 0, "name", None, None, None, None, None, True)
     conf.add_lm(lm)
     agent = ScmiAgent("agent0", lm, "agent0", True, lm.get_safe(), lm.get_did())
     lm.add_agent(agent)
@@ -59,23 +61,22 @@ def test_mu():
     generator.generate(conf, directory.name)
     file_name = os.path.join(directory.name, "config.mak")
     content = ""
-    with open(file_name, "r") as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
 
     assert "include ./sm/rpc/mb_mu/Makefile" in content
     assert "include ./sm/rpc/mb_loopback/Makefile" not in content
 
 
-def test_loopback():
+def test_loopback() -> None:
     """Tests that config.mak will contain only loopback makefile include"""
     directory = TemporaryDirectory()
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
-    lm = LM("id", 0, "name", None,
-            None, None, None, None, True)
+    lm = LM("id", 0, "name", None, None, None, None, None, True)
     conf.add_lm(lm)
-    agent = ScmiAgent("agent0", lm, "agent0", True,  lm.get_safe(), lm.get_did())
+    agent = ScmiAgent("agent0", lm, "agent0", True, lm.get_safe(), lm.get_did())
     lm.add_agent(agent)
     mailbox = MailboxLoopback(None, None)
     agent.add_mailbox(mailbox)
@@ -86,21 +87,20 @@ def test_loopback():
     generator.generate(conf, directory.name)
     file_name = os.path.join(directory.name, "config.mak")
     content = ""
-    with open(file_name, "r") as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
 
     assert "include ./sm/rpc/mb_loopback/Makefile" in content
     assert "include ./sm/rpc/mb_mu/Makefile" not in content
 
 
-def test_mu_loopback():
+def test_mu_loopback() -> None:
     """Tests that config.mak will contain both mu and loopback makefile includes"""
     directory = TemporaryDirectory()
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
-    lm = LM("id", 0, "name", None,
-            None, None, None, None, True)
+    lm = LM("id", 0, "name", None, None, None, None, None, True)
     conf.add_lm(lm)
     agent1 = ScmiAgent("agent1", lm, "agent1", True, lm.get_safe(), lm.get_did())
     lm.add_agent(agent1)
@@ -120,7 +120,7 @@ def test_mu_loopback():
     generator.generate(conf, directory.name)
     file_name = os.path.join(directory.name, "config.mak")
     content = ""
-    with open(file_name, "r") as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
 
     assert "include ./sm/rpc/mb_loopback/Makefile" in content

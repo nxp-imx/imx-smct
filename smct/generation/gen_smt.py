@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module for generating file config_smt.h"""
+
 import typing
 from typing import Any, Dict, List, Set
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.generation.generator import GeneratorBase, GenHeading, GenMacroList, GenMacroPresence, GenMacroValue, GenStructInit
 from smct.owners.owner_agent import ScmiAgent, SmtChannel
 from smct.owners.owner_lm import LM

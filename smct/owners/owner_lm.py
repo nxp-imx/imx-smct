@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to logical machines"""
+
 import logging
 from typing import Any, Dict, List, Tuple
 
 from smct import utils
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.resources.res_api import ApiResource
 from smct.resources.resource_base import AtomicResource, MacroResource
 
@@ -166,7 +168,7 @@ class MSEL:
             res (AtomicResource): The atomic resource to operate on.
             value (str): The operation value string containing order and arguments.
         """
-        (order_string, *args_string) = value.split("|")
+        order_string, *args_string = value.split("|")
         order = utils.parse_int(order_string)
         args = [utils.parse_int(x) for x in args_string]
 

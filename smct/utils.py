@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module with all common utils and generic classes"""
+
 import json
 import logging
 import os
@@ -213,7 +214,8 @@ def parse_int_or_return_str(value: Any) -> int | str:
     parsed: int | str
     try:
         parsed = int(value)
-    except ValueError:
+    except (TypeError, ValueError):  # TypeError when None, ValueError when non numeric string
+
         parsed = str(value)
     return parsed
 

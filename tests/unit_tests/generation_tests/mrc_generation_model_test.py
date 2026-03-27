@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 from typing import List
 
 from smct.generation.trdc.mrc_generation_model import MrcGenerationModel
@@ -11,11 +12,11 @@ from smct.generation.trdc.mrc_region import MrcRegion
 from smct.model.model_trdc import TrdcModel
 
 
-def _lists_equals(input_list: List[int], expected_list: List[int]):
+def _lists_equals(input_list: List[int], expected_list: List[int]) -> bool:
     return set(input_list) == set(expected_list)
 
 
-def test_basic():
+def test_basic() -> None:
     model = MrcGenerationModel(8)
     region = MrcRegion(0, 0, 15, 0x7777)
     region1 = MrcRegion(10, 0, 15, 0x7777)
@@ -27,7 +28,7 @@ def test_basic():
     assert regions == expected_regions
 
 
-def test_sorted():
+def test_sorted() -> None:
     model = MrcGenerationModel(8)
     region0_1 = MrcRegion(0, 255, 65535, 0x7777)
     region0_2 = MrcRegion(0, 0, 15, 0x7777)
@@ -50,7 +51,7 @@ def test_sorted():
     assert regions == expected_regions
 
 
-def test_remove_unnecessary():
+def test_remove_unnecessary() -> None:
     model = MrcGenerationModel(8)
     region0_0 = MrcRegion(0, 0x0, 0xFFFF, 0x0)
     region1_0 = MrcRegion(1, 0x0, 0xFFFF, 0x0)
@@ -71,7 +72,7 @@ def test_remove_unnecessary():
     assert regions == expected_regions
 
 
-def test_get_permissions():
+def test_get_permissions() -> None:
     model = MrcGenerationModel(8)
     region0_0 = MrcRegion(0, 0x0, 0xFFFF, 0x0)
     region1_0 = MrcRegion(1, 0x0, 0xFFFF, 0x0)
@@ -92,7 +93,7 @@ def test_get_permissions():
     assert _lists_equals(model.get_permissions(), [0x6600, 0x7777, TrdcModel.DEBUG_DOMAIN_PERMISSION])
 
 
-def test_generate_debug_regions():
+def test_generate_debug_regions() -> None:
     debug_domain = 7
     model = MrcGenerationModel(8)
     region0_1 = MrcRegion(0, 0xFF, 0xFFFF, 0x6666)
@@ -108,7 +109,7 @@ def test_generate_debug_regions():
     assert regions == expected_regions
 
 
-def test_generate_clearing():
+def test_generate_clearing() -> None:
     model = MrcGenerationModel(8)
     region0_0 = MrcRegion(0, 0x0, 0xFFFF, 0x0)
     region1_0 = MrcRegion(1, 0x0, 0xFFFF, 0x0)
@@ -130,11 +131,14 @@ def test_generate_clearing():
     clearing_region1 = MrcRegion(1, 0, 0, -1)
     clearing_region2 = MrcRegion(2, 0, 0, -1)
     clearing_region3 = MrcRegion(3, 0, 0, -1)
-    expected_regions = {0: [region0_1, region0_2, clearing_region0, clearing_region0],
-                        1: [clearing_region1, clearing_region1, clearing_region1, clearing_region1],
-                        2: [clearing_region2, clearing_region2, clearing_region2, clearing_region2],
-                        3: [clearing_region3, clearing_region3, clearing_region3, clearing_region3]}
+    expected_regions = {
+        0: [region0_1, region0_2, clearing_region0, clearing_region0],
+        1: [clearing_region1, clearing_region1, clearing_region1, clearing_region1],
+        2: [clearing_region2, clearing_region2, clearing_region2, clearing_region2],
+        3: [clearing_region3, clearing_region3, clearing_region3, clearing_region3],
+    }
     assert regions == expected_regions
+
 
 def test_generate_larger_clearing() -> None:
     """Test MRC clearing generation with non-default clearing value."""
@@ -147,10 +151,8 @@ def test_generate_larger_clearing() -> None:
     model.remove_unnecessary_regions()
     model.generate_clearing(6)
     regions = model.get_regions()
-    
+
     # Assert
     clearing_region0 = MrcRegion(0, 0, 0, -1)
     expected_regions = {0: [region0, clearing_region0, clearing_region0, clearing_region0, clearing_region0, clearing_region0]}
     assert regions == expected_regions
-
-

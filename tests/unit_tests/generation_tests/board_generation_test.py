@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 import os
 from tempfile import TemporaryDirectory
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_board import GeneratorBoard
+from smct.utils import FormatedInt
 
 
 def test_board_defines() -> None:
@@ -26,15 +28,15 @@ def test_board_defines() -> None:
         ("CONFIG_MEMORY_SIZE", "1024"),
         ("CONFIG_CPU_FREQ", "800000000"),
         ("CONFIG_ENABLE_CACHE", "1"),
-        ("CONFIG_GPIO_COUNT", "32")
+        ("CONFIG_GPIO_COUNT", "32"),
     ]
-    
+
     for config_name, config_val in board_configs:
         conf.add_board_config(config_name, config_val)
-    conf.set_debug_uart_instance(uart_instance)
-    conf.set_debug_uart_baudrate(uart_baudrate)
-    conf.set_pmic_i2c_instance(i2c_instance)
-    conf.set_pmic_i2c_baudrate(i2c_baudrate)
+    conf.set_debug_uart_instance(FormatedInt(uart_instance))
+    conf.set_debug_uart_baudrate(FormatedInt(uart_baudrate))
+    conf.set_pmic_i2c_instance(FormatedInt(i2c_instance))
+    conf.set_pmic_i2c_baudrate(FormatedInt(i2c_baudrate))
 
     # Act
     generator.generate(conf, directory.name)

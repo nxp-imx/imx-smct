@@ -118,6 +118,29 @@
          "type": "integer",
          "description": "Base offset for memory regions (required)",
          "minimum": 0
+        },
+        "origins": {
+         "type": "array",
+         "description": "Memory origin configurations (optional)",
+         "items": {
+          "type": "object",
+          "description": "Memory origin configuration",
+          "properties": {
+           "origin": {
+            "type": "string",
+            "description": "Base address of the memory origin (required)"
+           },
+           "size": {
+            "type": "string",
+            "description": "Size of the memory region (required)"
+           }
+          },
+          "required": [
+           "origin",
+           "size"
+          ],
+          "additionalProperties": false
+         }
         }
        },
        "required": [

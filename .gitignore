@@ -1,6 +1,6 @@
 /smct/__pycache__/
 /smct/configuration/__pycache__/
-/smct/expcetions/__pycache__/
+/smct/exceptions/__pycache__/
 /smct/model/__pycache__/
 /smct/owners/__pycache__/
 /smct/parsers/__pycache__/

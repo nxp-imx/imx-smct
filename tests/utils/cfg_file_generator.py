@@ -1,24 +1,34 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to generation of test CFG files"""
+
 import json
 from dataclasses import dataclass
 from io import StringIO
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 
 class Base:
+    """Base class for configuration data structures."""
+
     def to_dict(self) -> Dict[str, Any]:
+        """Convert object to dictionary representation.
+
+        Returns:
+            Dictionary representation of the object
+        """
         return vars(self)
 
 
 @dataclass
 class AccessRight(Base):
     """Access right representation"""
+
     name: str
     parameters: Dict[str, str]
 
@@ -26,6 +36,7 @@ class AccessRight(Base):
 @dataclass
 class AssignedResource(Base):
     """Resource assignment representation"""
+
     name: str
     template: str
     parameters: Dict[str, str]
@@ -34,6 +45,7 @@ class AssignedResource(Base):
 @dataclass
 class Domain(Base):
     """Domain section representation"""
+
     id: str
     did: int
     access_rights: Dict[str, AccessRight]
@@ -43,6 +55,7 @@ class Domain(Base):
 @dataclass
 class Mode(Base):
     """Mode command representation"""
+
     msel: int
     boot: int
 
@@ -50,6 +63,7 @@ class Mode(Base):
 @dataclass
 class StartStop(Base):
     """Start/stop assignment representation"""
+
     resource: str
     start: int | None
     stop: int | None
@@ -58,6 +72,7 @@ class StartStop(Base):
 @dataclass
 class Channel(Base):
     """Channel command representation"""
+
     db: int
     xport: str
     check: str
@@ -70,6 +85,7 @@ class Channel(Base):
 @dataclass
 class Mailbox(Base):
     """Mailbox section representation"""
+
     type: str
     mu: int | None
     test: int | None
@@ -80,6 +96,7 @@ class Mailbox(Base):
 @dataclass
 class Agent(Base):
     """Agent section representation"""
+
     id: str
     name: str
     access_rights: Dict[str, AccessRight]
@@ -90,6 +107,7 @@ class Agent(Base):
 @dataclass
 class LogicalMachine(Base):
     """Logical machine section representation"""
+
     id: str
     name: str
     did: int
@@ -106,6 +124,8 @@ class LogicalMachine(Base):
 
 @dataclass
 class Configuration:
+    """Complete configuration data structure."""
+
     access_rights: Dict[str, AccessRight]
     domains: Dict[str, Domain]
     logical_machines: Dict[str, LogicalMachine]
@@ -249,8 +269,7 @@ def _parse_logical_machines(json_object: List[Dict[str, Any]]) -> Dict[str, Logi
         if "agents" in json_logical_machine:
             agents = _parse_agents(json_logical_machine["agents"])
 
-        result[lm_id] = LogicalMachine(lm_id, name, did, boot, skip, safe, rpc, access_rights, assigned_resources,
-                                       modes, start_stops, agents)
+        result[lm_id] = LogicalMachine(lm_id, name, did, boot, skip, safe, rpc, access_rights, assigned_resources, modes, start_stops, agents)
     return result
 
 
@@ -271,16 +290,14 @@ def _parse_agents(json_object: List[Dict[str, Any]]) -> Dict[str, Agent]:
 
 class CfgFileGenerator:
     """Generator of test CFG files"""
-    def __init__(self) -> None:
+
+    def __init__(self, config: Configuration) -> None:
         self._buffer = StringIO()
-        self._configuration: Configuration | None = None
+        self._configuration: Configuration = config
 
-    def load_config(self, config: Configuration) -> None:
-        """Loads generation information from given dictionary"""
-        self._configuration = config
-
-    def load_dict(self, dictionary: Dict[str, Any]) -> None:
-        """Loads generation information from given dictionary"""
+    @classmethod
+    def from_dict(cls, dictionary: Dict[str, Any]) -> "CfgFileGenerator":
+        """Create generator from dictionary"""
         required_keys_in_dict = ["common_access_rights", "domains", "logical_machines", "make", "dox", "board", "device_include_path"]
         for key in required_keys_in_dict:
             if key not in dictionary:
@@ -294,32 +311,41 @@ class CfgFileGenerator:
         board_dict: Dict[str, str] = dictionary["board"]
         device_include_path: str = dictionary["device_include_path"]
 
-        configuration = Configuration(_parse_common_access_rights(common_access_rights), _parse_domains(domains), _parse_logical_machines(logical_machines), make, dox_dict, board_dict, device_include_path)
-        self._configuration = configuration
+        configuration = Configuration(
+            _parse_common_access_rights(common_access_rights),
+            _parse_domains(domains),
+            _parse_logical_machines(logical_machines),
+            make,
+            dox_dict,
+            board_dict,
+            device_include_path,
+        )
+        return cls(configuration)
 
-    def load_json(self, json_file: str) -> None:
-        """Loads generation information from content of given JSON file"""
+    @classmethod
+    def from_json(cls, json_file: str) -> "CfgFileGenerator":
+        """Create generator from JSON file"""
         with open(json_file, "r", encoding="utf-8") as file:
-            self.load_dict(json.load(file))
+            return cls.from_dict(json.load(file))
 
     def generate(self) -> None:
         """Generates content of the CFG file based on the loaded dictionary of information"""
         self._generate_make_command()
         self._generate_dox_command()
-        self._print('')
+        self._print("")
 
         self._generate_include_device()
-        self._print('')
+        self._print("")
 
         self._generate_board_commands()
-        self._print('')
+        self._print("")
 
-        self._print('# Common access rights')
+        self._print("# Common access rights")
         self._generate_access_rights(list(self._configuration.access_rights.values()))
-        self._print('')
+        self._print("")
         self._generate_domains()
         self._print("# Logical machines")
-        self._print('')
+        self._print("")
         self._generate_logical_machines()
 
     def get_result(self) -> str:
@@ -332,8 +358,9 @@ class CfgFileGenerator:
 
     def _generate_include_device(self) -> None:
         """Generates include path for the device CFG file"""
-        device_cfg_path = self._configuration.device_cfg_path.replace('\\', '/')  # Path must be in Linux format even on Windows
-        self._print(f'include {device_cfg_path}')
+        if self._configuration:
+            device_cfg_path = self._configuration.device_cfg_path.replace("\\", "/")  # Path must be in Linux format even on Windows
+            self._print(f"include {device_cfg_path}")
 
     def _generate_dox_command(self) -> None:
         """Generates DOX command"""
@@ -341,20 +368,22 @@ class CfgFileGenerator:
 
     def _generate_make_command(self) -> None:
         """Generates MAKE command"""
-        self._print(f'MAKE    soc={self._configuration.make_command["soc"]}, board={self._configuration.make_command["board"]}, build={self._configuration.make_command["build_tool"]}')
+        self._print(
+            f'MAKE    soc={self._configuration.make_command["soc"]}, board={self._configuration.make_command["board"]}, build={self._configuration.make_command["build_tool"]}'
+        )
 
     def _generate_board_commands(self) -> None:
         """Generates BOARD commands"""
         for key, value in self._configuration.board_command.items():
-            self._print(f'BOARD               {key}={value}')
+            self._print(f"BOARD               {key}={value}")
 
     def _generate_domains(self) -> None:
         """Generates DOMn commands and all domain related content"""
         for domain in self._configuration.domains.values():
             self._print(f"{domain.id}                did={domain.did}")
-            self._print('')
+            self._print("")
             self._generate_access_rights(list(domain.access_rights.values()))
-            self._print('')
+            self._print("")
             self._generate_assignments(list(domain.assigned_resources.values()))
 
     def _generate_logical_machines(self) -> None:
@@ -366,20 +395,20 @@ class CfgFileGenerator:
                 "rpc": logical_machine.rpc,
                 "boot": logical_machine.boot,
                 "skip": logical_machine.skip,
-                "safe": logical_machine.safe
+                "safe": logical_machine.safe,
             }
             parameters_str = format_parameters(parameters)
             self._print(f"{logical_machine.id}                {parameters_str}")
-            self._print('')
+            self._print("")
             self._generate_access_rights(list(logical_machine.access_rights.values()))
-            self._print('')
+            self._print("")
             self._generate_modes(logical_machine.modes)
-            self._print('')
+            self._print("")
             self._generate_assignments(list(logical_machine.assigned_resources.values()))
-            self._print('')
+            self._print("")
             self._generate_agents(list(logical_machine.agents.values()))
-            self._print('')
-            self._print('')
+            self._print("")
+            self._print("")
 
     def _generate_modes(self, modes: List[Mode]) -> None:
         """Generates MODE commands from given list"""
@@ -391,9 +420,9 @@ class CfgFileGenerator:
         for agent in agents:
             self._print(f"{agent.id}             name={agent.name}")
             self._generate_mailboxes(agent.mailboxes)
-            self._print('')
+            self._print("")
             self._generate_access_rights(list(agent.access_rights.values()))
-            self._print('')
+            self._print("")
             self._generate_assignments(list(agent.assigned_resources.values()))
 
     def _generate_assignments(self, assignments: List[AssignedResource]) -> None:
@@ -425,13 +454,7 @@ class CfgFileGenerator:
     def _generate_channels(self, channels: List[Channel]) -> None:
         """Generates CHANNEL commands from given list"""
         for channel in channels:
-            parameters = {
-                "db": channel.db,
-                "xport": channel.xport,
-                "check": channel.check,
-                "rpc": channel.rpc,
-                "type": channel.type
-            }
+            parameters = {"db": channel.db, "xport": channel.xport, "check": channel.check, "rpc": channel.rpc, "type": channel.type}
             if channel.test is not None:
                 parameters["test"] = channel.test
             if channel.notify is not None:

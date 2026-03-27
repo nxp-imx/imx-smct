@@ -1,0 +1,569 @@
+{
+    "sm_did": 2,
+    "MU_count": 27,
+    "security_peripherals": [
+        {
+            "peripheral": "TRDC",
+            "debug_domain_permission": "0x6666",
+            "MDAC": {
+                "registers": [
+                    {
+                        "name": "DFMT0",
+                        "bitfields": [
+                            {
+                                "name": "DID",
+                                "offset": 0,
+                                "width": 4
+                            },
+                            {
+                                "name": "DIDS",
+                                "offset": 4,
+                                "width": 2
+                            },
+                            {
+                                "name": "PE",
+                                "offset": 6,
+                                "width": 2
+                            },
+                            {
+                                "name": "PIDM",
+                                "offset": 8,
+                                "width": 6
+                            },
+                            {
+                                "name": "SA",
+                                "offset": 14,
+                                "width": 2
+                            },
+                            {
+                                "name": "PID",
+                                "offset": 16,
+                                "width": 6
+                            },
+                            {
+                                "name": "SID",
+                                "offset": 22,
+                                "width": 6
+                            },
+                            {
+                                "name": "KPA",
+                                "offset": 28,
+                                "width": 1
+                            },
+                            {
+                                "name": "DFMT",
+                                "offset": 29,
+                                "width": 1
+                            },
+                            {
+                                "name": "LK1",
+                                "offset": 30,
+                                "width": 1
+                            },
+                            {
+                                "name": "VLD",
+                                "offset": 31,
+                                "width": 1
+                            }
+                        ]
+                    },
+                    {
+                        "name": "DFMT1",
+                        "bitfields": [
+                            {
+                                "name": "DID",
+                                "offset": 0,
+                                "width": 4
+                            },
+                            {
+                                "name": "PA",
+                                "offset": 4,
+                                "width": 2
+                            },
+                            {
+                                "name": "SA",
+                                "offset": 6,
+                                "width": 2
+                            },
+                            {
+                                "name": "DIDB",
+                                "offset": 8,
+                                "width": 1
+                            },
+                            {
+                                "name": "SID",
+                                "offset": 22,
+                                "width": 6
+                            },
+                            {
+                                "name": "KPA",
+                                "offset": 28,
+                                "width": 1
+                            },
+                            {
+                                "name": "DFMT",
+                                "offset": 29,
+                                "width": 1
+                            },
+                            {
+                                "name": "LK1",
+                                "offset": 30,
+                                "width": 1
+                            },
+                            {
+                                "name": "VLD",
+                                "offset": 31,
+                                "width": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            "MBC": {
+                "registers": [
+                    {
+                        "name": "BLK_CFG",
+                        "width": 32,
+                        "bitfields": [
+                            {
+                                "name": "MBACSEL",
+                                "offset": 0,
+                                "width": 3
+                            },
+                            {
+                                "name": "NSE",
+                                "offset": 3,
+                                "width": 1
+                            }
+                        ]
+                    }
+                ]
+            },
+            "MRC": {
+                "registers": [
+                    {
+                        "name": "RGD",
+                        "bitfields": [
+                            {
+                                "name": "STRT_ADDR",
+                                "offset": 14,
+                                "width": 18
+                            },
+                            {
+                                "name": "END_ADDR",
+                                "offset": 14,
+                                "width": 18
+                            }
+                        ]
+                    }
+                ],
+                "configurations" :[
+                    {
+                        "memory": "MRC_A0",
+                        "origin": "0x100000", 
+                        "size": "256KB"
+                    },
+                    {
+                        "memory": "MRC_W0",
+                        "origin": "0x28000000", 
+                        "size": "128MB"
+                    },
+                    {
+                        "memory": "MRC_W1",
+                        "origin": "0x20380000", 
+                        "size": "512MB"
+                    },
+                    {
+                        "memory": "MRC_W1",
+                        "origin": "0x4A000000", 
+                        "size": "512MB"
+                    },
+                    {
+                        "memory": "MRC_C0",
+                        "origin": "0x4AF80000", 
+                        "size": "96KB"
+                    },
+                    {
+                        "memory": "MRC_G0",
+                        "origin": "0x4D900000", 
+                        "size": "5MB"
+                    },
+                    {
+                        "memory": "MRC_N0",
+                        "origin": "0x80000000", 
+                        "size": "16GB"
+                    },
+                    {
+                        "memory": "MRC_D0",
+                        "origin": "0x4B300000", 
+                        "size": "36KB"
+                    }
+                ]
+            },
+            "setting_types": [
+                {
+                    "id": "pa",
+                    "type": "enum",
+                    "label": "Privileged Attribute",
+                    "description": "Privileged attribute",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": 2
+                        },
+                        {
+                            "id": "user",
+                            "label": "User",
+                            "description": "User Access",
+                            "value": 0
+                        },
+                        {
+                            "id": "privileged",
+                            "label": "Privileged",
+                            "description": "Privileged Access",
+                            "value": 1
+                        },
+                        {
+                            "id": "bypass",
+                            "label": "Bypass",
+                            "description": "Bypass Access Permissions",
+                            "value": 2
+                        }
+                    ]
+                },
+                {
+                    "id": "sa",
+                    "type": "enum",
+                    "label": "Security Attribute",
+                    "description": "Security attribute",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": 2
+                        },
+                        {
+                            "id": "secure",
+                            "label": "S",
+                            "description": "Secure",
+                            "value": 0
+                        },
+                        {
+                            "id": "nonsecure",
+                            "label": "NS",
+                            "description": "Non-Secure",
+                            "value": 1
+                        },
+                        {
+                            "id": "bypass",
+                            "label": "Bypass",
+                            "description": "Bypass",
+                            "value": 2
+                        }
+                    ]
+                },
+                {
+                    "id": "access_templates",
+                    "type": "enum",
+                    "label": "Permission Value",
+                    "description": "Permission value defined by the Access template",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": "0"
+                        },
+                        {
+                            "id": "0",
+                            "label": "None (0)",
+                            "description": "No Permissions (default)",
+                            "value": "0x0000"
+                        },
+                        {
+                            "id": "none",
+                            "label": "None",
+                            "description": "No Permissions",
+                            "value": "0x0000"
+                        },
+                        {
+                            "id": "sec_r",
+                            "label": "Secure Read",
+                            "description": "Secure Read Permissions",
+                            "value": "0x4400"
+                        },
+                        {
+                            "id": "secpriv_rx",
+                            "label": "Secure Privileged Read-Execute",
+                            "description": "Secure Privileged Read-Execute Permissions",
+                            "value": "0x5000"
+                        },
+                        {
+                            "id": "secpriv_rw",
+                            "label": "Secure Privileged Read-Write",
+                            "description": "Secure Privileged Read-Write Permissions",
+                            "value": "0x6000"
+                        },
+                        {
+                            "id": "secpriv_rwx",
+                            "label": "Secure Privileged Read-Write-Execute",
+                            "description": "Secure Privileged Read-Write-Execute Permissions",
+                            "value": "0x7000"
+                        },
+                        {
+                            "id": "sec_rw",
+                            "label": "Secure Read-Write",
+                            "description": "Secute Read-Write",
+                            "value": "0x6600"
+                        },
+                        {
+                            "id": "rw",
+                            "label": "Read-Write",
+                            "description": "Read-Write",
+                            "value": "0x6666"
+                        },
+                        {
+                            "id": "sec_rwx",
+                            "label": "Secure Read-Write-Execute",
+                            "description": "Secure Read-Write-Execute",
+                            "value": "0x7700"
+                        },
+                        {
+                            "id": "ro",
+                            "label": "Read-only",
+                            "description": "Read-only",
+                            "value": "0x4444"
+                        },
+                        {
+                            "id": "nspriv_r",
+                            "label": "Non-secure Privileged Read",
+                            "description": "Non-secure Privileged Read",
+                            "value": "0x7740"
+                        },
+                        {
+                            "id": "ns_r",
+                            "label": "Non-secure Read",
+                            "description": "Non-secure Read",
+                            "value": "0x7744"
+                        },
+                        {
+                            "id": "nspriv_rw",
+                            "label": "Non-secure Privileged Read-Write",
+                            "description": "Non-secure Privileged Read-Write",
+                            "value": "0x6660"
+                        },
+                        {
+                            "id": "nspriv_rwx",
+                            "label": "Non-secure Privileged Read-Write-Execute",
+                            "description": "Non-secure Privileged Read-Write-Execute",
+                            "value": "0x7770"
+                        },
+                        {
+                            "id": "full",
+                            "label": "Full Access",
+                            "description": "Full Access",
+                            "value": "0x7777"
+                        }
+                    ]
+                },
+                {
+                    "id": "mdid",
+                    "type": "enum",
+                    "label": "Master DID Overwrite",
+                    "description": "Configuration of master (MDAC) Domain ID. It can be left as default or configured to specified number. In case it is not initialized, DID is configured from owner DID (LM/DOM).",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized - owner DID",
+                            "description": "Domain ID value is set to owner (LM/DOM) DID.",
+                            "value": ""
+                        },
+                        {
+                            "id": "none",
+                            "label": "No overwrite",
+                            "description": "Domain ID value is NOT configured to owner (LM/DOM) DID, it is left as default.",
+                            "value": "none"
+                        },
+                        {
+                            "id": "0",
+                            "label": "Domain 0",
+                            "description": "Domain ID 0 is used.",
+                            "value": "0"
+                        },
+                        {
+                            "id": "1",
+                            "label": "Domain 1",
+                            "description": "Domain ID 1 is used.",
+                            "value": "1"
+                        },
+                        {
+                            "id": "2",
+                            "label": "Domain 2",
+                            "description": "Domain ID 2 is used.",
+                            "value": "2"
+                        },
+                        {
+                            "id": "3",
+                            "label": "Domain 3",
+                            "description": "Domain ID 3 is used.",
+                            "value": "3"
+                        },
+                        {
+                            "id": "4",
+                            "label": "Domain 4",
+                            "description": "Domain ID 4 is used.",
+                            "value": "4"
+                        },
+                        {
+                            "id": "5",
+                            "label": "Domain 5",
+                            "description": "Domain ID 5 is used.",
+                            "value": "5"
+                        },
+                        {
+                            "id": "6",
+                            "label": "Domain 6",
+                            "description": "Domain ID 6 is used.",
+                            "value": "6"
+                        },
+                        {
+                            "id": "7",
+                            "label": "Domain 7",
+                            "description": "Domain ID 7 is used.",
+                            "value": "7"
+                        },
+                        {
+                            "id": "8",
+                            "label": "Domain 8",
+                            "description": "Domain ID 8 is used.",
+                            "value": "8"
+                        },
+                        {
+                            "id": "9",
+                            "label": "Domain 9",
+                            "description": "Domain ID 9 is used.",
+                            "value": "9"
+                        },
+                        {
+                            "id": "10",
+                            "label": "Domain 10",
+                            "description": "Domain ID 10 is used.",
+                            "value": "10"
+                        },
+                        {
+                            "id": "11",
+                            "label": "Domain 11",
+                            "description": "Domain ID 11 is used.",
+                            "value": "11"
+                        },
+                        {
+                            "id": "12",
+                            "label": "Domain 12",
+                            "description": "Domain ID 12 is used.",
+                            "value": "12"
+                        },
+                        {
+                            "id": "13",
+                            "label": "Domain 13",
+                            "description": "Domain ID 13 is used.",
+                            "value": "13"
+                        },
+                        {
+                            "id": "14",
+                            "label": "Domain 14",
+                            "description": "Domain ID 14 is used.",
+                            "value": "14"
+                        },
+                        {
+                            "id": "15",
+                            "label": "Domain 15",
+                            "description": "Domain ID 15 is used.",
+                            "value": "15"
+                        }
+                    ]
+                },
+                {
+                    "id": "sid",
+                    "type": "integer",
+                    "label": "Stream ID",
+                    "description": "MDAC Stream ID bus transaction attribute (SID)"
+                },
+                {
+                    "id": "kpa",
+                    "type": "enum",
+                    "label": "Known Physical Address",
+                    "description": "Known Physical Address (KPA) of MDAC",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": ""
+                        },
+                        {
+                            "id": "0",
+                            "label": "Non-Physical",
+                            "description": "Non-physical address",
+                            "value": "0"
+                        },
+                        {
+                            "id": "1",
+                            "label": "Physical",
+                            "description": "Physical address",
+                            "value": "1"
+                        }
+                    ]
+                },
+                {
+                    "id": "nodbg",
+                    "type": "enum",
+                    "label": "No mapping to Debug DID",
+                    "description": "Do not map to Debug Access Port (DAP) DID",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": ""
+                        },
+                        {
+                            "id": "false",
+                            "label": "Disable",
+                            "description": "Map to DAP DID.",
+                            "value": "false"
+                        },
+                        {
+                            "id": "true",
+                            "label": "Enable",
+                            "description": "Do not map to DAP DID.",
+                            "value": "true"
+                        }
+                    ]
+                },
+                {
+                    "id": "begin",
+                    "type": "integer",
+                    "label": "Begin",
+                    "description": "Begin address of a memory block",
+                    "override_type": true
+                },
+                {
+                    "id": "size",
+                    "type": "integer",
+                    "label": "Size",
+                    "description": "Size of a memory block",
+                    "override_type": true
+                },
+                {
+                    "id": "clr",
+                    "type": "integer",
+                    "label": "Clearing Registers Count",
+                    "description": "The value determines how many empty or clearing regions should be generated in the MRC configuration. This is used to ensure that unused MRC registers are properly cleared to a safe default state."
+                }
+            ]
+        }
+    ]
+}

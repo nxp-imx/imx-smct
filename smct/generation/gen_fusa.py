@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module for generating file config_fusa.h"""
+
 from typing import Any, Dict, List
 
 from smct import utils
@@ -45,7 +46,7 @@ class GeneratorFusa(GeneratorBase):
         all_defines = self._get_configuration().get_fusa_configs()
 
         if all_defines:
-            self.print_generator(GenHeading("FUSA Tasks Configuration"))
+            self.print_generator(GenHeading("FUSA Configuration Constants"))
             for config in self._get_configuration().get_fusa_configs():
                 if utils.is_numeric_literal(config.get_value()):
                     config_macro = GenMacroValue(f"FUSA_{config.get_name()}", config.get_value(), config.get_comment())
@@ -74,15 +75,15 @@ class GeneratorFusa(GeneratorBase):
 
         # taks count
         task_count = len(tasks)
-        self.print_generator(GenMacroValue(f"FUSA_NUM_SCHEDULER_{def_word}_USER_TASKS", task_count, f"Config for number of {task_type} user tasks"))
+        self.print_generator(GenMacroValue(f"FUSA_NUM_SCHEDULER_{def_word}_TASKS", task_count, f"Config for number of {task_type} tasks"))
 
         # each task structure
         for t in tasks:
-            self._print_fusa_task_struct(t, f"FUSA_SCHEDULER_{def_word}_USER_TASK{tasks.index(t)}_CONFIG")
+            self._print_fusa_task_struct(t, f"FUSA_SCHEDULER_{def_word}_TASK{tasks.index(t)}_CONFIG")
 
-        s = GenMacroList(f"FUSA_SCHEDULER_{def_word}_USER_CONFIG", f"Config data array for {def_word} SCHEDULER")
+        s = GenMacroList(f"FUSA_SCHEDULER_{def_word}_CONFIG", f"Config data array for {def_word} SCHEDULER")
         for i in range(0, task_count):
-            s.add_value(f"FUSA_SCHEDULER_{def_word}_USER_TASK{i}_CONFIG")
+            s.add_value(f"FUSA_SCHEDULER_{def_word}_TASK{i}_CONFIG")
         self.print_generator(s)
 
     def _print_fusa_tasks(self) -> None:
@@ -90,10 +91,9 @@ class GeneratorFusa(GeneratorBase):
         all_tasks = self._get_configuration().get_fusa_tasks()
 
         if all_tasks:
-            self.print_generator(GenHeading("FUSA Tasks Configuration"))
-
             # each type is generated separately
             for task_type in FusaTask.task_types:
+                self.print_generator(GenHeading(f"FUSA {task_type.upper()} Tasks Configuration"))
                 tasks = [t for t in all_tasks if t.get_task_type() == task_type]
                 self._print_fusa_tasks_for_type(tasks, task_type)
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to validation of mailboxes"""
+
 import logging
 import typing
 from typing import Dict, List
 
 from smct.configuration.confdata import ConfigurationData
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.owners.owner_agent import MailboxMu, ScmiAgent
 from smct.validation.validation_entry import ValidationEntry
 from smct.validation.validator_base import ValidatorBase

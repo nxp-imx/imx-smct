@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to parser of the CFG files"""
+
 import logging
 import re
 from typing import Any, Dict, List
 
 from smct import utils
+from smct.model.model_trdc import TrdcModel
 from smct.resources.res_bctrl import BctrlResource, BctrlResourceIpgDebug
 from smct.resources.res_mbc import MbcResource
 from smct.resources.res_mdac import MdacResource
@@ -37,6 +39,7 @@ _re_MBC_am_blk = re.compile(r"MBC_(\w)(\d+)=(\d+)\.(\d+)")
 # MBC_am=s.b - TRDC a, MBCm_MEMs, m is the MBC instance, s is the memory, and b is the block (e.g. MBC_N2=0)
 _re_MBC_am_mem = re.compile(r"MBC_(\w)(\d+)=(\d+)")
 _re_MRC_am = re.compile(r"MRC_(\w)(\d+)=(\d+)")  # MRC_am=0 - TRDC a, MRCm, m is the MRC instance (e.g. MRC_W2=0)
+_re_MRC = re.compile(r"(MRC_\w\d+)=.*")  # MRC_am=r1-r2 - TRDC a, MRCm, m is the MRC instance, r is register range (e.g. MRC_W2=0-15)
 
 
 class CfgResourceProvider:
@@ -197,6 +200,12 @@ def _rrc_resource_from_cfg_name(name: str, outer_name: str, outer_atoms: List[st
                 big = utils.get_attribute_value_from_list(outer_atoms, "big")
                 if big:
                     mrc.set_model_region_offset(10 if int(big) == 1 else 14)
+
+                config_name = _re_MRC.match(name)
+                if config_name and config_name.group(1) in TrdcModel.mrc_configurations:
+                    origins = TrdcModel.mrc_configurations[config_name.group(1)]
+                    for origin in origins:
+                        mrc.add_origin(origin.get("origin"), origin.get("size"))
     return res
 
 

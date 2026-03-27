@@ -1,16 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module with SCMI protocol related validations"""
+
 import logging
 import re
 from typing import List
 
 from smct import utils
 from smct.configuration.confdata import ConfigurationData
+from smct.owners.owner_lm import LM
 from smct.validation.validation_entry import ValidationEntry
 from smct.validation.validator_base import ValidatorBase
 
@@ -71,16 +74,18 @@ def _validate_channels(configuration: ConfigurationData, result: List[Validation
                     p2a_notify_counter += 1
                 case "p2a_priority":
                     priority_counter += 1
-        # Generate problem entries
-        if a2p_counter == 0:
-            msg = f"There must be at least one A2P channel in agent '{agent.get_name()}'"
-            result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
-        if p2a_notify_counter != 1:
-            msg = f"There must be exactly one P2A_NOTIFY channel in agent '{agent.get_name()}'"
-            result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
-        if priority_counter > 1:
-            msg = f"There must be maximally one P2A_PRIORITY channel in agent '{agent.get_name()}'"
-            result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
+        # Generate problem entries only if agent is inside real SCMI LM
+        # Note: there may be 'dummy' agents inside non-SCMI LMs for debugging purposes
+        if isinstance(agent.get_owner(), LM) and agent.get_owner().is_scmi():
+            if a2p_counter == 0:
+                msg = f"There must be at least one A2P channel in agent '{agent.get_name()}'"
+                result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
+            if p2a_notify_counter != 1:
+                msg = f"There must be exactly one P2A_NOTIFY channel in agent '{agent.get_name()}'"
+                result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
+            if priority_counter > 1:
+                msg = f"There must be maximally one P2A_PRIORITY channel in agent '{agent.get_name()}'"
+                result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
     if configuration.get_default_test_channel() == -1 and configuration.get_all_channels():
         msg = "There must be at least one channel with parameter test=default"
         result.append(ValidationEntry(logging.ERROR, "user_config", msg))

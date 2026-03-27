@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-from smct.configuration.configuration_provider import ConfigurationProvider
+
 from smct.configuration.confdata import ConfigurationData
+from smct.configuration.configuration_provider import ConfigurationProvider
 
 
 def test_identity() -> None:

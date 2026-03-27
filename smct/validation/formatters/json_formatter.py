@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to formatting logs into JSON output"""
+
 import json
 import logging
 import os
@@ -29,7 +30,7 @@ class JsonFormatter:
         record_dict: Dict[str, List] = {"DEBUG": [], "INFO": [], "WARNING": [], "ERROR": [], "CRITICAL": []}
         for record in records:
             record_dict[record.levelname].append(self._format_log(record))
-        return json.dumps(record_dict)
+        return json.dumps(record_dict, indent=2)
 
     @classmethod
     def _format_log(cls, record: logging.LogRecord) -> Dict[str, object]:
@@ -89,6 +90,7 @@ class JsonMemoryHandler(logging.handlers.MemoryHandler):
     def flush(self) -> None:
         """Flushes LogRecords to specified output file."""
         self.acquire()
+        os.makedirs(os.path.dirname(self.log_file), exist_ok=True)
         with open(self.log_file, self.mode, encoding="utf-8") as file:
             file.write(self.log_formatter.format_logs(self.buffer))
         self.release()

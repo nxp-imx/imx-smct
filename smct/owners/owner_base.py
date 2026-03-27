@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module with base implementation of resource owner, assigned resource and assigned permissions"""
+
 import logging
 import typing
 from typing import Any, Dict, List
 
 from smct import utils
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.resources.res_api import ApiResource
 from smct.resources.res_bctrl import BctrlResource
 from smct.resources.res_trdc import TrdcResource
@@ -85,8 +87,9 @@ class AssignedDefine:
         self._params: Dict[str, str] = {}
         param_assignments = utils.parse_line_to_atoms(params)
         for assignment in param_assignments:
-            name, val = assignment.split("=")
-            self._params[name] = val
+            if "=" in assignment:
+                name, val = assignment.split("=")
+                self._params[name] = val
 
     def get_assignment_json(self) -> object:
         """Returns JSON object with raw data.

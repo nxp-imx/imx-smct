@@ -76,17 +76,17 @@
                 {
                     "key": "trdc",
                     "label": "TRDC Letter",
-                    "description": "TRDC Letter of the MDAC"
+                    "description": "TRDC Letter of the MDAC (Master Domain Assignment Controller)"
                 },
                 {
                     "key": "master",
                     "label": "MDAC Number",
-                    "description": "Number of the Master"
+                    "description": "Number of the Bus Master"
                 },
                 {
                     "key": "core",
-                    "label": "Core (1) or Non-Core (0) Master",
-                    "description": "Number of the Master"
+                    "label": "Bus Master Type",
+                    "description": "Type of the Bus Master to handle data transactions - Core/Processor (1) or Non-Core/Non-processor (0) Bus Master"
                 }
             ],
             "param_types": [
@@ -119,12 +119,12 @@
                 {
                     "key": "trdc",
                     "label": "TRDC Letter",
-                    "description": "TRDC Letter of the MBC"
+                    "description": "TRDC Letter of the MBC (Memory Block Checker)"
                 },
                 {
                     "key": "mbc",
                     "label": "MBC Number",
-                    "description": "Memory block checker number"
+                    "description": "Memory Block Checker instance number"
                 },
                 {
                     "key": "mem",
@@ -159,7 +159,7 @@
                         {
                             "key": "blk",
                             "label": "Block Number",
-                            "description": "Block number"
+                            "description": "Block number identifies unique segment of the memory."
                         }
                     ]
                 },
@@ -171,12 +171,12 @@
                         {
                             "key": "blk",
                             "label": "Start Block Number",
-                            "description": "Block number"
+                            "description": "Block number identifies unique segment of the memory start address."
                         },
                         {
                             "key": "bcnt",
                             "label": "Block Count",
-                            "description": "Number of blocks assigned"
+                            "description": "Number of memory blocks assigned"
                         }
                     ]
                 }
@@ -209,18 +209,25 @@
                     "json_file": "soc_model",
                     "id": "size",
                     "category": "MBC/MRC"
+                },
+                {
+                    "param": "clr",
+                    "json_file": "soc_model",
+                    "id": "clr",
+                    "category": "MBC/MRC"
+
                 }
             ],
             "infos": [
                 {
                     "key": "trdc",
                     "label": "TRDC letter",
-                    "description": "TRDC Letter of the MRC"
+                    "description": "TRDC Letter of the MRC (Memory Region Checker)"
                 },
                 {
                     "key": "mrc",
                     "label": "MRC number",
-                    "description": "MRC number"
+                    "description": "MRC instance number"
                 }
             ]
         },
@@ -237,12 +244,12 @@
                 {
                     "key": "regn",
                     "label": "BCTRL register number",
-                    "description": "Block Control Register Number to enable IPG debug"
+                    "description": "Block Control Register number to enable IPG debug halted mode"
                 },
                 {
                     "key": "mask",
                     "label": "BCTRL mask",
-                    "description": "Block Control mask to enable IPG debug"
+                    "description": "Block Control mask to enable IPG debug halted mode"
                 }
             ]
         }
@@ -270,7 +277,7 @@
             {
                 "id": "sys",
                 "label": "System Power Protocol",
-                "description": "system power protocol access rights",
+                "description": "System power protocol access rights",
                 "prefix": "SYS",
                 "test": "TEST_SYS",
                 "static": true
@@ -430,7 +437,7 @@
             "id": "lmm_safe_type",
             "type": "enum",
             "label": "Safety Class",
-            "description": "Safety class of the SCMI Agent",
+            "description": "Safety classification of the SCMI Agent",
             "items": [
                 {
                     "id": "nseenv",
@@ -456,7 +463,7 @@
             "id": "lmm_ss_type",
             "type": "enum",
             "label": "Start-Stop Command",
-            "description": "Start-stop command",
+            "description": "Start-stop command to be executed when an LM is booted or shutdown.",
             "items": [
                 {
                     "id": "pd",
@@ -506,18 +513,18 @@
             "id": "lmm_react_types",
             "type": "enum",
             "label": "Reaction",
-            "description": "Fault reaction type",
+            "description": "Fault reaction type - this requires the SM own and program the FCCU; it then provides configurable reactions for each fault.",
             "items": [
                 {
                     "id": "",
-                    "label": "Not Initialized / Set up by Define",
-                    "description": "Value is not initialized, default value is used instead.",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized",
                     "value": ""
                 },
                 {
                     "id": "none",
                     "label": "No Reaction",
-                    "description": "No reaction",
+                    "description": "No reaction is configured explicitly",
                     "value": "LMM_REACT_NONE"
                 },
                 {
@@ -579,7 +586,7 @@
                 {
                     "id": "",
                     "label": "Not Initialized",
-                    "description": "Value is not initialized, default value is used instead.",
+                    "description": "Value is not initialized, default value (None) is used instead.",
                     "value": ""
                 },
                 {
@@ -623,7 +630,7 @@
                 {
                     "id": "scmi",
                     "label": "SCMI",
-                    "description": "System Control and Management Interface",
+                    "description": "ARM standard System Control and Management Interface",
                     "value": "SM_RPC_SCMI"
                 }
             ]
@@ -670,7 +677,7 @@
             "id": "scmi_sequence",
             "type": "enum",
             "label": "Sequence Type",
-            "description": "SCMI sequence type",
+            "description": "SCMI sequence ordering type",
             "items": [
                 {
                     "id": "",
@@ -696,18 +703,18 @@
             "id": "scmi_perms",
             "type": "enum",
             "label": "API Permission",
-            "description": "System Manager API permission for resources",
+            "description": "System Manager RPC API permission for resources",
             "items": [
                 {
                     "id": "",
-                    "label": "Not Initialized / Set up by Define",
-                    "description": "Value is not initialized, default value is used instead.",
+                    "label": "Not Initialized",
+                    "description": "Value is not initialized",
                     "value": ""
                 },
                 {
                     "id": "0",
-                    "label": "No Access (default)",
-                    "description": "No Access (default)",
+                    "label": "No Access (0)",
+                    "description": "No Access (default explicit initialization)",
                     "value": "SM_SCMI_PERM_NONE"
                 },
                 {
@@ -758,7 +765,7 @@
             "id": "xport_types",
             "type": "enum",
             "label": "XPORT Type",
-            "description": "XPORT (transport) type",
+            "description": "XPORT (transport) type to link RPC channel",
             "items": [
                 {
                     "id": "none",
@@ -769,7 +776,7 @@
                 {
                     "id": "smt",
                     "label": "SMT",
-                    "description": "Shared Memory Transport",
+                    "description": "Shared Memory Transport is configured to RPC channel.",
                     "value": "SM_XPORT_SMT"
                 }
             ]
@@ -778,7 +785,7 @@
             "id": "smt_crc_types",
             "type": "enum",
             "label": "Channel Check Type",
-            "description": "SMT channel check type",
+            "description": "SMT channel check type. It calculates the CRC of the payload and write it into the shared memory area.",
             "items": [
                 {
                     "id": "",
@@ -816,7 +823,7 @@
             "id": "mailbox_types",
             "type": "enum",
             "label": "Mailbox Type",
-            "description": "Mailbox type",
+            "description": "Mailbox connects physical hardware to transport channels.",
             "items": [
                 {
                     "id": "none",
@@ -827,13 +834,13 @@
                 {
                     "id": "loopback",
                     "label": "Loopback",
-                    "description": "Loopback Mailbox",
+                    "description": "Loopback Mailbox is configured to transport (used for simulation builds to allow SCMI unit tests).",
                     "value": "SM_MB_LOOPBACK"
                 },
                 {
                     "id": "mu",
                     "label": "MU",
-                    "description": "Message Unit Mailbox",
+                    "description": "Message Unit Mailbox is configured to transport.",
                     "value": "SM_MB_MU"
                 }
             ]
@@ -842,7 +849,7 @@
             "id": "mailbox_np_priority",
             "type": "enum",
             "label": "Mailbox Priority",
-            "description": "Mailbox priority",
+            "description": "Priority of MU's interrupt, default is NORMAL.",
             "items": [
                 {
                     "id": "",
@@ -904,11 +911,11 @@
             "id": "scmi_unit_test",
             "type": "enum",
             "label": "Unit Test",
-            "description": "Perform SCMI unit tests on resource",
+            "description": "Perform SCMI unit tests on resource. SCMI test calls go through the MUs as if they came from client agents. This works as the tests run from the main thread while the SCMI server-side functions run within the MU interrupt context.",
             "items": [
                 {
                     "id": "",
-                    "label": "Not Initialized / Set up by Define",
+                    "label": "Not Initialized",
                     "description": "Value is not initialized, default value is used instead.",
                     "value": ""
                 },
@@ -936,25 +943,25 @@
             "id": "lm_group",
             "type": "integer",
             "label": "LB Group",
-            "description": "Logical machine group number."
+            "description": "Logical machine group number (default is 0). There are commands like boot, shutdown and reset that can be executed on group of LMs."
         },
         {
             "id": "lm_rtime",
             "type": "integer",
             "label": "Relative Boot Time",
-            "description": "Boot time of LM in uS, relative to start of LM boot loop"
+            "description": "Boot time of LM in uS, relative to start of LM boot loop (max 178 seconds). It is useful to delay the start of an AP core to give RT cores a change to boot and make many calls to the SM. "
         },
         {
             "id": "notify_buffer_depth",
             "type": "integer",
             "label": "Notification Buffer Depth",
-            "description": "Notification Buffer Depth"
+            "description": "Notification Buffer size in words per agent. One setting applies on all channels."
         },
         {
             "id": "sma",
             "type": "integer",
             "label": "Shared Memory Address",
-            "description": "Shared Memory Address"
+            "description": "Shared Memory Address, undefined (0) indicates the MU's SRAM."
         },
         {
             "id": "arg1",

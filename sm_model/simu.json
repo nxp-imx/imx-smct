@@ -167,8 +167,8 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": 2
                         },
                         {
@@ -199,8 +199,8 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": 2
                         },
                         {
@@ -231,13 +231,13 @@
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
                             "value": "0"
                         },
                         {
                             "id": "0",
-                            "label": "None (default)",
+                            "label": "None (0)",
                             "description": "No Permissions (default)",
                             "value": "0x0000"
                         },
@@ -331,18 +331,18 @@
                     "id": "mdid",
                     "type": "enum",
                     "label": "Master DID Overwrite",
-                    "description": "Master Domain ID (MDID) overwirte",
+                    "description": "Configuration of master (MDAC) Domain ID. It can be left as default or configured to specified number. In case it is not initialized, DID is configured from owner DID (LM/DOM).",
                     "items": [
                         {
                             "id": "",
-                            "label": "Not Initialized / Set up by Define",
-                            "description": "Value is not initialized, default value is used instead.",
+                            "label": "Not Initialized - owner DID",
+                            "description": "Domain ID value is set to owner (LM/DOM) DID.",
                             "value": ""
                         },
                         {
                             "id": "none",
                             "label": "No overwrite",
-                            "description": "Domain ID is not overwritten, it is the same as the Owner.",
+                            "description": "Domain ID value is NOT configured to owner (LM/DOM) DID, it is left as default.",
                             "value": "none"
                         },
                         {
@@ -447,13 +447,13 @@
                     "id": "sid",
                     "type": "integer",
                     "label": "Stream ID",
-                    "description": "Stream ID bus transaction attribute (SID)"
+                    "description": "MDAC Stream ID bus transaction attribute (SID)"
                 },
                 {
                     "id": "kpa",
                     "type": "enum",
                     "label": "Known Physical Address",
-                    "description": "Known Physical Address (KPA)",
+                    "description": "Known Physical Address (KPA) of MDAC",
                     "items": [
                         {
                             "id": "",
@@ -514,6 +514,12 @@
                     "label": "Size",
                     "description": "Size of a block",
                     "override_type": true
+                },
+                {
+                    "id": "clr",
+                    "type": "integer",
+                    "label": "Clearing Registers Count",
+                    "description": "The value determines how many empty or clearing regions should be generated in the MRC configuration. This is used to ensure that unused MRC registers are properly cleared to a safe default state."
                 }
             ]
         }

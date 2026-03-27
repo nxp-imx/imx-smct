@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module for generating file config_scmi.h"""
+
 import logging
 from typing import Any, Dict, List
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.generation.generator import GeneratorBase, GenHeading, GenMacroList, GenMacroValue, GenStructInit
 from smct.owners.owner_agent import ScmiAgent, ScmiChannel
 from smct.owners.owner_base import AssignedResource
@@ -182,9 +184,9 @@ class GeneratorSCMI(GeneratorBase):
         conf = self._get_configuration()
 
         for lm in conf.get_all_lms():
-            if lm.get_rpc() == "scmi":
-                for a in lm.get_all_agents():
-                    self._print_agent(a)
+            for a in lm.get_all_agents():
+                self._print_agent(a)
+            if lm.is_scmi():
                 self._print_scmi(lm)
 
         self._print_agents_summary()

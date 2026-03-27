@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 from smct.resources.resdb import ResourceDb
 from smct.resources.resource_base import AtomicResource, MacroResource
 from smct.resources.resource_database_provider import ResourceDatabaseProvider
@@ -37,4 +38,3 @@ def test_clear_configuration() -> None:
     assert db.find_macro_resource("Lorem") is None
     assert len(db.find_atomic_resource_by("name", "Ipsum")) == 0
     assert db.is_empty()
-

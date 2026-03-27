@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module related to TRDC model"""
+
 import logging
 import re
 from typing import Any, Dict, List, Optional
 
-from smct.expcetions.cfg_tool_exception import CfgToolException
+from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.utils import FormatedInt
 
 logger = logging.getLogger()
@@ -152,6 +153,16 @@ class MrcModel:
         self._name: str = f"{trdc_name}.MRC{mrc}"  # Name of the MRC - mostly for debugging purposes
         self._number_of_regions: int = 0  # number of regions need to be set before first use of this object
         self._memory_region_address_offset: int = 14  # 14 or 10 (if big=1) bits on mx95
+        self._origins: List[Any] = []
+
+    def add_origin(self, origin: str, size: str) -> None:
+        """Adds origin address and size of the region
+
+        Args:
+            origin: origin address to set
+            size: size of the region
+        """
+        self._origins.append({"origin": origin, "size": size})
 
     def set_model_number_of_regions(self, number_of_regions: int) -> None:
         """Sets number of regions in the MRC model
@@ -197,6 +208,7 @@ class MrcModel:
             "mrc": self._mrc,
             "nrgns": self._number_of_regions,
             "memory_region_offset": self._memory_region_address_offset,
+            "origins": self._origins,
         }
 
 
@@ -209,6 +221,9 @@ class TrdcModel:
     pa_types: Dict[str, int]
     # named security values
     sa_types: Dict[str, int]
+
+    # MRC configurations
+    mrc_configurations: Dict[str, List[Any]]
 
     # DFMT registers
     DFMT0_register: Dict[str, Dict[str, Any]]
@@ -253,6 +268,8 @@ class TrdcModel:
             nmstr: Number of masters
             nmbc: Number of MBCs
             nmrc: Number of MRCs
+            kpaen: KPA enable
+            sidsz: SID size
         """
         if self._model_already_set:
             logger.error("%s cannot be re-configured", self._name)

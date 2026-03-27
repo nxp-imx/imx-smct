@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
 """Module with logical machine related validations"""
+
 import logging
 import re
 from typing import List
@@ -41,7 +42,7 @@ def _validate_lm0(logical_machine: LM, result: List[ValidationEntry]) -> None:
     expected_boot = 1
     boot = logical_machine.get_boot()
     if boot != expected_boot:
-        validation_id = ".".join([logical_machine.get_id(), "BOOT"])
+        validation_id = ".".join([logical_machine.get_id(), "MSEL0", "BOOT"])
         result.append(ValidationEntry(logging.ERROR, source, f"LM0 does not have required boot order '{expected_boot}'", validation_id))
     expected_skip = False
     skip = logical_machine.get_skip()

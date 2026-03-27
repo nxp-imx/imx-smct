@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+
 """Module related to TRDC resources"""
+
 import logging
 from typing import Any, Dict, List, Tuple
 
@@ -12,7 +14,7 @@ from smct import utils
 from smct.generation.trdc.mrc_generation_model import MrcGenerationModel
 from smct.model.model_trdc import TrdcModel
 
-from ..utils import FormatedInt, UInt64Constraints
+from ..utils import FormatedInt, UInt32Constraints, UInt64Constraints
 from .default_permission import DefaultPermission
 from .resource_base import AtomicResource
 
@@ -58,10 +60,10 @@ class MbcMrcResource(TrdcResource):
                         continue
                     generate_debug = "no_debug" not in permission or permission["no_debug"] is False
                     permission["begin"] = FormatedInt(permission["begin"]) if isinstance(permission["begin"], str) else (FormatedInt(str(permission["begin"])))
-                    if permission["begin"].get_value() > UInt64Constraints.MAX_VALUE:
+                    if permission["begin"].get_value() > UInt32Constraints.MAX_VALUE:
                         source = "/".join(["atomic_resources", self.get_name(), "default_permission", permissions.index(permission), "BEGIN"])
-                        logger.error("Begin address %s exceeds maximum 64-bit value.", permission["begin"], extra={"source": source})
-                        permission["begin"] = FormatedInt(UInt64Constraints.DEFAULT_VALUE)
+                        logger.error("Begin address %s exceeds maximum 32-bit value.", permission["begin"], extra={"source": source})
+                        permission["begin"] = FormatedInt(UInt32Constraints.DEFAULT_VALUE)
                     permission["size"] = FormatedInt(permission["size"]) if isinstance(permission["size"], str) else (FormatedInt(str(permission["size"])))
                     if permission["size"].get_value() > UInt64Constraints.MAX_VALUE:
                         source = "/".join(["atomic_resources", self.get_name(), "default_permission", permissions.index(permission), "SIZE"])
@@ -107,12 +109,6 @@ class MbcMrcResource(TrdcResource):
         Returns:
             Dict[str, Any] | None: Dictionary of assignment parameters or None if assignment should be prevented
         """
-        # perm
-        perm = utils.get_attribute_value_from_list(params, "perm")
-        if not perm or perm not in TrdcModel.permission_types:
-            source = "/".join(["model", "chip", "TRDC" + self.get_trdc_id(), self.get_name()])
-            logger.error("A valid 'perm' permission needs to be defined for %s, but '%s' was given", self._name, perm, extra={"source": source})
-            return None
 
         no_debug_access = utils.contains_attribute_in_list(params, "nodbg", no_value=True) or (
             utils.contains_attribute_in_list(params, "nodbg") and utils.get_bool(utils.get_attribute_value_from_list(params, "nodbg"))
@@ -120,10 +116,11 @@ class MbcMrcResource(TrdcResource):
         begin_attr = utils.get_attribute_value_from_list(params, "begin")
         size = FormatedInt(0)
         begin = FormatedInt(begin_attr) if begin_attr else FormatedInt(0)
-        if begin.get_value() > UInt64Constraints.MAX_VALUE:
+        if begin.get_value() > UInt32Constraints.MAX_VALUE:
+            validation_id = ".".join(["RESOURCES", self._name, "BEGIN"])
             source = "/".join(["atomic_resources", self.get_name(), "default_permission", "BEGIN"])
-            logger.error("Begin address %s exceeds maximum 64-bit value.", begin, extra={"source": source})
-            begin = FormatedInt(UInt64Constraints.DEFAULT_VALUE)
+            logger.error("Begin address %s exceeds maximum 32-bit value.", begin, extra={"source": source, "validation_id": validation_id})
+            begin = FormatedInt(UInt32Constraints.DEFAULT_VALUE)
         if begin_attr is not None:
             end_attr = utils.get_attribute_value_from_list(params, "end")
             end = utils.parse_int(end_attr) if end_attr else 0
@@ -131,14 +128,43 @@ class MbcMrcResource(TrdcResource):
             size = FormatedInt(size_attr) if size_attr else FormatedInt(0)
             if end and not size_attr:
                 if end < begin.get_value():
+                    validation_id = ".".join(["RESOURCES", self._name, "BEGIN"])
                     source = "/".join(["model", "chip", "TRDC" + self.get_trdc_id(), self.get_name()])
-                    logger.error('Bad begin(%s)..end(%s) values defined for "%s"', str(begin), str(end), self.get_name(), extra={"source": source})
+                    logger.error(
+                        'Bad begin(%s)..end(%s) values defined for "%s"',
+                        str(begin),
+                        str(end),
+                        self.get_name(),
+                        extra={"source": source, "validation_id": validation_id},
+                    )
                 else:
                     size = FormatedInt(end - begin.get_value() + 1)
             if size.get_value() > UInt64Constraints.MAX_VALUE:
+                validation_id = ".".join(["RESOURCES", self._name, "SIZE"])
                 source = "/".join(["atomic_resources", self.get_name(), "default_permission", "SIZE"])
-                logger.error("Size %s exceeds maximum 64-bit value.", size, extra={"source": source})
-                size = FormatedInt(UInt64Constraints.DEFAULT_VALUE)
+                logger.error("Size %s exceeds maximum 64-bit value.", size, extra={"source": source, "validation_id": validation_id})
+                size = FormatedInt(0)
+
+        perm = utils.get_attribute_value_from_list(params, "perm")
+        if not perm or perm not in TrdcModel.permission_types:
+            source = "/".join(["model", "chip", "TRDC" + self.get_trdc_id(), self.get_name()])
+            validation = ["RESOURCES", self._name]
+            if size.get_value() > 0:
+                validation.append("BEGIN")
+                validation.append(str(begin.get_value()))
+                validation.append("SIZE")
+                validation.append(str(size.get_value()))
+            validation.append("PERM")
+            validation_id = ".".join(validation)
+            logger.error(
+                "A valid 'perm' permission needs to be defined for %s, but '%s' was given with params %s",
+                self._name,
+                perm,
+                params,
+                extra={"source": source, "validation_id": validation_id},
+            )
+            return None
+
         did = utils.get_attribute_value_from_list(params, "did")
         if did:
             # using did, means overriding assignment and setting just default permissions

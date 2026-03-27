@@ -2,20 +2,20 @@
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
-    "created": "2025-12-17T14:10:46Z",
+    "created": "2026-03-22T21:54:40Z",
     "creators": [
       "Organization: NXP"
     ],
     "licenseListVersion": "3.26"
   },
-  "name": "System Manager Config Tool CLI-25.12.0",
+  "name": "System Manager Config Tool CLI-26.03",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://nxp.com/spdx/08231691-cfd5-4c8e-a724-34094c4a29a6",
+  "documentNamespace": "https://nxp.com/spdx/3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
   "packages": [
     {
-      "SPDXID": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
+      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
       "name": "System Manager Config Tool CLI",
-      "versionInfo": "25.12.0",
+      "versionInfo": "26.03",
       "licenseConcluded": "(BSD-3-Clause)",
       "licenseDeclared": "(BSD-3-Clause)",
       "downloadLocation": "github.com/nxp-imx/imx-smct",
@@ -25,13 +25,13 @@
       "filesAnalyzed": false
     },
     {
-      "SPDXID": "SPDXRef-package-8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
+      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
       "name": "fastjsonschema",
       "versionInfo": "2.21.2",
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "BSD-3-Clause",
       "homepage": "https://github.com/seznam/python-fastjsonschema",
-      "downloadLocation": "https://pypi.org/project/fastjsonschema/2.21.2",
+      "downloadLocation": "NOASSERTION",
       "originator": "Organization: pypi",
       "supplier": "NOASSERTION",
       "externalRefs": [
@@ -49,24 +49,23 @@
       "filesAnalyzed": false
     },
     {
-      "SPDXID": "SPDXRef-package-37d54577-8a2c-4d78-8b0e-01cad87ae847",
+      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---9f8d1873-f228-4541-afdb-a721a38a41d7",
       "name": "nxp-imx/imx-sm",
-      "versionInfo": "android-16.0.0_1.0.0",
+      "versionInfo": "rel_imx_sm_2026q1",
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "BSD-3-Clause",
-      "homepage": "https://github.com/nxp-imx/imx-sm",
       "downloadLocation": "NOASSERTION",
       "originator": "Organization: nxp-imx",
       "supplier": "NOASSERTION",
       "externalRefs": [
         {
           "referenceCategory": "OTHER",
-          "referenceLocator": "1aa733fc-4962-444f-bf86-d2bafa2a9d55",
+          "referenceLocator": "e2659524-89d2-48ca-8d3e-2c1a0df52b84",
           "referenceType": "BlackDuck-ComponentOrigin"
         },
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referenceLocator": "pkg:github/nxp-imx/imx-sm@android-16.0.0_1.0.0",
+          "referenceLocator": "pkg:github/nxp-imx/imx-sm@rel_imx_sm_2026q1",
           "referenceType": "purl"
         }
       ],
@@ -77,18 +76,18 @@
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
       "relationshipType": "DESCRIBES",
-      "relatedSpdxElement": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6"
+      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7"
     },
     {
-      "spdxElementId": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
-      "relationshipType": "OTHER",
-      "relatedSpdxElement": "SPDXRef-package-37d54577-8a2c-4d78-8b0e-01cad87ae847",
-      "comment": "Separate Work"
-    },
-    {
-      "spdxElementId": "SPDXRef-package-08231691-cfd5-4c8e-a724-34094c4a29a6",
+      "spdxElementId": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
       "relationshipType": "DYNAMIC_LINK",
-      "relatedSpdxElement": "SPDXRef-package-8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
+      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
+    },
+    {
+      "spdxElementId": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
+      "relationshipType": "OTHER",
+      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---9f8d1873-f228-4541-afdb-a721a38a41d7",
+      "comment": "Separate Work"
     }
   ]
 }
