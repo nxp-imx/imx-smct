@@ -19,6 +19,7 @@ def test_identity() -> None:
 
 
 def test_clear_model() -> None:
+    ChipModelProvider.clear_model()
     model = ChipModelProvider.get_model()
     original_id = id(model)
     assert isinstance(model, ChipModelImx9)

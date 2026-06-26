@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to TRDC MDAC resources"""
+"""Module related to TRDC MDAC resources."""
 
 from typing import Any, Dict, List
 
@@ -17,7 +17,7 @@ from .res_trdc import TrdcResource
 
 
 class MdacResource(TrdcResource):
-    """MDAC resource in TRDC"""
+    """MDAC resource in TRDC."""
 
     def __init__(self, raw: Dict[str, Any]):
         super().__init__(raw)

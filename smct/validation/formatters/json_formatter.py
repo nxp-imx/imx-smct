@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to formatting logs into JSON output"""
+"""Module related to formatting logs into JSON output."""
 
 import json
 import logging
@@ -16,7 +16,7 @@ from typing import Dict, List
 
 
 class JsonFormatter:
-    """Formatter of LogRecords to JSON format"""
+    """Formatter of LogRecords to JSON format."""
 
     def format_logs(self, records: list[LogRecord]) -> str:
         """Formats list of LogRecord to dictionary form with log level as key.
@@ -60,7 +60,7 @@ class JsonFormatter:
 
 
 class JsonMemoryHandler(logging.handlers.MemoryHandler):
-    """MemoryHandler used to buffer LogRecords and flush them into output file"""
+    """MemoryHandler used to buffer LogRecords and flush them into output file."""
 
     def __init__(self, formatter: JsonFormatter, output_folder: str, mode: str):
         """Initialize JsonMemoryHandler.
@@ -76,8 +76,9 @@ class JsonMemoryHandler(logging.handlers.MemoryHandler):
         self.log_formatter: JsonFormatter = formatter
 
     def shouldFlush(self, _: LogRecord) -> bool:
-        """Returns true if the buffer is up to capacity. This method is
-        overridden to implement custom flushing strategy.
+        """Returns true if the buffer is up to capacity.
+
+        This method is overridden to implement custom flushing strategy.
 
         Args:
             _: LogRecord (unused parameter).

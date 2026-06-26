@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to MRC regions generation model"""
+"""Module related to MRC regions generation model."""
 
 import functools
 import logging
@@ -18,7 +18,7 @@ logger = logging.getLogger()
 
 
 def _compare_regions_legacy(region1: MrcRegion, region2: MrcRegion) -> int:
-    """Compares two regions by start and end addresses
+    """Compares two regions by start and end addresses.
 
     Args:
         region1: First region to compare
@@ -38,12 +38,12 @@ def _compare_regions_legacy(region1: MrcRegion, region2: MrcRegion) -> int:
 
 
 class MrcGenerationModel:
-    """Model for generation of MRC"""
+    """Model for generation of MRC."""
 
     DEFAULT_CLEARING: int = 4
 
     def __init__(self, regions_count: int) -> None:
-        """Initialize MrcGenerationModel
+        """Initialize MrcGenerationModel.
 
         Args:
             regions_count: Number of regions
@@ -52,7 +52,7 @@ class MrcGenerationModel:
         self._regions_count = regions_count
 
     def add_region(self, region: MrcRegion) -> None:
-        """Adds region to the model
+        """Adds region to the model.
 
         Args:
             region: The MRC region to add
@@ -60,12 +60,35 @@ class MrcGenerationModel:
         domain = region.get_domain()
         if domain not in self._regions:
             self._regions[domain] = []
+
+        for existing_region in self._regions[domain]:
+            if region.overwrites(existing_region):
+                if region.is_dom_clearing() and not existing_region.is_dom_clearing():
+                    return
+                if not region.is_dom_clearing() and existing_region.is_dom_clearing():
+                    self._regions[domain].remove(existing_region)
+                    break
+                # Two real (non-clearing) regions at same location
+                if not region.is_dom_clearing() and not existing_region.is_dom_clearing():
+                    if region.get_permission() == existing_region.get_permission():
+                        if region.get_permission() == TrdcModel.DEBUG_DOMAIN_PERMISSION:
+                            # Debug domain: don't deduplicate, keep both (Perl parity)
+                            break  # Exit loop and add this region
+                        # Deduplicate: same permission, skip (idempotent)
+                        # NOTE: Intentional optimization over Perl configtool.pl, which assigns
+                        # each MRC entry its own RGD slot without deduplication.
+                        return
+                    # Different permission: OR permissions together, matching Perl |= behavior
+                    existing_region.merge_permission(region.get_permission())
+                    return
+
         self._regions[domain].append(region)
 
     def generate_clearing_in_domain(self, domain: int, amount: int) -> None:
-        """Generates clearing of registers
+        """Generates clearing of registers.
 
         Args:
+            domain: Domain to generate clearing for
             amount: Amount of clearing to generate
         """
         need_to_generate = amount - len(self._regions[domain])
@@ -74,7 +97,7 @@ class MrcGenerationModel:
                 self._regions[domain].append(MrcRegion(domain, 0, 0, -1))
 
     def generate_clearing(self, amount: int = DEFAULT_CLEARING) -> None:
-        """Generates clearing of registers
+        """Generates clearing of registers.
 
         Args:
             amount: Amount of clearing to generate
@@ -84,7 +107,7 @@ class MrcGenerationModel:
             self.generate_clearing_in_domain(domain, amount)
 
     def remove_unnecessary_regions(self) -> None:
-        """Removes unnecessary regions. For example: Regions with permission 0"""
+        """Removes unnecessary regions. For example: Regions with permission 0."""
         for domain in self._regions:
             to_be_removed = []
             for region in self._regions[domain]:
@@ -94,7 +117,7 @@ class MrcGenerationModel:
                 self._regions[domain].remove(region)
 
     def get_permissions(self) -> List[int]:
-        """Returns permissions in order in which the regions are stored in the model
+        """Returns permissions in order in which the regions are stored in the model.
 
         Returns:
             List of permissions
@@ -109,7 +132,7 @@ class MrcGenerationModel:
         return result
 
     def generate_debug_regions(self, debug_domain: int) -> None:
-        """Generates copy of all regions in all domains into debug domain
+        """Generates copy of all regions in all domains into debug domain.
 
         Args:
             debug_domain: The debug domain to generate regions for
@@ -128,7 +151,7 @@ class MrcGenerationModel:
             self._regions[debug_domain].append(region)
 
     def get_regions(self) -> Dict[int, List[MrcRegion]]:
-        """Returns list of all regions in the MRC model
+        """Returns list of all regions in the MRC model.
 
         Returns:
             Dictionary mapping domain IDs to lists of MRC regions
@@ -136,6 +159,6 @@ class MrcGenerationModel:
         return self._regions
 
     def sort_regions(self) -> None:
-        """Sorts the regions in all domains"""
+        """Sorts the regions in all domains."""
         for domain in self._regions:
             self._regions[domain].sort(key=functools.cmp_to_key(_compare_regions_legacy))

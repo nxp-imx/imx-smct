@@ -11,6 +11,9 @@ from smct.generation.trdc.mrc_generation_model import MrcGenerationModel
 from smct.generation.trdc.mrc_region import MrcRegion
 from smct.model.model_trdc import TrdcModel
 
+# Initialize DEBUG_DOMAIN_PERMISSION (normally set by parser from chip model JSON)
+TrdcModel.DEBUG_DOMAIN_PERMISSION = 0x6666
+
 
 def _lists_equals(input_list: List[int], expected_list: List[int]) -> bool:
     return set(input_list) == set(expected_list)
@@ -156,3 +159,88 @@ def test_generate_larger_clearing() -> None:
     clearing_region0 = MrcRegion(0, 0, 0, -1)
     expected_regions = {0: [region0, clearing_region0, clearing_region0, clearing_region0, clearing_region0, clearing_region0]}
     assert regions == expected_regions
+
+
+def test_add_region_same_permission_deduplicates() -> None:
+    """Test that adding same region twice with same permission deduplicates (idempotent)"""
+    # Arrange
+    model = MrcGenerationModel(8)
+    region1 = MrcRegion(1, 0x1000, 0x2000, 0x7777)
+    region2 = MrcRegion(1, 0x1000, 0x2000, 0x7777)  # Same domain, range, permission
+    # Act
+    model.add_region(region1)
+    model.add_region(region2)
+    regions = model.get_regions()
+    # Assert - With dedup logic: same permission at same location → deduplicate (only one stored)
+    assert len(regions[1]) == 1
+    assert regions[1][0].get_permission() == 0x7777
+
+
+def test_add_region_different_permission_or_merged() -> None:
+    """Test that adding same region with different permission ORs them together"""
+    # Arrange
+    model = MrcGenerationModel(8)
+    region1 = MrcRegion(2, 0x1000, 0x2000, 0x6600)
+    region2 = MrcRegion(2, 0x1000, 0x2000, 0x4400)  # Same domain, range but DIFFERENT permission
+    # Act
+    model.add_region(region1)
+    model.add_region(region2)
+    regions = model.get_regions()
+    # Assert - permissions are OR'd together (matching Perl |= behavior)
+    assert len(regions[2]) == 1
+    assert regions[2][0].get_permission() == 0x6600 | 0x4400
+
+
+def test_add_region_clearing_behavior_unchanged() -> None:
+    """Test that clearing region behavior is preserved (dom_clearing vs non-clearing logic)"""
+    # Arrange
+    model = MrcGenerationModel(8)
+    # Create a real region and a dom_clearing region
+    real_region = MrcRegion(3, 0x1000, 0x2000, 0x7700, clearing=False)
+    clearing_region = MrcRegion(3, 0x1000, 0x2000, 0x0, clearing=True)
+    # Act & Assert - clearing region added first, then real region should replace it
+    model.add_region(clearing_region)
+    assert len(model.get_regions()[3]) == 1
+    model.add_region(real_region)
+    assert len(model.get_regions()[3]) == 1
+    assert model.get_regions()[3][0] == real_region
+    # Act & Assert - real region first, then clearing region should be ignored
+    model2 = MrcGenerationModel(8)
+    model2.add_region(real_region)
+    assert len(model2.get_regions()[3]) == 1
+    model2.add_region(clearing_region)
+    assert len(model2.get_regions()[3]) == 1
+    assert model2.get_regions()[3][0] == real_region
+
+
+def test_add_region_different_range_no_dedup() -> None:
+    """Test that adding regions with different ranges keeps both (no deduplication)"""
+    # Arrange
+    model = MrcGenerationModel(8)
+    region1 = MrcRegion(4, 0x1000, 0x2000, 0x7777)
+    region2 = MrcRegion(4, 0x3000, 0x4000, 0x7777)  # Same domain, permission, but DIFFERENT range
+    # Act
+    model.add_region(region1)
+    model.add_region(region2)
+    regions = model.get_regions()
+    # Assert - Different ranges → both regions kept (no overlap, no dedup)
+    assert len(regions[4]) == 2
+    assert region1 in regions[4]
+    assert region2 in regions[4]
+
+
+def test_add_region_debug_domain_no_dedup() -> None:
+    """Test that debug domain regions are NOT deduplicated (Perl parity)"""
+    # Arrange
+    model = MrcGenerationModel(8)
+    region1 = MrcRegion(9, 0x08600000, 0x089FFFFF, TrdcModel.DEBUG_DOMAIN_PERMISSION)
+    region2 = MrcRegion(9, 0x08600000, 0x089FFFFF, TrdcModel.DEBUG_DOMAIN_PERMISSION)  # Same domain, range, permission (debug)
+    # Act
+    model.add_region(region1)
+    model.add_region(region2)
+    regions = model.get_regions()
+    # Assert - Debug domain regions must NOT be deduplicated (both kept for Perl parity)
+    assert len(regions[9]) == 2
+    assert region1 in regions[9]
+    assert region2 in regions[9]
+

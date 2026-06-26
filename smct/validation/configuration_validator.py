@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to user configuration validation"""
+"""Module related to user configuration validation."""
 
 from typing import List
 
@@ -15,12 +15,13 @@ from smct.validation.validation_entry import ValidationEntry
 from smct.validation.validator_base import ValidatorBase
 from smct.validation.validators.logical_machines_validator import LogicalMachinesValidator
 from smct.validation.validators.mailboxes_validator import MailboxesValidator
+from smct.validation.validators.resources_validator import ResourcesValidator
 from smct.validation.validators.scmi_validator import ScmiValidator
 from smct.validation.validators.version_validator import VersionValidator
 
 
 class ConfigurationValidator:
-    """Validator of configuration"""
+    """Validator of configuration."""
 
     def __init__(self, conf: ConfigurationData) -> None:
         """Initialize the configuration validator.
@@ -29,7 +30,7 @@ class ConfigurationValidator:
             conf: The configuration data to validate.
         """
         self._conf: ConfigurationData = conf
-        self._validators: List[ValidatorBase] = [LogicalMachinesValidator(), ScmiValidator(), VersionValidator(), MailboxesValidator()]
+        self._validators: List[ValidatorBase] = [LogicalMachinesValidator(), ScmiValidator(), VersionValidator(), MailboxesValidator(), ResourcesValidator()]
         self._validation_entries: List[ValidationEntry] = []
 
     def validate(self) -> None:

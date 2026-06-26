@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module with product info related stuff"""
+"""Module with product info related stuff."""
 
 from typing import Tuple
 
@@ -12,7 +12,7 @@ from smct._version import __version__
 
 
 class ProductInfo:
-    """Class containing information about the product"""
+    """Class containing information about the product."""
 
     _smct_version = __version__
     _sm_fw_compatibility_version = 2

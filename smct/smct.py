@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Main module of the System Manager configuration tool"""
+"""Main module of the System Manager configuration tool."""
 
 import argparse
 import logging
@@ -19,6 +19,7 @@ from smct.generation.config_generator import ConfigGenerator
 from smct.generation.export_cfg import CfgExporter
 from smct.model.chip_model_provider import ChipModelProvider
 from smct.parsers.cfg_parser import CfgFileParser
+from smct.parsers.command_parser import CfgCommandParser, CfgPreprocessor
 from smct.parsers.hdr_parser import ApiResourceParser
 from smct.parsers.resource_parser import ResourceParser
 from smct.product_info import ProductInfo
@@ -33,7 +34,7 @@ logger = logging.getLogger()
 
 
 class AppErrorException(Exception):
-    """Application error exception"""
+    """Application error exception."""
 
     def __init__(self, message: str):
         if not message:
@@ -197,6 +198,7 @@ def _parse_database(root_directory: str, device_name: str, board_name: str) -> b
         if not header_parser.parse_board(root_directory, board_name):
             return False
         cfg_parser.add_static_resources()
+        cfg_parser.set_command_parser(CfgCommandParser())
         cfg_parser.parse_device(root_directory, device_name)
 
         if ResourceDatabaseProvider.get_database().is_empty():
@@ -223,6 +225,11 @@ def _parse_config_file(root_directory: str, config_file_name: str) -> None:
         file_name = os.path.splitext(os.path.basename(file_path))[0]
         ConfigurationProvider.get_configuration().set_config_name(file_name)
         cfg_parser.add_static_resources()
+        # pre-process step
+        cfg_parser.set_command_parser(CfgPreprocessor())
+        cfg_parser.parse_file(file_path)
+        # configuration parsing step
+        cfg_parser.set_command_parser(CfgCommandParser())
         cfg_parser.parse_file(file_path)
 
         if ResourceDatabaseProvider.get_database().is_empty():
@@ -277,7 +284,7 @@ def _generate_all(output_dir: str, force: bool = False) -> None:
 
 
 def _store_cfg_file(output_filename: str, force: bool = False) -> None:
-    """Exports configuration to a legacy CFG file format"""
+    """Exports configuration to a legacy CFG file format."""
     try:
         directory, name = os.path.split(output_filename)
         exporter = CfgExporter(name)

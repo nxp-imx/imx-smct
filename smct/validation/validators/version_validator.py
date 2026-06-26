@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with version related validations"""
+"""Module with version related validations."""
 
 import logging
 import os
@@ -56,7 +56,7 @@ def _validate_sm_fw_compatibility(configuration: ConfigurationData, result: List
 
 
 class VersionValidator(ValidatorBase):
-    """Validator of versions"""
+    """Validator of versions."""
 
     def validate(self, configuration: ConfigurationData) -> List[ValidationEntry]:
         """Validates versions in the configuration.

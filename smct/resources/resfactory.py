@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with resource factory"""
+"""Module with resource factory."""
 
 from typing import Any, Dict
 

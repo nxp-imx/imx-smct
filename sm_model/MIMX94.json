@@ -157,60 +157,60 @@
                         ]
                     }
                 ],
-                "configurations" :[
+                "configurations": [
                     {
                         "memory": "MRC_A0",
-                        "origin": "0x100000", 
+                        "origin": "0x100000",
                         "size": "256KB"
                     },
                     {
                         "memory": "MRC_W0",
-                        "origin": "0x0", 
+                        "origin": "0x0",
                         "size": "256KB"
                     },
                     {
                         "memory": "MRC_W1",
-                        "origin": "0x28000000", 
+                        "origin": "0x28000000",
                         "size": "128MB"
                     },
                     {
                         "memory": "MRC_W1",
-                        "origin": "0x47420000", 
+                        "origin": "0x47420000",
                         "size": "128MB"
                     },
                     {
                         "memory": "MRC_W2",
-                        "origin": "0x20380000", 
+                        "origin": "0x20380000",
                         "size": "512KB"
                     },
                     {
                         "memory": "MRC_W2",
-                        "origin": "0x4A000000", 
+                        "origin": "0x4A000000",
                         "size": "512KB"
                     },
                     {
                         "memory": "MRC_W3",
-                        "origin": "0x20280000", 
+                        "origin": "0x20280000",
                         "size": "512KB"
                     },
                     {
                         "memory": "MRC_W3",
-                        "origin": "0x49C00000", 
+                        "origin": "0x49C00000",
                         "size": "512KB"
                     },
                     {
                         "memory": "MRC_W4",
-                        "origin": "0x24000000", 
+                        "origin": "0x24000000",
                         "size": "64MB"
                     },
                     {
                         "memory": "MRC_W4",
-                        "origin": "0x47440000", 
+                        "origin": "0x47440000",
                         "size": "64MB"
                     },
                     {
                         "memory": "MRC_N0",
-                        "origin": "0x80000000", 
+                        "origin": "0x80000000",
                         "size": "16GB"
                     }
                 ]
@@ -536,7 +536,7 @@
                     "id": "nodbg",
                     "type": "enum",
                     "label": "No mapping to Debug DID",
-                    "description": "Do not map to DAP DID",
+                    "description": "Do not map to Debug Access Port (DAP) DID",
                     "items": [
                         {
                             "id": "",
@@ -562,14 +562,14 @@
                     "id": "begin",
                     "type": "integer",
                     "label": "Begin",
-                    "description": "Begin address of a block",
+                    "description": "Begin address of a memory block",
                     "override_type": true
                 },
                 {
                     "id": "size",
                     "type": "integer",
                     "label": "Size",
-                    "description": "Size of a block",
+                    "description": "Size of a memory block",
                     "override_type": true
                 },
                 {
@@ -577,6 +577,58 @@
                     "type": "integer",
                     "label": "Clearing Registers Count",
                     "description": "The value determines how many empty or clearing regions should be generated in the MRC configuration. This is used to ensure that unused MRC registers are properly cleared to a safe default state."
+                },
+                {
+                    "id": "dom_clr_unused",
+                    "type": "enum",
+                    "label": "Clear Unused Domains",
+                    "description": "Clear TRDC configuration of selected resource for all unused domains to ensure the after-reset state.",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": ""
+                        },
+                        {
+                            "id": "false",
+                            "label": "Disable",
+                            "description": "Keep default TRDC configuration for other domains.",
+                            "value": "false"
+                        },
+                        {
+                            "id": "true",
+                            "label": "Enable",
+                            "description": "Clear TRDC configuration of selected resource for all unused domains to ensure the after-reset state.",
+                            "value": "true"
+                        }
+                    ]
+                },
+                {
+                    "id": "dom_exclusive",
+                    "type": "enum",
+                    "label": "Check Domain Exclusivity",
+                    "description": "Enable validation of exclusive TRDC configuration for selected resource.",
+                    "items": [
+                        {
+                            "id": "",
+                            "label": "Not Initialized",
+                            "description": "Value is not initialized",
+                            "value": ""
+                        },
+                        {
+                            "id": "false",
+                            "label": "Disable",
+                            "description": "Do not expect exclusive TRDC domain configuration for selected resource.",
+                            "value": "false"
+                        },
+                        {
+                            "id": "true",
+                            "label": "Enable",
+                            "description": "Expect exclusive TRDC domain configuration for selected resource (TRDC configuration of the selected resource in other domain invokes error).",
+                            "value": "true"
+                        }
+                    ]
                 }
             ]
         }

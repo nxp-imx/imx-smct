@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_smt.h"""
+"""Module for generating file config_smt.h."""
 
 import typing
 from typing import Any, Dict, List, Set
@@ -17,7 +17,7 @@ from smct.owners.owner_lm import LM
 
 
 class GeneratorSMT(GeneratorBase):
-    """Generator of config_smt.h"""
+    """Generator of config_smt.h."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.
@@ -82,8 +82,9 @@ class GeneratorSMT(GeneratorBase):
             self._print_smt(agent, ch)
 
     def _print_lm_smts(self, lm: LM) -> None:
-        """Generates SMT channels configuration macros of given logical machine. Includes all SCMI channels in this
-         logical machine.
+        """Generates SMT channels configuration macros of given logical machine.
+
+        Includes all SCMI channels in this logical machine.
 
         Args:
             lm: The logical machine to generate SMT channels configuration for.

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to TRDC resources"""
+"""Module related to TRDC resources."""
 
 import logging
 from typing import Any, Dict, List, Tuple
@@ -22,7 +22,7 @@ logger = logging.getLogger()
 
 
 class TrdcResource(AtomicResource):
-    """Base class for TRDC resources like MBC, MRC and MDAC"""
+    """Base class for TRDC resources like MBC, MRC and MDAC."""
 
     def __init__(self, raw: Dict[str, Any]):
         super().__init__(raw)
@@ -30,7 +30,7 @@ class TrdcResource(AtomicResource):
         self._trdc_id: str = ""
 
     def get_trdc_id(self) -> str:
-        """Returns ID of the TRDc that contains this resource
+        """Returns ID of the TRDc that contains this resource.
 
         Returns:
             str: The ID of the TRDC that contains this resource
@@ -39,7 +39,7 @@ class TrdcResource(AtomicResource):
 
 
 class MbcMrcResource(TrdcResource):
-    """Base class for MBC and MRC - which are assignable with permissions"""
+    """Base class for MBC and MRC - which are assignable with permissions."""
 
     def __init__(self, raw: Dict[str, Any]):
         super().__init__(raw)
@@ -79,7 +79,7 @@ class MbcMrcResource(TrdcResource):
                     )
 
     def add_default_permission(self, begin: FormatedInt, size: FormatedInt, dids: Tuple[int, int], perm: str, should_generate_debug: bool) -> None:
-        """Adds default permission configuration
+        """Adds default permission configuration.
 
         Args:
             begin (FormatedInt): The beginning address of the permission
@@ -93,7 +93,7 @@ class MbcMrcResource(TrdcResource):
             self._default_permissions.append(new_permission)
 
     def get_default_permissions(self) -> List[DefaultPermission]:
-        """Returns list of default permission objects
+        """Returns list of default permission objects.
 
         Returns:
             List[DefaultPermission]: List of default permission objects
@@ -101,7 +101,7 @@ class MbcMrcResource(TrdcResource):
         return self._default_permissions
 
     def get_assignment_parameters(self, params: List[str]) -> Dict[str, Any] | None:
-        """Taking CfgFile parameters from an assignment line (overridden)
+        """Taking CfgFile parameters from an assignment line (overridden).
 
         Args:
             params (List[str]): List of parameter strings from assignment line
@@ -109,7 +109,6 @@ class MbcMrcResource(TrdcResource):
         Returns:
             Dict[str, Any] | None: Dictionary of assignment parameters or None if assignment should be prevented
         """
-
         no_debug_access = utils.contains_attribute_in_list(params, "nodbg", no_value=True) or (
             utils.contains_attribute_in_list(params, "nodbg") and utils.get_bool(utils.get_attribute_value_from_list(params, "nodbg"))
         )
@@ -173,6 +172,13 @@ class MbcMrcResource(TrdcResource):
             # prevent resource assignment, this was just default permission override
             return None
 
+        dom_clr = utils.contains_attribute_in_list(params, "dom_clr_unused", no_value=True) or (
+            utils.contains_attribute_in_list(params, "dom_clr_unused") and utils.get_bool(utils.get_attribute_value_from_list(params, "dom_clr_unused"))
+        )
+        dom_exclusive = utils.contains_attribute_in_list(params, "dom_exclusive", no_value=True) or (
+            utils.contains_attribute_in_list(params, "dom_exclusive") and utils.get_bool(utils.get_attribute_value_from_list(params, "dom_exclusive"))
+        )
+
         result: Dict[str, Any] = {"perm": perm}
         if begin_attr is not None:
             result |= {"begin": begin, "size": size}
@@ -182,11 +188,15 @@ class MbcMrcResource(TrdcResource):
             result |= {"clr": clr}
         if no_debug_access:
             result |= {"nodbg": True}
+        if dom_clr:
+            result |= {"dom_clr_unused": True}
+        if dom_exclusive:
+            result |= {"dom_exclusive": True}
 
         return result
 
     def get_raw_json(self) -> Dict[str, Any]:
-        """Get the raw JSON representation of the resource
+        """Get the raw JSON representation of the resource.
 
         Returns:
             Dict[str, Any]: Dictionary containing the raw JSON representation

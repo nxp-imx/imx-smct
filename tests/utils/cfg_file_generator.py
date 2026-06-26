@@ -47,6 +47,7 @@ class Domain(Base):
     """Domain section representation"""
 
     id: str
+    name: str
     did: int
     access_rights: Dict[str, AccessRight]
     assigned_resources: Dict[str, AssignedResource]
@@ -234,11 +235,12 @@ def _parse_domains(json_list: List[Dict[str, Any]]) -> Dict[str, Domain]:
     result = {}
     for json_access_right in json_list:
         domain_id = json_access_right["id"]
+        name = json_access_right["name"]
         did = json_access_right["did"]
         json_access_rights: List[Dict[str, Any]] = json_access_right["access_rights"]
         access_rights = _parse_common_access_rights(json_access_rights)
         assigned_resources = _parse_resource_assignment(json_access_right["assigned_resources"])
-        result[domain_id] = Domain(domain_id, did, access_rights, assigned_resources)
+        result[domain_id] = Domain(domain_id, name, did, access_rights, assigned_resources)
     return result
 
 
@@ -380,7 +382,7 @@ class CfgFileGenerator:
     def _generate_domains(self) -> None:
         """Generates DOMn commands and all domain related content"""
         for domain in self._configuration.domains.values():
-            self._print(f"{domain.id}                did={domain.did}")
+            self._print(f'{domain.id}                name="{domain.name}", did={domain.did}')
             self._print("")
             self._generate_access_rights(list(domain.access_rights.values()))
             self._print("")

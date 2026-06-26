@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to block control model"""
+"""Module related to block control model."""
 
 from typing import Dict, List, Optional
 
@@ -13,7 +13,7 @@ from smct.exceptions.cfg_tool_exception import CfgToolException
 
 
 class BctrlModel:
-    """Block control unit model"""
+    """Block control unit model."""
 
     def __init__(self, id_letter: str, name: Optional[str] = None) -> None:
         """Initialize BctrlModel instance.

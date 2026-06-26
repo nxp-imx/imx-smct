@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with base configuration validator"""
+"""Module with base configuration validator."""
 
 from typing import List
 
@@ -14,10 +14,10 @@ from smct.validation.validation_entry import ValidationEntry
 
 
 class ValidatorBase:
-    """Validator base class that must be extended by all validators"""
+    """Validator base class that must be extended by all validators."""
 
     def validate(self, _: ConfigurationData) -> List[ValidationEntry]:
-        """Validates configuration and returns list of found problems
+        """Validates configuration and returns list of found problems.
 
         Args:
             _: Configuration data to validate

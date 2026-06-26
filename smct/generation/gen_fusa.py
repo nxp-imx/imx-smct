@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module for generating file config_fusa.h"""
+"""Module for generating file config_fusa.h."""
 
 from typing import Any, Dict, List
 
@@ -14,7 +14,7 @@ from smct.generation.generator import GeneratorBase, GenHeading, GenMacroList, G
 
 
 class GeneratorFusa(GeneratorBase):
-    """Generator for config_fusa.h file"""
+    """Generator for config_fusa.h file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.
@@ -42,7 +42,7 @@ class GeneratorFusa(GeneratorBase):
         return ["", "", " Header file containing FUSA-related configuration."]
 
     def _print_fusa_defines(self) -> None:
-        """Generates fusa defines"""
+        """Generates fusa defines."""
         all_defines = self._get_configuration().get_fusa_configs()
 
         if all_defines:
@@ -55,8 +55,7 @@ class GeneratorFusa(GeneratorBase):
                 self.print_generator(config_macro)
 
     def _print_fusa_task_struct(self, task: FusaTask, def_name: str) -> None:
-        """Generate task structure initializer specific task"""
-
+        """Generate task structure initializer specific task."""
         s = GenStructInit(def_name, "Task configuration" + (f": {task.get_comment()}" if task.get_comment() else ""))
         s["task"] = f"{task.get_name()}"
         s["period"] = f"{task.get_period_ms()}"
@@ -68,8 +67,7 @@ class GeneratorFusa(GeneratorBase):
         self._print(s.get_tail_string(), end="")
 
     def _print_fusa_tasks_for_type(self, tasks: List[FusaTask], task_type: str) -> None:
-        """Generates fusa tasks of one type (thread|handler)"""
-
+        """Generates fusa tasks of one type (thread|handler)."""
         # for now it is that easy (e.g. thread->THREAD, handler->HANDLER, but may get more complex later)
         def_word = task_type.upper()
 
@@ -87,7 +85,7 @@ class GeneratorFusa(GeneratorBase):
         self.print_generator(s)
 
     def _print_fusa_tasks(self) -> None:
-        """Generates fusa tasks"""
+        """Generates fusa tasks."""
         all_tasks = self._get_configuration().get_fusa_tasks()
 
         if all_tasks:
@@ -98,7 +96,7 @@ class GeneratorFusa(GeneratorBase):
                 self._print_fusa_tasks_for_type(tasks, task_type)
 
     def print_content(self) -> None:
-        """Generates content of this file"""
+        """Generates content of this file."""
         self._print_fusa_defines()
         self._print_fusa_tasks()
 

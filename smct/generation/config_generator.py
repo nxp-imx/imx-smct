@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generation of content based on the configuration"""
+"""Module for generation of content based on the configuration."""
 
 from typing import List
 
@@ -28,7 +28,7 @@ from smct.generation.generator import GeneratorBase
 
 
 class ConfigGenerator:
-    """Collection of generators which generate all needed configuration files"""
+    """Collection of generators which generate all needed configuration files."""
 
     def __init__(self, populate: bool = True) -> None:
         """Initialize the ConfigGenerator.

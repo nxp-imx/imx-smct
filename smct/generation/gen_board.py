@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_board.h"""
+"""Module for generating file config_board.h."""
 
 from typing import Any, Dict, List
 
@@ -13,7 +13,7 @@ from smct.generation.generator import GeneratorBase, GenMacroValue
 
 
 class GeneratorBoard(GeneratorBase):
-    """Generator for config_board.h file"""
+    """Generator for config_board.h file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.
@@ -51,7 +51,7 @@ class GeneratorBoard(GeneratorBase):
         self.print_generator(GenMacroValue("BOARD_I2C_BAUDRATE", f"{self._get_configuration().get_pmic_i2c_baudrate()}U", "Config for PMIC I2C baudrate"))
 
     def print_content(self) -> None:
-        """Generates content of this file"""
+        """Generates content of this file."""
         self._print_board_defines()
 
     def __str__(self) -> str:

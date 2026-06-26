@@ -5,19 +5,19 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with user configuration provider"""
+"""Module with user configuration provider."""
 
 from smct.configuration.confdata import ConfigurationData
 
 
 class ConfigurationProvider:
-    """Provider of the configuration singleton"""
+    """Provider of the configuration singleton."""
 
     _singleton: ConfigurationData = ConfigurationData()
 
     @classmethod
     def get_configuration(cls) -> ConfigurationData:
-        """Returns singleton of the configuration object
+        """Returns singleton of the configuration object.
 
         Returns:
             ConfigurationData: The singleton configuration object
@@ -26,7 +26,7 @@ class ConfigurationProvider:
 
     @classmethod
     def clear_configuration(cls) -> None:
-        """Clears the configuration singleton by creating new one
+        """Clears the configuration singleton by creating new one.
 
         Returns:
             None

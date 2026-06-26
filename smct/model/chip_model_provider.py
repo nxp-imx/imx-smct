@@ -5,13 +5,13 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with chip model provider"""
+"""Module with chip model provider."""
 
 from smct.model.model_chip import ChipModelImx9
 
 
 class ChipModelProvider:
-    """Provider of the chip model singleton"""
+    """Provider of the chip model singleton."""
 
     _singleton: ChipModelImx9 = ChipModelImx9()
 

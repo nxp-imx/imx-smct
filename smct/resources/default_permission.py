@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to default permission assignment"""
+"""Module related to default permission assignment."""
 
 from typing import Any, Tuple
 
@@ -13,7 +13,7 @@ from smct.utils import FormatedInt
 
 
 class DefaultPermission:
-    """Default permission data class"""
+    """Default permission data class."""
 
     def __init__(self, begin: FormatedInt, size: FormatedInt, dids: Tuple[int, int], permission: str, should_generate_debug_access: bool = True) -> None:
         """Initialize DefaultPermission instance.

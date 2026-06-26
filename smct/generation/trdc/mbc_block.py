@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to MBC block generation"""
+"""Module related to MBC block generation."""
 
 import typing
 from typing import Tuple
@@ -14,9 +14,9 @@ from smct.resources.res_mbc import MbcResource
 
 
 class MbcBlock:
-    """Block of MBC"""
+    """Block of MBC."""
 
-    def __init__(self, domain: int, resource: MbcResource, block_range: Tuple[int, int], permission: int) -> None:
+    def __init__(self, domain: int, resource: MbcResource, block_range: Tuple[int, int], permission: int, clearing: bool = False) -> None:
         """Initialize MBC block.
 
         Args:
@@ -24,11 +24,13 @@ class MbcBlock:
             resource: MBC resource
             block_range: Range of blocks for the resource
             permission: Permission of the block
+            clearing: Whether this block is for clearing
         """
         self._domain = domain
         self._resource = resource
         self._block_range = block_range
         self._permission = permission
+        self._clearing = clearing
 
     def get_mbc(self) -> int:
         """Return MBC index of the block.
@@ -81,6 +83,14 @@ class MbcBlock:
         """
         return self._permission
 
+    def merge_permission(self, permission: int) -> None:
+        """Merges (ORs) additional permission bits into this block.
+
+        Args:
+            permission: Permission bits to OR with existing permission
+        """
+        self._permission |= permission
+
     def get_name(self) -> str:
         """Return name of the block.
 
@@ -88,6 +98,34 @@ class MbcBlock:
             Name of the block
         """
         return self._resource.get_name()
+
+    def is_dom_clearing(self) -> bool:
+        """Returns clearing flag of the block.
+
+        Returns:
+            Clearing flag of the block
+        """
+        return self._clearing
+
+    def overwrites(self, other: object) -> bool:
+        """Check if other block is overwritten by this block.
+
+        Args:
+            other: Object to check
+
+        Returns:
+            True if this block overwrites the other block
+        """
+        if not isinstance(other, MbcBlock):
+            return False
+        other_mbc = typing.cast(MbcBlock, other)
+        if self.get_domain() != other_mbc.get_domain():
+            return False
+        if self.get_name() != other_mbc.get_name():
+            return False
+        if self.get_block_range() != other_mbc.get_block_range():
+            return False
+        return True
 
     def __eq__(self, other: object) -> bool:
         """Check equality with another object.

@@ -4,7 +4,7 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to parser of the CFG files"""
+"""Module related to parser of the CFG files."""
 
 import logging
 import re
@@ -43,11 +43,11 @@ _re_MRC = re.compile(r"(MRC_\w\d+)=.*")  # MRC_am=r1-r2 - TRDC a, MRCm, m is the
 
 
 class CfgResourceProvider:
-    """Provider for the resources parsed from CFG file"""
+    """Provider for the resources parsed from CFG file."""
 
     @classmethod
     def atomic_resource_from_cfg_name(cls, name: str, outer_name: str, outer_all_atoms: List[str]) -> AtomicResource | None:
-        """Auto-infer atomic resource from name used in .cfg file"""
+        """Auto-infer atomic resource from name used in .cfg file."""
         factories = {
             (re.compile("^MBC_"), _mbc_resource_from_cfg_name),
             (re.compile("^MRC_"), _rrc_resource_from_cfg_name),

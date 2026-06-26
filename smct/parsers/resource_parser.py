@@ -4,7 +4,7 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to loading resource database JSONs"""
+"""Module related to loading resource database JSONs."""
 
 import json
 import logging
@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 class ResourceParser:
-    """Parser of resource database JSONs"""
+    """Parser of resource database JSONs."""
 
     soc_directory: str | None = None
 

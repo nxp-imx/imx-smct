@@ -5,7 +5,22 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to user configuration"""
+"""Module related to user configuration.
+
+Duplicate Agent Handling:
+    Functions get_all_lm_assignments() and get_all_dom_assignments() filter
+    duplicate agents (identified via agent.get_dup() != None) to prevent
+    duplicate configuration generation. Duplicate agents share resources with
+    their source agent via deep-copy in ScmiAgent.duplicate(). The source
+    agent's resources are used for configuration generation, while dup agents
+    are skipped in assignment collection to avoid duplicate entries in generated
+    output (TRDC, BCTRL, etc.).
+
+    JSON Export/Import:
+    - Export: ScmiAgent.get_assignment_json() includes "dup" parameter when set
+    - Import: ConfigLoader.load_configuration_handle_agents() restores dup state
+              by calling ScmiAgent.duplicate() when "dup" key is present in JSON
+"""
 
 import json
 import logging
@@ -35,7 +50,7 @@ logger = logging.getLogger()
 
 
 class ConfigurationData:
-    """Main object representing user configuration. Exists as singleton CONF"""
+    """Main object representing user configuration. Exists as singleton CONF."""
 
     def __init__(self) -> None:
         self._sm_fw_directory: str = ""
@@ -137,7 +152,7 @@ class ConfigurationData:
         return None
 
     def get_all_non_lm_domains(self) -> List[DOM]:
-        """Returns all pure DOM domains which are not LMs"""
+        """Returns all pure DOM domains which are not LMs."""
         return [dom for dom in self._domains if dom is not None and not isinstance(dom, LM)]
 
     def get_all_debug_domains(self) -> List[DOM | LM]:
@@ -250,7 +265,7 @@ class ConfigurationData:
             Maximum depth of notification buffer across all SCMI channels.
         """
         all_scmi_channels = self.get_all_scmi_channels()
-        maximum = 1
+        maximum = 20  # Perl configtool.pl defaults to 20 (hardcoded minimum buffer depth)
         for channel in all_scmi_channels:
             maximum = max(maximum, channel.get_notify())
         return maximum
@@ -512,7 +527,9 @@ class ConfigurationData:
         for logical_machine in self._lmm:
             result += logical_machine.get_assigned_resources()
             for agent in logical_machine.get_all_agents():
-                result += agent.get_assigned_resources()
+                # Skip dup agents - they share resources with source agent
+                if agent.get_dup() is None:
+                    result += agent.get_assigned_resources()
         return result
 
     def get_all_dom_assignments(self) -> List[AssignedResource]:
@@ -527,7 +544,9 @@ class ConfigurationData:
                 result += domain.get_assigned_resources()
                 if isinstance(domain, LM):
                     for agent in domain.get_all_agents():
-                        result += agent.get_assigned_resources()
+                        # Skip dup agents - they share TRDC config with source agent
+                        if agent.get_dup() is None:
+                            result += agent.get_assigned_resources()
         return result
 
     def get_all_bctrl_assignments(self) -> Dict[BctrlModel, List[AssignedResource]]:
@@ -840,6 +859,17 @@ class ConfigurationData:
             json_object = json.load(file)
 
         validate_json(json_object, file_name, "user_schema.json", "critical")
+
+        # SMCT CLI configuration version check
+        json_version = json_object["SMCT_version"]
+        if list(json_version) != list(ProductInfo.get_smct_version()):
+            logger.warning(
+                "Configuration was created with SMCT version %s, current version is %s",
+                ".".join(str(v) for v in json_version),
+                ProductInfo.get_smct_version_string(),
+                extra={"source": file_name},
+            )
+
         # Configuration initialization
         config = json_object["Config"]
         if config is None:
@@ -992,5 +1022,5 @@ class ConfigurationData:
         return None
 
     def get_common_defines(self) -> Dict[str, AssignedDefine]:
-        """Returns all common define names as a list"""
+        """Returns all common define names as a list."""
         return self._common_defines

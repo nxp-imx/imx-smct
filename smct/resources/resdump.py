@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for exporting resources"""
+"""Module for exporting resources."""
 
 import json
 import os.path

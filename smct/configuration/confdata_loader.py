@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to user configuration"""
+"""Module related to user configuration."""
 
 import logging
 import typing
@@ -69,7 +69,7 @@ def _expand_resource_to_atoms(resource: AtomicResource | MacroResource) -> List[
 
 
 class ConfigLoader:
-    """Loader class that parses JSON to objects stored in configuration data"""
+    """Loader class that parses JSON to objects stored in configuration data."""
 
     @classmethod
     def load_configuration_handle_start_stops(cls, msel: MSEL, json_msel: Any, ss_sequences: Any) -> None:
@@ -158,6 +158,7 @@ class ConfigLoader:
         Args:
             target: Resource owner to assign resources to.
             json_resources: JSON object containing resource definitions.
+            common_defines: Dictionary of common define assignments.
         """
         for json_resource in json_resources:
             resource_name = json_resource["name"]
@@ -199,6 +200,7 @@ class ConfigLoader:
             logical_machine: Logical machine to add agents to.
             agents: JSON object containing agent definitions.
             agents_count: Current count of agents for ID generation.
+            common_defines: Dictionary of common define assignments.
         """
         sm_num_mb_mu_db = 4
         for agent_index, agent in enumerate(agents):
@@ -263,7 +265,31 @@ class ConfigLoader:
                 cls.load_configuration_handle_defines(scmi_agent, json_defines)
 
             logical_machine.add_agent(scmi_agent)
-            cls.load_configuration_assign_resources(scmi_agent, agent["resources"], common_defines)
+
+            if "dup" in agent:
+                dup_int = agent["dup"]
+                dup_agents = [x for x in logical_machine.get_all_agents() if x.get_id() == ("SCMI_AGENT" + str(dup_int))]
+                if len(dup_agents) == 1:
+                    scmi_agent.duplicate(dup_agents[0], dup_int)
+                else:
+                    source = "/".join(["user_config", logical_machine.get_id(), scmi_agent.get_name()])
+                    validation_id = ".".join([scmi_agent.get_id(), "DUP"])
+                    logger.error(
+                        "Agent %s cannot duplicate agent with index %s",
+                        scmi_agent.get_name(),
+                        dup_int,
+                        extra={"source": source, "validation_id": validation_id},
+                    )
+            elif "resources" in agent:
+                cls.load_configuration_assign_resources(scmi_agent, agent["resources"], common_defines)
+            else:
+                validation_id = ".".join([scmi_agent.get_id(), "NO_RESOURCES"])
+                source = "/".join(["user_config", logical_machine.get_id(), scmi_agent.get_name()])
+                logger.error(
+                    "Agent %s has neither 'dup' nor 'resources' defined",
+                    scmi_agent.get_name(),
+                    extra={"source": source, "validation_id": validation_id},
+                )
 
     @classmethod
     def load_configuration_handle_logical_machines(cls, logical_machines: Any, common_defines: Dict[str, AssignedDefine]) -> List[LM]:
@@ -271,6 +297,7 @@ class ConfigLoader:
 
         Args:
             logical_machines: JSON object containing logical machine definitions.
+            common_defines: Dictionary of common define assignments.
         """
         agents_count = 0
         lms: List[LM] = []
@@ -319,6 +346,7 @@ class ConfigLoader:
 
         Args:
             domains: JSON object containing domain definitions.
+            common_defines: Dictionary of common define assignments.
         """
         doms: List[DOM] = []
         for json_domain in domains:

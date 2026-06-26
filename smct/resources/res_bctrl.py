@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to BCTRL resources"""
+"""Module related to BCTRL resources."""
 
 from typing import Any, Dict
 
@@ -16,7 +16,7 @@ from .resource_base import AtomicResource
 
 
 class BctrlResource(AtomicResource):
-    """Block control resource base class"""
+    """Block control resource base class."""
 
     def __init__(self, raw: Dict[str, Any]):
         """Initialize BctrlResource.
@@ -44,7 +44,7 @@ class BctrlResource(AtomicResource):
 
 
 class BctrlResourceIpgDebug(BctrlResource):
-    """Block control resource with IPG debug capabilities"""
+    """Block control resource with IPG debug capabilities."""
 
     def __init__(self, raw: Dict[str, Any]):
         """Initialize BctrlResourceIpgDebug.

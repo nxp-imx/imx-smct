@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to parsing generic files"""
+"""Module related to parsing generic files."""
 
 import logging
 import os
@@ -16,14 +16,14 @@ logger = logging.getLogger()
 
 
 class FileParser:
-    """Generic file parser"""
+    """Generic file parser."""
 
     def __init__(self) -> None:
         self._patterns: List[str] = []
         self._results: Dict[str, List[re.Match]] = {}
 
     def add_regex(self, pattern_str: str) -> None:
-        """Adds regex that will be parsed from files
+        """Adds regex that will be parsed from files.
 
         Args:
             pattern_str: The regex pattern string to add for parsing
@@ -31,7 +31,7 @@ class FileParser:
         self._patterns.append(pattern_str)
 
     def parse(self, file_path: str) -> None:
-        """Parses all added regexes in given file and stores them internally
+        """Parses all added regexes in given file and stores them internally.
 
         Args:
             file_path: Path to the file to parse
@@ -52,7 +52,7 @@ class FileParser:
                     match = pattern.search(content, pos=end_position_of_match)
 
     def get_results(self) -> Dict[str, List[re.Match]]:
-        """Returns all the results
+        """Returns all the results.
 
         Returns:
             Dictionary mapping pattern strings to lists of regex matches

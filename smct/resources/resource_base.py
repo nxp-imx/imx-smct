@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to resources"""
+"""Module related to resources."""
 
 import copy
 import typing
@@ -16,7 +16,7 @@ from smct.exceptions.cfg_tool_exception import CfgToolException
 
 
 class AtomicResource:
-    """Base class for all atomic resources"""
+    """Base class for all atomic resources."""
 
     # static properties
     _counter: int = 0
@@ -42,7 +42,7 @@ class AtomicResource:
             raise CfgToolException("Missing required attributes in database object") from exc
 
     def __getitem__(self, key: str) -> Any:
-        """Access to raw object values is possible using array subscript. Even more complex such as ["key.subkey"]
+        """Access to raw object values is possible using array subscript. Even more complex such as ["key.subkey"].
 
         Args:
             key: Key to access in the raw object, supports dot notation for nested keys
@@ -77,7 +77,7 @@ class AtomicResource:
         return True
 
     def rename(self, new_name: str) -> None:
-        """Renames the resource
+        """Renames the resource.
 
         Args:
             new_name: New name for the resource
@@ -86,7 +86,7 @@ class AtomicResource:
         self._raw["name"] = new_name
 
     def get_name(self) -> str:
-        """Returns name of the atomic resource
+        """Returns name of the atomic resource.
 
         Returns:
             Name of the atomic resource
@@ -94,7 +94,7 @@ class AtomicResource:
         return self._name
 
     def get_atomic_resources(self) -> List["AtomicResource"]:
-        """Returns list with this atomic resource
+        """Returns list with this atomic resource.
 
         Returns:
             List containing this atomic resource
@@ -102,7 +102,7 @@ class AtomicResource:
         return [self]
 
     def get_api_id(self) -> str | None:
-        """Return identifier of the resource used in API calls (e.g. in LM start/stop)
+        """Return identifier of the resource used in API calls (e.g. in LM start/stop).
 
         Returns:
             Identifier of the resource used in API calls
@@ -110,7 +110,7 @@ class AtomicResource:
         raise CfgToolException(f"Resource {self._name} cannot be used in Api calls")
 
     def get_start_stop_type(self) -> str | None:
-        """Return identifier of the LMM_SS_ operation type
+        """Return identifier of the LMM_SS_ operation type.
 
         Returns:
             Identifier of the LMM_SS_ operation type
@@ -118,7 +118,7 @@ class AtomicResource:
         raise CfgToolException(f"Resource {self._name} cannot be used in Start/Stop operations")
 
     def get_raw_json(self) -> Dict[str, Any]:
-        """Returns the raw JSON representation of this atomic resource
+        """Returns the raw JSON representation of this atomic resource.
 
         Returns:
             Deep copy of the raw JSON representation
@@ -127,7 +127,7 @@ class AtomicResource:
         return raw
 
     def get_assignment_parameters(self, _: List[str]) -> Dict[str, Any] | None:
-        """Taking configuration parameters from an assignment line (typically overridden)
+        """Taking configuration parameters from an assignment line (typically overridden).
 
         Args:
             _: List of parameters (unused in base implementation)
@@ -138,7 +138,7 @@ class AtomicResource:
         return None
 
     def should_generate_test(self) -> bool:
-        """Returns True when this resource should generate test
+        """Returns True when this resource should generate test.
 
         Returns:
             True if this resource should generate test, False otherwise
@@ -146,7 +146,7 @@ class AtomicResource:
         return self._test
 
     def get_parameters(self) -> List[str]:
-        """Returns list of parameters
+        """Returns list of parameters.
 
         Returns:
             List of parameters
@@ -158,8 +158,10 @@ class AtomicResource:
 
 
 class MacroResource:
-    """Representation of Macro resource. Contains names of multiple atomic resources of which this macro resource
-    is made of."""
+    """Representation of Macro resource.
+
+    Contains names of multiple atomic resources of which this macro resource is made of.
+    """
 
     def __init__(self, name: str):
         """Initialize a MacroResource instance.
@@ -172,7 +174,7 @@ class MacroResource:
         self._params: List[str] = []  # additional parameters required by the macro itself (e.g. DFMT0/DFMT1)
 
     def get_name(self) -> str:
-        """Returns name of the macro resource
+        """Returns name of the macro resource.
 
         Returns:
             Name of the macro resource
@@ -180,7 +182,7 @@ class MacroResource:
         return self._name
 
     def is_empty(self) -> bool:
-        """Returns True when this maro resource is not made of any atomic resources
+        """Returns True when this maro resource is not made of any atomic resources.
 
         Returns:
             True if this macro resource contains no atomic resources, False otherwise
@@ -188,7 +190,7 @@ class MacroResource:
         return len(self._atoms) == 0
 
     def add_atomic_resource(self, atom: AtomicResource) -> None:
-        """Adds atomic resource to this macro resource
+        """Adds atomic resource to this macro resource.
 
         Args:
             atom: Atomic resource to add to this macro resource
@@ -196,7 +198,7 @@ class MacroResource:
         self._atoms.append(atom)
 
     def add_parameter(self, param: str) -> None:
-        """Adds assignment parameter to this macro resource
+        """Adds assignment parameter to this macro resource.
 
         Args:
             param: Parameter to add to this macro resource
@@ -204,7 +206,7 @@ class MacroResource:
         self._params.append(param)
 
     def get_atomic_resources(self) -> List[AtomicResource]:
-        """Returns list of all atomic resources
+        """Returns list of all atomic resources.
 
         Returns:
             List of all atomic resources in this macro resource
@@ -212,7 +214,7 @@ class MacroResource:
         return self._atoms
 
     def get_assignment_parameters(self, params: List[str]) -> Dict[str, Any] | None:
-        """Returns configuration parameters from an assignment
+        """Returns configuration parameters from an assignment.
 
         Args:
             params: List of parameters to process
@@ -230,7 +232,7 @@ class MacroResource:
         return result
 
     def get_raw_json(self) -> Dict[str, Any]:
-        """Returns raw JSON representation of this macro resource
+        """Returns raw JSON representation of this macro resource.
 
         Returns:
             Raw JSON representation as a dictionary
@@ -245,7 +247,7 @@ class MacroResource:
         return raw
 
     def get_parameters(self) -> List[str]:
-        """Returns list of parameters
+        """Returns list of parameters.
 
         Returns:
             List of parameters for this macro resource

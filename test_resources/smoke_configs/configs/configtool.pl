@@ -1,2 +1,0 @@
-
-my $configVer = 2;

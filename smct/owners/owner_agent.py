@@ -5,22 +5,24 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to SCMI agents"""
+"""Module related to SCMI agents."""
 
+import copy
 import logging
 from typing import Any, Dict, List
 
 from smct import utils
 from smct.exceptions.cfg_tool_exception import CfgToolException
+from smct.resources.resource_base import AtomicResource, MacroResource
 
 from ..utils import FormatedInt
-from .owner_base import ResourceOwner
+from .owner_base import AssignedDefine, AssignedResource, ResourceOwner
 
 logger = logging.getLogger()
 
 
 class Mailbox:
-    """Abstract mailbox with doorbells mapped to abstract upstream channels"""
+    """Abstract mailbox with doorbells mapped to abstract upstream channels."""
 
     mailbox_types: Dict[str, str]
     mailbox_priority_types: Dict[str, str]
@@ -139,7 +141,7 @@ class Mailbox:
 
 
 class MailboxMu(Mailbox):
-    """MU mailbox of an SCMI_AGENT"""
+    """MU mailbox of an SCMI_AGENT."""
 
     def __init__(self, mu: int, test: int | None, sma: FormatedInt | None, priority: str | None) -> None:
         super().__init__("mu", test, priority)
@@ -177,7 +179,7 @@ class MailboxMu(Mailbox):
 
 
 class MailboxLoopback(Mailbox):
-    """Loopback mailbox of an SCMI_AGENT"""
+    """Loopback mailbox of an SCMI_AGENT."""
 
     def __init__(self, test: int | None, priority: str | None) -> None:
         super().__init__("loopback", test, priority)
@@ -188,7 +190,7 @@ class MailboxLoopback(Mailbox):
 
 
 class Channel:
-    """Generic CHANNEL"""
+    """Generic CHANNEL."""
 
     # dict of allowed rpc types assignment
     rpc_types: Dict[str, str]
@@ -244,7 +246,7 @@ class Channel:
 
 
 class SmtChannel(Channel):
-    """SMT channel"""
+    """SMT channel."""
 
     smt_crc_types: Dict[str, str]
 
@@ -334,7 +336,7 @@ class SmtChannel(Channel):
 
 
 class ScmiChannel(Channel):
-    """SCMI channel object"""
+    """SCMI channel object."""
 
     # dict of allowed SCMI channel types
     channel_types: Dict[str, str]
@@ -467,7 +469,7 @@ class ScmiChannel(Channel):
 
 
 class ScmiAgent(ResourceOwner):
-    """SCMI agent object representation"""
+    """SCMI agent object representation."""
 
     def __init__(self, agent_id: str, owner: Any, name: str, secure: bool, safe: str = "nseenv", did: int = -1) -> None:
         super().__init__(agent_id)
@@ -478,6 +480,7 @@ class ScmiAgent(ResourceOwner):
         self._mailbox: Mailbox | None = None
         self._safe: str = safe
         self._did: int = did
+        self._dup: int | None = None
 
     def get_did(self) -> int:
         """Returns domain ID of the agent's owner.
@@ -586,6 +589,53 @@ class ScmiAgent(ResourceOwner):
         """
         self._owner = owner
 
+    def duplicate(self, other: ResourceOwner, dup: int) -> None:
+        """Duplicate assigned resources from agent.
+
+        Args:
+            other: The agent to duplicate resources from
+            dup: The duplication parameter
+        """
+        self._resources = copy.deepcopy(other.get_assigned_resources())
+        self._defines = copy.deepcopy(other.get_defines())
+        for resource in self._resources:
+            resource.set_owner(self)
+        self._dup = dup
+
+    def get_dup(self) -> int | None:
+        """Returns duplication parameter of this agent.
+
+        Returns:
+            The duplication or None if not duplicating
+        """
+        return self._dup
+
+    def assign_resource(
+        self,
+        res: AtomicResource | MacroResource,
+        params: List[str],
+        expanded_defines: List[AssignedDefine] | None = None,
+        dirty_flag: bool = True,
+        ignore_api_check: bool = False,
+    ) -> AssignedResource | None:
+        """Assigns resource to this agent.
+
+        Args:
+            res: The resource to assign
+            params: Parameters for the assignment
+            expanded_defines: Expanded defines dictionary
+            dirty_flag: Flag
+            ignore_api_check: Whether to ignore API checks
+
+        Returns:
+            The AssignedResource object if successful, None if resource denied assignment.
+        """
+        if self._dup is not None:
+            source = "/".join(["user_config", self._name, "dup"])
+            logger.error("Cannot assign resource %s to duplicated agent %s", res.get_name(), self.get_name(), extra={"source": source})
+            return None
+        return super().assign_resource(res, params, expanded_defines, dirty_flag, ignore_api_check)
+
     def get_assignment_json(self) -> Dict[str, Any]:
         """Returns JSON object with raw data.
 
@@ -599,9 +649,10 @@ class ScmiAgent(ResourceOwner):
             "secure": self._secure,
             "channels": [c.get_assignment_json() for c in self._channels],
         }
-
         if mailbox is not None:
             ret["mailbox"] = mailbox.get_assignment_json()
+        if self._dup is not None:
+            ret["dup"] = self._dup
         return ret
 
     def __str__(self) -> str:

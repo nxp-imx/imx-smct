@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module for generating file config_test.h"""
+"""Module for generating file config_test.h."""
 
 import logging
 from typing import Any, Dict, List
@@ -17,7 +17,7 @@ logger = logging.getLogger()
 
 
 class GeneratorTest(GeneratorBase):
-    """Generator for config_test.h file"""
+    """Generator for config_test.h file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Gets generator information.
@@ -82,12 +82,15 @@ class GeneratorTest(GeneratorBase):
                                 else:
                                     struct.add_entry("rsrc", rsrc_name if rsrc_name.startswith("BRD_SM_") else f"DEV_SM_{rsrc_name}")
                                 struct.print_members()
-                                result.append("{" + struct.get_members_string() + "}")
+                                entry = "{" + struct.get_members_string() + "}"
+                                result.append(entry)
             for scmi_agent in lm.get_all_agents():
                 for scmi_channel in scmi_agent.get_all_scmi_channels():
                     if scmi_channel.get_channel_type() == "a2p":
                         a2p = channel_counter
                     channel_counter += 1
+                if scmi_agent.get_dup() is not None:
+                    continue
                 for protocol, test in lm.protocols:
                     for assignment in scmi_agent.get_assigned_resources():
                         atomic_resources = assignment.get_atomic_resources()
@@ -111,7 +114,8 @@ class GeneratorTest(GeneratorBase):
                                 else:
                                     struct.add_entry("rsrc", name if name.startswith("BRD_SM_") else f"DEV_SM_{name}")
                                 struct.print_members()
-                                result.append("{" + struct.get_members_string() + "}")
+                                entry = "{" + struct.get_members_string() + "}"
+                                result.append(entry)
         return result
 
     def _generate_test_configs(self, test_structures_macro: GenMacroList) -> None:
@@ -167,14 +171,14 @@ class GeneratorTest(GeneratorBase):
         self.print_generator(test_structures_macro)
 
         self.print_generator(GenHeading("Test Config"))
-        self.print_generator(GenMacroValue("SM_SCMI_NUM_TEST", f"{len(tests)}U", "Config for number of tests"))
 
         scmi_test_structures_macro = GenMacroList("SM_SCMI_TEST_CONFIG_DATA", "Config data array for tests")
-        for test in tests:
-            scmi_test_structures_macro.add_value(test)
+        scmi_test_structures_macro.set_values(tests)
+        self.print_generator(GenMacroValue("SM_SCMI_NUM_TEST", f"{len(scmi_test_structures_macro)}U", "Config for number of tests"))
         self.print_generator(scmi_test_structures_macro)
         default_channel = self._get_configuration().get_default_test_channel()
-        self.print_generator(GenMacroValue("SM_TEST_DEFAULT_CHN", f"{default_channel}U", "Default channel for non-agent specific tests"))
+        if default_channel >= 0:
+            self.print_generator(GenMacroValue("SM_TEST_DEFAULT_CHN", f"{default_channel}U", "Default channel for non-agent specific tests"))
 
     def print_content(self) -> None:
         """Prints content of this file."""

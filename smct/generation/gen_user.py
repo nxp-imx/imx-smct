@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_user.h"""
+"""Module for generating file config_user.h."""
 
 import os.path
 from typing import Any, Dict, List
@@ -15,7 +15,7 @@ from smct.model.chip_model_provider import ChipModelProvider
 
 
 class GeneratorUser(GeneratorBase):
-    """Generator for config_user.h file"""
+    """Generator for config_user.h file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.

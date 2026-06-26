@@ -38,10 +38,11 @@ dev = [
     "isort>=5.13.2",
     "mypy>=1.10",
     "ruff>=0.6.0",
-    "nxp_codecheck<1,>=0.3.1",
+    "nxp_codecheck>=0.3.16",
+    "pydocstyle>=6.3.0",
 ]
 test = [
-    "pytest>=7.0",
+    "pytest>=9.0.3",
     "pytest-cov>=4.1",
     "pytest-xdist>=3.5.0",
 ]
@@ -90,28 +91,35 @@ target-version = "py310"
 select = ["E", "F", "W"]
 ignore = ["E501"]
 
+[tool.pydocstyle]
+convention = "google"
+add_ignore = "D105, D107"
+match = '(?!test_|_version|smct\.py).*\.py'
+match_dir = '(?!\.|venv|reports|__pycache__|tests|distribution).*'
+
 [tool.gitcov]
 skip-files = ""
 repo-path = "."
 module = "codecheck"
 coverage-report = "reports/coverage.xml"
 coverage-cutoff = 0.8
-parent-branch = "origin/26.03/integration"
+parent-branch = "origin/26.06/integration"
 include-merges = 0
 verbose = 0
 debug = 0
 full-file-test = 0
 
 [tool.nxp_codecheck]
-git_parent_branch = "origin/26.03/integration"
+git_parent_branch = "origin/26.06/integration"
 output_directory = "reports"
 default_check_paths = ["smct"]
 
 checkers = [
-    { "pytest" = { timeout = 2000 } },
-    { "gitcov" = { info_only = true } },
+    { "pytest" = { timeout = 4000 } },
+    { "gitcov" = { timeout = 300, info_only = true} },
     { "pylint" = { timeout = 300 } },
     { "mypy" = { timeout = 300 } },
+    { "pydocstyle" = { timeout = 200 } },
     # "dependencies",
     "ruff",
     { "radon_c" = { info_only = true, timeout = 60 } },

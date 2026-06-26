@@ -2,7 +2,7 @@
 
 ## Version 25.12.00 - Initial Release
 
-**Release Date:** 17-Dec-2025
+**Release Date:** 2025-12-17
 
 ### Features
 - Generation of the System Manager FW configuration
@@ -14,7 +14,7 @@
 
 ## Version 26.03.00
 
-**Release Date:** 26-Mar-2026
+**Release Date:** 2026-03-26
 
 ### Features
 - Supported `kpaen` and `sidsz` parameters processing
@@ -23,3 +23,18 @@
 - Improved validation
 - Fixed BASE, special test, and board-resource permission generation
 - Support for i.MX 952 devices
+
+## Version 26.06.00
+
+**Release Date:** 2026-06-26
+
+### Features
+- Added the`dom_clr_unused` parameter support for MBC/MRC resources
+- Added the `dom_exclusive` resource parameter validation
+- Added TRDC MBC/MRC deduplication and the `dup` command with agent filtering
+- Added automatic resource loading during CFG file pre-processing
+- Added SMCT version validation from `user_configuration.json`
+- Extended TRDC configuration records generation
+
+### Bug Fixes
+- Fixed missing parser when loading device/board configurations

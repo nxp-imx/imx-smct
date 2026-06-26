@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to logical machines"""
+"""Module related to logical machines."""
 
 import logging
 from typing import Any, Dict, List, Tuple
@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 class StartStop:
-    """One start or stop operation within mSel"""
+    """One start or stop operation within mSel."""
 
     def __init__(self, msel: "MSEL", res: AtomicResource, test: bool, args: List[int]):
         self._msel: "MSEL" = msel  # our parent MSEL
@@ -93,7 +93,7 @@ class StartStop:
 
 
 class StartStopSequence:
-    """Sequence of starts/stops in one LM"""
+    """Sequence of starts/stops in one LM."""
 
     def __init__(self, ss_index: int, lm_name: str, start_stops: List[StartStop | None]):
         self._ss_index: int = ss_index
@@ -111,7 +111,7 @@ class StartStopSequence:
 
 
 class MSEL:
-    """One MSEL mode of logical machine"""
+    """One MSEL mode of logical machine."""
 
     def __init__(self, lm: "LM", msel: int, boot: int | None, skip: bool | None):
         self._lm: "LM" = lm  # our parent LM
@@ -289,7 +289,7 @@ class MSEL:
 
 
 class LM(DOM):
-    """Represents a DOMAIN to which we can assign resources (only TRDC resources)"""
+    """Represents a DOMAIN to which we can assign resources (only TRDC resources)."""
 
     # dict of allowed safety types assignment
     safety_types: Dict[str, str]

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to domains"""
+"""Module related to domains."""
 
 from typing import Any, Dict
 
@@ -13,7 +13,7 @@ from .owner_base import ResourceOwner
 
 
 class DOM(ResourceOwner):
-    """Represents a DOMAIN to which we can assign resources (only TRDC resources)"""
+    """Represents a DOMAIN to which we can assign resources (only TRDC resources)."""
 
     def __init__(self, domain_id: str, did: int, name: str | None = None) -> None:
         """Initialize a DOM instance.
@@ -21,6 +21,7 @@ class DOM(ResourceOwner):
         Args:
             domain_id: The domain identifier string.
             did: The domain identifier integer.
+            name: Optional name for the domain
         """
         super().__init__(domain_id)
         dom_name = f"DOM{did}" if not name else name

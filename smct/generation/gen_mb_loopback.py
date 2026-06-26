@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_mb_loopback.h"""
+"""Module for generating file config_mb_loopback.h."""
 
 import typing
 from typing import Any, Dict, List
@@ -17,7 +17,7 @@ from smct.owners.owner_lm import LM
 
 
 class GeneratorMailboxLoopback(GeneratorBase):
-    """Generator of config_mb_loopback.h"""
+    """Generator of config_mb_loopback.h."""
 
     def _get_doxygen_file_name(self) -> str:
         """Get the doxygen file name.

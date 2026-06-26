@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_mb_mu.h"""
+"""Module for generating file config_mb_mu.h."""
 
 import typing
 from typing import Any, Dict, List
@@ -17,7 +17,7 @@ from smct.owners.owner_lm import LM
 
 
 class GeneratorMBMU(GeneratorBase):
-    """Generator of config_mb_Mu.h"""
+    """Generator of config_mb_Mu.h."""
 
     def _get_doxygen_file_name(self) -> str:
         """Gets the doxygen file name.

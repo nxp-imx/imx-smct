@@ -2,20 +2,20 @@
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
-    "created": "2026-03-22T21:54:40Z",
+    "created": "2026-06-02T12:26:47Z",
     "creators": [
       "Organization: NXP"
     ],
     "licenseListVersion": "3.26"
   },
-  "name": "System Manager Config Tool CLI-26.03",
+  "name": "System Manager Config Tool CLI-26.06",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://nxp.com/spdx/3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
+  "documentNamespace": "https://nxp.com/spdx/88795f4c-d613-4e24-907d-e03b6eb2c708",
   "packages": [
     {
-      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
+      "SPDXID": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708",
       "name": "System Manager Config Tool CLI",
-      "versionInfo": "26.03",
+      "versionInfo": "26.06",
       "licenseConcluded": "(BSD-3-Clause)",
       "licenseDeclared": "(BSD-3-Clause)",
       "downloadLocation": "github.com/nxp-imx/imx-smct",
@@ -25,7 +25,7 @@
       "filesAnalyzed": false
     },
     {
-      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
+      "SPDXID": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708---8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
       "name": "fastjsonschema",
       "versionInfo": "2.21.2",
       "licenseConcluded": "BSD-3-Clause",
@@ -47,47 +47,18 @@
         }
       ],
       "filesAnalyzed": false
-    },
-    {
-      "SPDXID": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---9f8d1873-f228-4541-afdb-a721a38a41d7",
-      "name": "nxp-imx/imx-sm",
-      "versionInfo": "rel_imx_sm_2026q1",
-      "licenseConcluded": "BSD-3-Clause",
-      "licenseDeclared": "BSD-3-Clause",
-      "downloadLocation": "NOASSERTION",
-      "originator": "Organization: nxp-imx",
-      "supplier": "NOASSERTION",
-      "externalRefs": [
-        {
-          "referenceCategory": "OTHER",
-          "referenceLocator": "e2659524-89d2-48ca-8d3e-2c1a0df52b84",
-          "referenceType": "BlackDuck-ComponentOrigin"
-        },
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
-          "referenceLocator": "pkg:github/nxp-imx/imx-sm@rel_imx_sm_2026q1",
-          "referenceType": "purl"
-        }
-      ],
-      "filesAnalyzed": false
     }
   ],
   "relationships": [
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
       "relationshipType": "DESCRIBES",
-      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7"
+      "relatedSpdxElement": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708"
     },
     {
-      "spdxElementId": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
+      "spdxElementId": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708",
       "relationshipType": "DYNAMIC_LINK",
-      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
-    },
-    {
-      "spdxElementId": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7",
-      "relationshipType": "OTHER",
-      "relatedSpdxElement": "SPDXRef-package-3e1cd493-2014-4c46-989f-2c3a5e87f0e7---9f8d1873-f228-4541-afdb-a721a38a41d7",
-      "comment": "Separate Work"
+      "relatedSpdxElement": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708---8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
     }
   ]
 }

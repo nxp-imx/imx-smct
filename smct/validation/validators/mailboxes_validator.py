@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to validation of mailboxes"""
+"""Module related to validation of mailboxes."""
 
 import logging
 import typing
@@ -19,7 +19,7 @@ from smct.validation.validator_base import ValidatorBase
 
 
 class MailboxesValidator(ValidatorBase):
-    """Validator of mailboxes"""
+    """Validator of mailboxes."""
 
     @classmethod
     def check_mu_mailboxes(cls, configuration: ConfigurationData, result: List[ValidationEntry]) -> None:

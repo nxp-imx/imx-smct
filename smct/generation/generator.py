@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module with base generator implementation"""
+"""Module with base generator implementation."""
 
 import logging
 import os.path
@@ -24,7 +24,7 @@ COPYRIGHT_YEAR = datetime.now().year
 
 
 class GeneratorBase:
-    """Base class for different configuration header file generators"""
+    """Base class for different configuration header file generators."""
 
     def __init__(self) -> None:
         self._conf: ConfigurationData | None = None
@@ -56,8 +56,7 @@ class GeneratorBase:
         raise CfgToolException("Each generator must override this function")
 
     def _get_generator_name(self) -> str:
-        """Get the generator name such as DEV, LMM, SCMI, ... This name is used to generate filename, protection
-        macro etc.
+        """Get the generator name such as DEV, LMM, SCMI, ... This name is used to generate filename, protection macro etc.
 
         Returns:
             The generator name string.
@@ -333,7 +332,7 @@ class GeneratorBase:
 
 
 class GenHeading(CDefineGeneratorBase):
-    """Helper class as section heading in the generated file, typically used by generators"""
+    """Helper class as section heading in the generated file, typically used by generators."""
 
     def __init__(self, comment: str, comment_chars: Tuple[str, str] = ("/*", "*/")) -> None:
         super().__init__()
@@ -342,7 +341,7 @@ class GenHeading(CDefineGeneratorBase):
         self._right = comment_chars[1]
 
     def print_head(self) -> None:
-        """Prints the heading section with formatted comment borders"""
+        """Prints the heading section with formatted comment borders."""
         comment_start = f"{self._left}{'-' * 74}{self._right}"
         self.add_to_head("")
         self.add_to_head(comment_start)
@@ -353,7 +352,7 @@ class GenHeading(CDefineGeneratorBase):
 
 
 class GenMacroValue(CDefineGeneratorBase):
-    """Helper class as C define with value, typically used by generators"""
+    """Helper class as C define with value, typically used by generators."""
 
     def __init__(self, define: str, value: Any, comment: str = "") -> None:
         super().__init__()
@@ -362,21 +361,24 @@ class GenMacroValue(CDefineGeneratorBase):
         self._comment: str = comment  # heading comment
 
     def print_head(self) -> None:
+        """Emit the heading comment, if any, into the head section."""
         if self._comment:
             self.add_to_head(f"/*! {self._comment} */")
 
     def print_members(self) -> None:
+        """Emit the ``#define <name> <value>`` line into the members section."""
         v = self._value
         if isinstance(v, int):
             v = f"{v}U"
         self.add_to_members(f"#define {self._define}  {v}")
 
     def print_tail(self) -> None:
+        """Emit a trailing blank line into the tail section."""
         self.add_to_tail("")
 
 
 class GenMacroPresence(CDefineGeneratorBase):
-    """Helper class as C define without value, typically used by generators"""
+    """Helper class as C define without value, typically used by generators."""
 
     def __init__(self, define: str, comment: str = "") -> None:
         super().__init__()
@@ -384,18 +386,21 @@ class GenMacroPresence(CDefineGeneratorBase):
         self._comment: str = comment  # heading comment
 
     def print_head(self) -> None:
+        """Emit the heading comment, if any, into the head section."""
         if self._comment:
             self.add_to_head(f"/*! {self._comment} */")
 
     def print_members(self) -> None:
+        """Emit the bare ``#define <name>`` line into the members section."""
         self.add_to_members(f"#define {self._define}")
 
     def print_tail(self) -> None:
+        """Emit a trailing blank line into the tail section."""
         self.add_to_tail("")
 
 
 class GenMacroList(CDefineGeneratorBase):
-    """Helper class for macro initializer with value as list of items, each put to a separate line"""
+    """Helper class for macro initializer with value as list of items, each put to a separate line."""
 
     def __init__(self, define: str, comment: str | None = None, suffix: str = "") -> None:
         super().__init__()
@@ -411,7 +416,16 @@ class GenMacroList(CDefineGeneratorBase):
         Args:
             value: The value to add to the macro list.
         """
-        self._values.append(value)
+        if value not in self._values:
+            self._values.append(value)
+
+    def set_values(self, values: List[str]) -> None:
+        """Sets the values list directly.
+
+        Args:
+            values: The list of values to set.
+        """
+        self._values = list(values)
 
     def print_head(self) -> None:
         """Generates the comment and define name."""
@@ -441,7 +455,7 @@ class GenMacroList(CDefineGeneratorBase):
 
 
 class GenStructInit(DictOrdered, CDefineGeneratorBase):
-    """Helper class as structure initializer, typically used by generators"""
+    """Helper class as structure initializer, typically used by generators."""
 
     def __init__(self, define: str | None, comment: str | None = None) -> None:
         DictOrdered.__init__(self)
@@ -500,7 +514,7 @@ class GenStructInit(DictOrdered, CDefineGeneratorBase):
 
 
 class GenStructInitInline(GenStructInit):
-    """Helper class as structure initializer, typically used by generators"""
+    """Helper class as structure initializer, typically used by generators."""
 
     def __init__(self, define: str | None, comment: str | None = None) -> None:
         super().__init__(define, comment)
@@ -540,7 +554,7 @@ class GenStructInitInline(GenStructInit):
 
 
 class GenDcdInit(CDefineGeneratorBase):
-    """Helper class as DCD initializer, typically used by generators"""
+    """Helper class as DCD initializer, typically used by generators."""
 
     def __init__(self, define: str, comment: str | None = None) -> None:
         super().__init__()
@@ -743,10 +757,10 @@ class GenDcdInit(CDefineGeneratorBase):
 
 
 class GenCfgMacro:
-    """Finalizes the command or macro line for .cfg file generation"""
+    """Finalizes the command or macro line for .cfg file generation."""
 
     def __init__(self, name: str, value: str = "", colon_macro: bool = False, value_tab_pos: int = 12) -> None:
-        """Initialize final configuration macro generation settings
+        """Initialize final configuration macro generation settings.
 
         Args:
           name: The name of the macro
@@ -761,7 +775,7 @@ class GenCfgMacro:
         self._commented_out = False
 
     def append(self, value: str, auto_comma: bool = True) -> None:
-        """Append a string value to the existing value, keep comma-separated by default
+        """Append a string value to the existing value, keep comma-separated by default.
 
         Args:
           value: The string value to append
@@ -780,6 +794,7 @@ class GenCfgMacro:
         all_keys: bool = False,
     ) -> None:
         """Append selected keys from json to existing value.
+
         Different set of keys generate:
             normal:  'key=value' if value is not None
             novalue: 'key' if value is boolean True
@@ -815,7 +830,7 @@ class GenCfgMacro:
                 self.append(f"{spec_key}={spec_val}")
 
     def set_commented_out(self, commented_out: bool = True) -> None:
-        """Mark the whole macro as commented out or active
+        """Mark the whole macro as commented out or active.
 
         Args:
           commented_out: Whether to mark the macro as commented out
@@ -823,7 +838,7 @@ class GenCfgMacro:
         self._commented_out = commented_out
 
     def get(self) -> str:
-        """Return string representation for .cfg file
+        """Return string representation for .cfg file.
 
         Returns:
           Formatted string representation of the macro
@@ -836,7 +851,7 @@ class GenCfgMacro:
         return f"{comment}{name}{space}{self._value}"
 
     def __str__(self) -> str:
-        """String representation for .cfg file
+        """String representation for .cfg file.
 
         Returns:
           Formatted string representation of the macro

@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to API resources"""
+"""Module related to API resources."""
 
 import logging
 from typing import Any, Dict, List
@@ -19,7 +19,7 @@ logger = logging.getLogger()
 
 
 class ApiResource(AtomicResource):
-    """SCMI API resource"""
+    """SCMI API resource."""
 
     # dict of allowed API permission assignment (syntax from .cfg file)
     start_stop_types: Dict[str, str]

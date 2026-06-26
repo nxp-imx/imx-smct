@@ -12,6 +12,9 @@ from smct.generation.trdc.mbc_generation_model import MbcGenerationModel
 from smct.model.model_trdc import TrdcModel
 from smct.resources.res_mbc import MbcResource
 
+# Initialize DEBUG_DOMAIN_PERMISSION (normally set by parser from chip model JSON)
+TrdcModel.DEBUG_DOMAIN_PERMISSION = 0x6666
+
 
 def _lists_equals(input_list: List[int], expected_list: List[int]) -> bool:
     return set(input_list) == set(expected_list)
@@ -89,3 +92,62 @@ def test_sort_blocks() -> None:
     expected_blocks = {1: [block2, block1], 2: [block4, block3]}
     blocks = model.get_blocks()
     assert blocks == expected_blocks
+
+
+def test_add_block_same_permission_deduplicates() -> None:
+    """Test that adding same block twice with same permission deduplicates (only one instance)"""
+    # Arrange
+    model = MbcGenerationModel()
+    raw = {"name": "TestMBC", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "10", "bcnt": "5"}
+    res = MbcResource(raw)
+    block1 = MbcBlock(1, res, (10, 15), 0x4400)
+    block2 = MbcBlock(1, res, (10, 15), 0x4400)  # Same domain, resource, range, permission
+    # Act
+    model.add_block(block1)
+    model.add_block(block2)
+    blocks = model.get_blocks()
+    # Assert - should only have one block
+    assert len(blocks[1]) == 1
+    assert blocks[1][0] == block1
+
+
+def test_add_block_different_permission_or_merged() -> None:
+    """Test that adding same block with different permission ORs them together"""
+    # Arrange
+    model = MbcGenerationModel()
+    raw = {"name": "TestMBC", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "10", "bcnt": "5"}
+    res = MbcResource(raw)
+    block1 = MbcBlock(1, res, (10, 15), 0x4400)
+    block2 = MbcBlock(1, res, (10, 15), 0x0011)  # Same domain, resource, range but DIFFERENT permission
+    # Act
+    model.add_block(block1)
+    model.add_block(block2)
+    blocks = model.get_blocks()
+    # Assert - permissions are OR'd together (matching Perl |= behavior)
+    assert len(blocks[1]) == 1
+    assert blocks[1][0].get_permission() == 0x4400 | 0x0011
+
+
+def test_add_block_clearing_behavior_unchanged() -> None:
+    """Test that clearing block behavior is preserved (dom_clearing vs non-clearing logic)"""
+    # Arrange
+    model = MbcGenerationModel()
+    raw = {"name": "TestMBC", "type": "MBC", "trdc": "A", "mbc": "0", "mem": "0", "blk": "10", "bcnt": "5"}
+    res = MbcResource(raw)
+    # Create a real block and a dom_clearing block
+    real_block = MbcBlock(1, res, (10, 15), 0x4400, clearing=False)
+    clearing_block = MbcBlock(1, res, (10, 15), 0x0, clearing=True)
+    # Act & Assert - clearing block added first, then real block should replace it
+    model.add_block(clearing_block)
+    assert len(model.get_blocks()[1]) == 1
+    model.add_block(real_block)
+    assert len(model.get_blocks()[1]) == 1
+    assert model.get_blocks()[1][0] == real_block
+    # Act & Assert - real block first, then clearing block should be ignored
+    model2 = MbcGenerationModel()
+    model2.add_block(real_block)
+    assert len(model2.get_blocks()[1]) == 1
+    model2.add_block(clearing_block)
+    assert len(model2.get_blocks()[1]) == 1
+    assert model2.get_blocks()[1][0] == real_block
+

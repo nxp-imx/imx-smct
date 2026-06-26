@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to parsing header files"""
+"""Module related to parsing header files."""
 
 import copy
 import logging
@@ -20,7 +20,7 @@ logger = logging.getLogger()
 
 
 class HeaderParser:
-    """Parser of .h files"""
+    """Parser of .h files."""
 
     _patterns: Dict[re.Pattern, Dict[str, Any]] = {}
 
@@ -78,7 +78,7 @@ class HeaderParser:
 
 
 class ApiResourceParser:
-    """API resource parser. Parses all API resources in given file/directory"""
+    """API resource parser. Parses all API resources in given file/directory."""
 
     _apiResTypes: List[Tuple[str, str | None]] = [
         # permission,   header-parsing prefix

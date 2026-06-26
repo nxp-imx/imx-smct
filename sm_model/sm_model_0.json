@@ -113,6 +113,18 @@
                     "json_file": "soc_model",
                     "id": "access_templates",
                     "category": "MBC/MRC"
+                },
+                {
+                    "param": "dom_clr_unused",
+                    "json_file": "soc_model",
+                    "id": "dom_clr_unused",
+                    "category": "MBC/MRC"
+                },
+                {
+                    "param": "dom_exclusive",
+                    "json_file": "soc_model",
+                    "id": "dom_exclusive",
+                    "category": "MBC/MRC"
                 }
             ],
             "infos": [
@@ -215,7 +227,18 @@
                     "json_file": "soc_model",
                     "id": "clr",
                     "category": "MBC/MRC"
-
+                },
+                {
+                    "param": "dom_clr_unused",
+                    "json_file": "soc_model",
+                    "id": "dom_clr_unused",
+                    "category": "MBC/MRC"
+                },
+                {
+                    "param": "dom_exclusive",
+                    "json_file": "soc_model",
+                    "id": "dom_exclusive",
+                    "category": "MBC/MRC"
                 }
             ],
             "infos": [

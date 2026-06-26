@@ -89,24 +89,33 @@ class FileDiffer:
             with open(diff_file_path, "w", encoding="utf-8") as f:
                 f.write(self._errors[file])
 
-    def check_differences(self) -> bool:
+    def check_differences(self, exclude_files: set[str] | None = None) -> bool:
         """Check for differences between golden and test files.
+
+        Args:
+            exclude_files: Optional set of relative file paths to exclude from comparison
 
         Returns:
             True if no differences found, False otherwise
         """
+        if exclude_files is None:
+            exclude_files = set()
+
         files: List[str] = []
         for file_filter in self.file_filter.split(";"):
             files.extend(os.path.relpath(path, self.test_folder_path) for path in glob.glob(os.path.join(self.test_folder_path, file_filter), recursive=True))
 
         for file in files:
+            # Skip excluded files
+            if file in exclude_files:
+                continue
             self._check_file(file)
 
         # Copy files that are different
         error_file_names = self._errors.keys()
         if len(error_file_names) != 0:
             diff_folder_path = self.diff_folder_path
-            if diff_folder_path is not None:
+            if diff_folder_path is not None and self.golden_folder_path is not None:
                 if os.path.exists(diff_folder_path):
                     shutil.rmtree(diff_folder_path)
                 os.makedirs(os.path.join(diff_folder_path, "golden"), exist_ok=True)
@@ -139,14 +148,17 @@ class FileDiffer:
         new_lines: List[str] = []
         perform_diff_of_files = True
 
-        try:
-            with open(os.path.join(self.golden_folder_path, file), "r", encoding="utf-8") as golden_sample_file:
-                golden_content = golden_sample_file.read()
-                golden_content = re.sub(self.strip_pattern, "", golden_content)
-                golden_content = re.sub(self.space_trimming_pattern, " ", golden_content)
-                old_lines = [ln for ln in golden_content.splitlines() if ln not in ("", "\r\n", "\n", "\r")]
-        except FileNotFoundError:
-            self._missing_in_golden_sample.append(file)
+        if self.golden_folder_path is not None:
+            try:
+                with open(os.path.join(self.golden_folder_path, file), "r", encoding="utf-8") as golden_sample_file:
+                    golden_content = golden_sample_file.read()
+                    golden_content = re.sub(self.strip_pattern, "", golden_content)
+                    golden_content = re.sub(self.space_trimming_pattern, " ", golden_content)
+                    old_lines = [ln for ln in golden_content.splitlines() if ln not in ("", "\r\n", "\n", "\r")]
+            except FileNotFoundError:
+                self._missing_in_golden_sample.append(file)
+                perform_diff_of_files = False
+        else:
             perform_diff_of_files = False
 
         try:

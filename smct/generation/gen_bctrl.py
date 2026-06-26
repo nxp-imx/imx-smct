@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_bctrl.h"""
+"""Module for generating file config_bctrl.h."""
 
 import logging
 from typing import Any, Dict, List
@@ -20,7 +20,7 @@ logger = logging.getLogger()
 
 
 class GeneratorBCTRL(GeneratorBase):
-    """Generator of config_bctrl.h"""
+    """Generator of config_bctrl.h."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.

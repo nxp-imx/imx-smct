@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to TRDC MBC resources"""
+"""Module related to TRDC MBC resources."""
 
 import logging
 from enum import Enum
@@ -20,7 +20,7 @@ logger = logging.getLogger()
 
 
 class MbcResourceWriteType(Enum):
-    """Enumeration of write types into MBC registers"""
+    """Enumeration of write types into MBC registers."""
 
     UNKNOWN = 0  # Fallback value when the write type is not decided
     BLOCK = 1  # Write to one block
@@ -29,7 +29,7 @@ class MbcResourceWriteType(Enum):
 
     @classmethod
     def from_name(cls, name: str) -> "MbcResourceWriteType":
-        """Returns enumeration value by its name
+        """Returns enumeration value by its name.
 
         Args:
             name: The name of the enumeration value
@@ -47,7 +47,7 @@ class MbcResourceWriteType(Enum):
 
 
 class MbcResource(MbcMrcResource):
-    """MBC resource object"""
+    """MBC resource object."""
 
     def __init__(self, raw: Dict[str, Any]):
         super().__init__(raw)
@@ -63,7 +63,7 @@ class MbcResource(MbcMrcResource):
             raise CfgToolException(f"Missing required MBC attributes in database object {raw}") from exc
 
     def get_index(self) -> int:
-        """Returns MBC index of the MBC
+        """Returns MBC index of the MBC.
 
         Returns:
             The MBC index
@@ -71,7 +71,7 @@ class MbcResource(MbcMrcResource):
         return self._mbc
 
     def get_mem(self) -> int:
-        """Returns MEM index of the MBC
+        """Returns MEM index of the MBC.
 
         Returns:
             The MEM index
@@ -79,7 +79,7 @@ class MbcResource(MbcMrcResource):
         return self._mem
 
     def get_write_type(self) -> MbcResourceWriteType:
-        """Returns the write type of this MBC resource. Possible values can be found in enum MbcResourceWriteType
+        """Returns the write type of this MBC resource. Possible values can be found in enum MbcResourceWriteType.
 
         Returns:
             The write type of this MBC resource
@@ -115,7 +115,7 @@ class MbcResource(MbcMrcResource):
         return block_range
 
     def get_register_name(self, domain_id: int, word: int) -> str:
-        """Returns register name for given domain and word
+        """Returns register name for given domain and word.
 
         Args:
             domain_id: The domain ID

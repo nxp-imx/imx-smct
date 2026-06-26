@@ -5,13 +5,16 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_lmm.h"""
+"""Module for generating file config_lmm.h."""
 
+import logging
 from typing import Any, Dict, List
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.generator import GeneratorBase, GenHeading, GenMacroList, GenMacroValue, GenStructInit, GenStructInitInline
 from smct.owners.owner_lm import LM, MSEL, StartStop
+
+logger = logging.getLogger()
 
 
 def _group_start_stops(conf: ConfigurationData, start_stops_input: List[StartStop], starts: bool) -> Dict[int, List[StartStop]]:
@@ -70,7 +73,7 @@ def _print_msel(struct: GenStructInit, msel: MSEL) -> None:
 
 
 class GeneratorLMM(GeneratorBase):
-    """Generator of config_lmm.h"""
+    """Generator of config_lmm.h."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         return {"name": "LMM", "incl": ["config_user.h"]}
@@ -145,7 +148,10 @@ class GeneratorLMM(GeneratorBase):
 
         self.print_generator(GenMacroValue("SM_LM_NUM_MSEL", msel_num, "Number of  mSel"))
         self.print_generator(GenMacroValue("SM_LM_NUM_SEENV", seenv_len, "Number of  S-EENV"))
-        self.print_generator(GenMacroValue("SM_LM_CFG_NAME", f'"{conf.get_config_name()}"', "Config name"))
+        config_name = conf.get_config_name()
+        if len(config_name) > 15:
+            logger.warning("Config name '%s' exceeds 15 characters, truncating to '%s'", config_name, config_name[:15])
+        self.print_generator(GenMacroValue("SM_LM_CFG_NAME", f'"{config_name[:15]}"', "Config name"))
         self.print_generator(GenMacroValue("SM_LM_DEFAULT", lm_default_id, "Default LM for monitor"))
 
     def _print_start_stop(self, start: bool) -> None:
@@ -187,18 +193,23 @@ class GeneratorLMM(GeneratorBase):
         """Generates fault configuration defines."""
         self.print_generator(GenHeading("LM Fault Lists"))
         start_stop_list_define = GenMacroList("SM_LM_FAULT_DATA", "LM fault reactions", suffix=",")
+        seen_fault_ids: set[str] = set()
 
         for lm in self._get_configuration().get_all_lms():
             lm_id = self._get_configuration().get_lm_id(lm)
             for assigned_resource in lm.get_all_faults():
                 for fault_resource in assigned_resource.get_fault_resources():
+                    fault_api_id = fault_resource.get_api_id()
+                    if fault_api_id is None or fault_api_id in seen_fault_ids:
+                        continue
+                    seen_fault_ids.add(fault_api_id)
                     struct_generator = GenStructInitInline(None)
                     reaction = assigned_resource.get_react_type()
                     if reaction is not None:
                         struct_generator.add_entry("reaction", reaction)
                         struct_generator.add_entry("lm", lm_id)
                         struct_generator.print_members()
-                        start_stop_list_define.add_value(f"[{fault_resource.get_api_id()}] = {{{struct_generator.get_members_string()}}}")
+                        start_stop_list_define.add_value(f"[{fault_api_id}] = {{{struct_generator.get_members_string()}}}")
         self.print_generator(start_stop_list_define)
 
     def print_content(self) -> None:

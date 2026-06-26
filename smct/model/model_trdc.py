@@ -4,7 +4,7 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to TRDC model"""
+"""Module related to TRDC model."""
 
 import logging
 import re
@@ -17,7 +17,7 @@ logger = logging.getLogger()
 
 
 class MbcMemModel:
-    """One MBC.MEM region definition"""
+    """One MBC.MEM region definition."""
 
     def __init__(self) -> None:
         self._origin: FormatedInt = FormatedInt("0")  # base address of this MBC (if used for memory check)
@@ -25,7 +25,7 @@ class MbcMemModel:
         self._blksize: FormatedInt = FormatedInt("0")  # size of one memory block (if used for memory check)
 
     def get_raw_json(self) -> object:
-        """Returns JSON object with raw data
+        """Returns JSON object with raw data.
 
         Returns:
             JSON object with raw data
@@ -37,7 +37,7 @@ class MbcMemModel:
         }
 
     def get_origin(self) -> FormatedInt:
-        """Returns origin of the MEM
+        """Returns origin of the MEM.
 
         Returns:
             Origin of the MEM
@@ -45,7 +45,7 @@ class MbcMemModel:
         return self._origin
 
     def get_block_count(self) -> int:
-        """Returns amount of blocks in the MEM
+        """Returns amount of blocks in the MEM.
 
         Returns:
             Amount of blocks in the MEM
@@ -53,7 +53,7 @@ class MbcMemModel:
         return self._nblks
 
     def get_block_size(self) -> FormatedInt:
-        """Returns size of the MEM
+        """Returns size of the MEM.
 
         Returns:
             Size of the MEM
@@ -61,7 +61,7 @@ class MbcMemModel:
         return self._blksize
 
     def set_origin(self, origin: FormatedInt) -> None:
-        """Set origin of the MEM
+        """Set origin of the MEM.
 
         Args:
             origin: Origin of the MEM
@@ -69,7 +69,7 @@ class MbcMemModel:
         self._origin = origin
 
     def set_nblks(self, nblks: int) -> None:
-        """Set amount of blocks in the MEM
+        """Set amount of blocks in the MEM.
 
         Args:
             nblks: Amount of blocks in the MEM
@@ -77,7 +77,7 @@ class MbcMemModel:
         self._nblks = nblks
 
     def set_blksize(self, blksize: FormatedInt) -> None:
-        """Set size of the MEM
+        """Set size of the MEM.
 
         Args:
             blksize: Size of the MEM
@@ -99,7 +99,7 @@ class MbcModel:
         self._glbac: List[int] = [0x0000, 0x6666, 0x7777]  # default always-used GLBAC, extended as needed later
 
     def set_model_mem(self, mem: int, origin: FormatedInt, nblks: int, blksize: FormatedInt) -> None:
-        """Sets MEM model based on given information
+        """Sets MEM model based on given information.
 
         Args:
             mem: MEM index
@@ -120,7 +120,7 @@ class MbcModel:
         mbc_mem.set_blksize(blksize)
 
     def get_model_mem(self, index: int) -> None | MbcMemModel:
-        """Returns MEM model based on index
+        """Returns MEM model based on index.
 
         Args:
             index: Index of the MEM model
@@ -131,7 +131,7 @@ class MbcModel:
         return self._mem[index]
 
     def get_raw_json(self) -> object:
-        """Returns JSON object with raw data
+        """Returns JSON object with raw data.
 
         Returns:
             JSON object with raw data
@@ -156,7 +156,7 @@ class MrcModel:
         self._origins: List[Any] = []
 
     def add_origin(self, origin: str, size: str) -> None:
-        """Adds origin address and size of the region
+        """Adds origin address and size of the region.
 
         Args:
             origin: origin address to set
@@ -165,7 +165,7 @@ class MrcModel:
         self._origins.append({"origin": origin, "size": size})
 
     def set_model_number_of_regions(self, number_of_regions: int) -> None:
-        """Sets number of regions in the MRC model
+        """Sets number of regions in the MRC model.
 
         Args:
             number_of_regions: Number of regions to set
@@ -175,7 +175,7 @@ class MrcModel:
         self._number_of_regions = number_of_regions
 
     def set_model_region_offset(self, offset: int) -> None:
-        """Sets memory region offset in the MRC model
+        """Sets memory region offset in the MRC model.
 
         Args:
             offset: Memory region offset to set
@@ -183,7 +183,7 @@ class MrcModel:
         self._memory_region_address_offset = offset
 
     def get_model_region_offset(self) -> int:
-        """Returns memory region offset
+        """Returns memory region offset.
 
         Returns:
             Memory region offset
@@ -191,7 +191,7 @@ class MrcModel:
         return self._memory_region_address_offset
 
     def get_model_number_of_regions(self) -> int:
-        """Returns number of regions in this MRC
+        """Returns number of regions in this MRC.
 
         Returns:
             Number of regions in this MRC
@@ -199,7 +199,7 @@ class MrcModel:
         return self._number_of_regions
 
     def get_raw_json(self) -> object:
-        """Returns JSON object with raw data
+        """Returns JSON object with raw data.
 
         Returns:
             JSON object with raw data
@@ -213,7 +213,7 @@ class MrcModel:
 
 
 class TrdcModel:
-    """TRDC unit model"""
+    """TRDC unit model."""
 
     # named perm values
     permission_types: Dict[str, int]
@@ -261,7 +261,7 @@ class TrdcModel:
         return f"TRDC_{self._id_letter}[domains={self._ndid}, mbcs={self._nmbc}. mrcs={self._nmrc}]"
 
     def set_model_params(self, ndid: int, nmstr: int, nmbc: int, nmrc: int, kpaen: int, sidsz: int) -> None:
-        """Sets TRDC model parameters
+        """Sets TRDC model parameters.
 
         Args:
             ndid: Number of DIDs
@@ -293,7 +293,7 @@ class TrdcModel:
         self._model_already_set = True
 
     def get_id(self) -> str:
-        """Returns letter id of the TRDC
+        """Returns letter id of the TRDC.
 
         Returns:
             Letter id of the TRDC
@@ -301,7 +301,7 @@ class TrdcModel:
         return self._id_letter
 
     def get_name(self) -> str:
-        """Returns name of the TRDC
+        """Returns name of the TRDC.
 
         Returns:
             Name of the TRDC
@@ -309,7 +309,7 @@ class TrdcModel:
         return self._name
 
     def get_kpaen(self) -> int:
-        """Returns KPA enable value
+        """Returns KPA enable value.
 
         Returns:
             KPA enable value
@@ -317,7 +317,7 @@ class TrdcModel:
         return self._kpaen
 
     def get_sidsz(self) -> int:
-        """Returns SID size value
+        """Returns SID size value.
 
         Returns:
             SID size value
@@ -325,7 +325,7 @@ class TrdcModel:
         return self._sidsz
 
     def get_perm_value(self, permission: str) -> int:
-        """Returns value of the given permission
+        """Returns value of the given permission.
 
         Args:
             permission: Permission name
@@ -338,8 +338,24 @@ class TrdcModel:
         logger.error("Invalid TRDC permission value '%s' requested", permission)
         return 0
 
+    def get_perm_string(self, permission: int) -> str:
+        """Returns value of the given permission.
+
+        Args:
+            permission: Permission name
+
+        Returns:
+            Value of the given permission
+        """
+        for permission_str in self.permission_types:
+            if self.permission_types[permission_str] == permission:
+                return permission_str if permission_str else "0 (default)"
+        if permission < 0:
+            return "clearing"
+        return str(permission)
+
     def get_mbc(self, mbc: int, create_if_needed: bool = True) -> MbcModel | None:
-        """Returns MBC model based on given index
+        """Returns MBC model based on given index.
 
         Args:
             mbc: MBC index
@@ -359,7 +375,7 @@ class TrdcModel:
         return self._mbc[mbc]
 
     def get_mrc(self, mrc: int, create_if_needed: bool = True) -> MrcModel | None:
-        """Returns MRC model based on given index
+        """Returns MRC model based on given index.
 
         Args:
             mrc: MRC index
@@ -379,7 +395,7 @@ class TrdcModel:
         return self._mrc[mrc]
 
     def get_domains_count(self) -> int:
-        """Returns amount of domains in this TRDC
+        """Returns amount of domains in this TRDC.
 
         Returns:
             Amount of domains in this TRDC
@@ -388,7 +404,7 @@ class TrdcModel:
 
     @classmethod
     def _get_register_offset_mdac(cls, m: re.Match) -> int:
-        """Returns offset of given MDAC register
+        """Returns offset of given MDAC register.
 
         Args:
             m: Regular expression match object
@@ -403,7 +419,7 @@ class TrdcModel:
 
     @classmethod
     def _get_register_offset_mbc_glbac(cls, m: re.Match) -> int:
-        """Returns offset of given MBC_GLBAC register
+        """Returns offset of given MBC_GLBAC register.
 
         Args:
             m: Regular expression match object
@@ -418,7 +434,7 @@ class TrdcModel:
 
     @classmethod
     def _get_register_offset_mbc_dom(cls, m: re.Match) -> int:
-        """Returns offset of given MBC register
+        """Returns offset of given MBC register.
 
         Args:
             m: Regular expression match object
@@ -436,7 +452,7 @@ class TrdcModel:
         return addr
 
     def _get_register_offset_mrc_glbac(self, m: re.Match) -> int:
-        """Returns offset of given MRC_GLBAC register
+        """Returns offset of given MRC_GLBAC register.
 
         Args:
             m: Regular expression match object
@@ -450,7 +466,7 @@ class TrdcModel:
         return addr
 
     def _get_register_offset_mrc_dom(self, m: re.Match) -> int:
-        """Returns offset of given MRC register
+        """Returns offset of given MRC register.
 
         Args:
             m: Regular expression match object
@@ -466,7 +482,7 @@ class TrdcModel:
         return addr
 
     def get_register_offset(self, reg: str) -> int:
-        """Returns offset of given register
+        """Returns offset of given register.
 
         Args:
             reg: Register name
@@ -490,7 +506,7 @@ class TrdcModel:
         raise KeyError(f"Invalid TRDC register name '{reg}'")
 
     def get_raw_json(self) -> object:
-        """Returns JSON object with raw data
+        """Returns JSON object with raw data.
 
         Returns:
             JSON object with raw data

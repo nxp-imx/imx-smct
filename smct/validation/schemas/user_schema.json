@@ -419,6 +419,11 @@
          "type": "boolean",
          "description": "Security status (required)"
         },
+        "dup": {
+         "type": "integer",
+         "description": "Duplication source agent index (optional)",
+         "minimum": 0
+        },
         "defines": {
          "type": "array",
          "description": "Agent-specific defines (required)",
@@ -558,7 +563,7 @@
          "additionalProperties": false
         }
        },
-       "required": ["channels", "defines", "mailbox", "name", "resources", "secure", "type"],
+       "required": ["channels", "defines", "mailbox", "name", "secure", "type"],
        "additionalProperties": false
       }
      }

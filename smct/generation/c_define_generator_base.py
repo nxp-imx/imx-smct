@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with generators of C language defines"""
+"""Module with generators of C language defines."""
 
 import sys
 from io import StringIO
@@ -13,7 +13,7 @@ from typing import IO
 
 
 class CDefineGeneratorBase:
-    """Base of C define generators"""
+    """Base of C define generators."""
 
     def __init__(self) -> None:
         self._head_buffer = StringIO()

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with SCMI protocol related validations"""
+"""Module with SCMI protocol related validations."""
 
 import logging
 import re
@@ -107,7 +107,7 @@ def _validate_scmi_agents(configuration: ConfigurationData, result: List[Validat
 
 
 class ScmiValidator(ValidatorBase):
-    """Validator of SCMI"""
+    """Validator of SCMI."""
 
     def validate(self, configuration: ConfigurationData) -> List[ValidationEntry]:
         """Validates SCMI relates configuration.

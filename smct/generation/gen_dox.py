@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config.dox"""
+"""Module for generating file config.dox."""
 
 from typing import Any, Dict
 

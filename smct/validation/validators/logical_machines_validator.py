@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module with logical machine related validations"""
+"""Module with logical machine related validations."""
 
 import logging
 import re
@@ -161,7 +161,7 @@ def _validate_lm_default_option(logical_machines: List[LM], result: List[Validat
 
 
 class LogicalMachinesValidator(ValidatorBase):
-    """Validator of logical machines"""
+    """Validator of logical machines."""
 
     def validate(self, configuration: ConfigurationData) -> List[ValidationEntry]:
         """Validates logical machines configuration.

@@ -4,7 +4,7 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module related to chip model"""
+"""Module related to chip model."""
 
 import json
 import logging
@@ -19,7 +19,7 @@ logger = logging.getLogger()
 
 
 class ChipModel:
-    """Base class for all models of chips"""
+    """Base class for all models of chips."""
 
     def __init__(self) -> None:
         self._mixes: List[str] = []

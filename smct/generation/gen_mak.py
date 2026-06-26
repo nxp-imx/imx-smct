@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config.mak"""
+"""Module for generating file config.mak."""
 
 from typing import Any, Dict
 
@@ -14,7 +14,7 @@ from smct.product_info import ProductInfo
 
 
 class GeneratorMakeFile(GeneratorBase):
-    """Generator for make file"""
+    """Generator for make file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Get generator information.

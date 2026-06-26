@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module with all common utils and generic classes"""
+"""Module with all common utils and generic classes."""
 
 import json
 import logging
@@ -14,7 +14,7 @@ from typing import Any, Dict, List, Tuple, TypeVar
 
 import fastjsonschema
 
-_re_attr = re.compile(r'^([a-z0-9]+)=(("[^"]*?")|(\S*))')  # lowercase key=val or key="quoted val"
+_re_attr = re.compile(r'^([a-z0-9_]+)=(("[^"]*?")|(\S*))')  # lowercase key=val or key="quoted val"
 
 logger = logging.getLogger()
 
@@ -83,7 +83,7 @@ def parse_int(text: str, allow_units: bool = False) -> int:
 
 
 class FormatedInt:
-    """Class used for storing integer with its base for backwards conversion"""
+    """Class used for storing integer with its base for backwards conversion."""
 
     def __init__(self, formated_int: str | int) -> None:
         if isinstance(formated_int, str):
@@ -133,9 +133,10 @@ class FormatedInt:
 
 
 class FormatedIntEncoder(json.JSONEncoder):
-    """For encoding FormatedInt class into JSON"""
+    """For encoding FormatedInt class into JSON."""
 
     def default(self, o: Any) -> Any:
+        """Encode FormatedInt as its formatted string; defer to base encoder otherwise."""
         if isinstance(o, FormatedInt):
             if o.get_base() == "0x":
                 return hex(o.get_value())
@@ -146,10 +147,9 @@ class FormatedIntEncoder(json.JSONEncoder):
 
 
 def parse_int_or_default(text: str, default_value: int, allow_units: bool = False) -> int:
-    """Parses integer out of the provided string. Returns default value if parsing is not possible.
-     Units might be present if allowed.
+    """Parses integer out of the provided string. Returns default value if parsing is not possible. Units might be present if allowed.
 
-     Args:
+    Args:
         text: The string to parse.
         default_value: The value to return if parsing fails.
         allow_units: Whether to allow unit suffixes (K, M, G).
@@ -221,8 +221,9 @@ def parse_int_or_return_str(value: Any) -> int | str:
 
 
 def parse_int_range(text: str, allow_single: bool = True, allow_units: bool = False) -> Tuple[int, int]:
-    """Parses integer range from the input. Units might be present if allowed. If single integer is present and
-    allowed then the resulting tuple contains the same value.
+    """Parses integer range from the input.
+
+    Units might be present if allowed. If single integer is present and allowed then the resulting tuple contains the same value.
 
     Args:
         text: The string containing the range (e.g., "1-10" or "5").
@@ -428,8 +429,7 @@ def parse_time_to_ms(period: str, throw: bool = False) -> int | None:
 
 
 def are_all_numbers_present(input_list: List[int]) -> bool:
-    """Returns True if all numbers from minimum to maximum (inferred from the list) are present and there is no gap,
-     False otherwise.
+    """Returns True if all numbers from minimum to maximum (inferred from the list) are present and there is no gap. False otherwise.
 
     Args:
         input_list: List of integers to check.
@@ -557,7 +557,14 @@ class DictOrdered(Dict[K, V]):
 
 
 def validate_json(json_object: dict, json_path: str, schema_file: str, level: str) -> None:
-    """Returns list of the keys in order of their addition to this dictionary"""
+    """Validate a JSON object against a schema file; log a message on failure.
+
+    Args:
+        json_object: The JSON object (dict) to validate.
+        json_path: Path to the JSON file being validated (used in log messages).
+        schema_file: Filename of the JSON Schema file (relative to smct/validation/schemas/).
+        level: Severity level for the log message on failure – ``"warning"`` or ``"critical"``.
+    """
     schema_dir = os.path.join(os.path.dirname(__file__), "validation", "schemas")
     schema_path = os.path.join(schema_dir, schema_file)
     if not os.path.exists(schema_path):
@@ -614,16 +621,14 @@ class DataTypeConstraints:
 
 
 class UInt32Constraints(DataTypeConstraints):
-    """Class used to store maximal value of uint32 data type for
-    validation and default value if the max value is exceeded."""
+    """Class used to store maximal value of uint32 data type. For validation and default value if the max value is exceeded."""
 
     MAX_VALUE = 0xFFFFFFFF
     DEFAULT_VALUE = 0xFFFFFFFF
 
 
 class UInt64Constraints(DataTypeConstraints):
-    """Class used to store maximal value of uint64 data type for
-    validation and default value if the max value is exceeded."""
+    """Class used to store maximal value of uint64 data type. For validation and default value if the max value is exceeded."""
 
     MAX_VALUE = 0xFFFFFFFFFFFFFFFF
     DEFAULT_VALUE = 0xFFFFFFFFFFFFFFFF

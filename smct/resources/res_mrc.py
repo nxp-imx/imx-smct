@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to TRDC MRC resources"""
+"""Module related to TRDC MRC resources."""
 
 from typing import Any, Dict
 
@@ -16,7 +16,7 @@ from .res_trdc import MbcMrcResource
 
 
 class MrcResource(MbcMrcResource):
-    """MRC resource object"""
+    """MRC resource object."""
 
     def __init__(self, raw: Dict[str, Any]):
         super().__init__(raw)
@@ -38,8 +38,9 @@ class MrcResource(MbcMrcResource):
 
     def get_clr(self) -> int:
         """Returns clr of the MRC resource.
+
         Returns:
-            int: The clr of the MRC resource..
+            int: The clr of the MRC resource.
         """
         return self._clr
 

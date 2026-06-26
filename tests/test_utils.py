@@ -40,25 +40,28 @@ def get_smct_root() -> str:
     return os.path.abspath(os.path.join(folder, ".."))
 
 
-def execute_binary(binary_path: str, arguments: List[str], stdin: str | None = None) -> Tuple[int, str, str]:
+def execute_binary(binary_path: str, arguments: List[str], stdin: str | None = None, timeout: int = 300) -> Tuple[int, str, str]:
     """Execute external binary with given arguments.
 
     Args:
         binary_path: Path to the binary to execute
         arguments: List of command-line arguments
         stdin: Optional stdin input string
+        timeout: Maximum seconds to wait for process completion (default: 300)
 
     Returns:
         Tuple of (exit_code, stdout, stderr)
     """
     process_arguments = [binary_path] + arguments
+    input_data = stdin.encode("utf-8") if stdin is not None else None
     with subprocess.Popen(process_arguments, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
-        if stdin is not None and process.stdin is not None:
-            process.stdin.write(stdin.encode("utf-8"))
-        code = process.wait()
-        stdout = process.stdout.read().decode("utf-8") if process.stdout is not None else ""
-        stderr = process.stderr.read().decode("utf-8") if process.stderr is not None else ""
-    return code, stdout, stderr
+        try:
+            stdout_bytes, stderr_bytes = process.communicate(input=input_data, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.communicate()
+            raise
+    return process.returncode, stdout_bytes.decode("utf-8"), stderr_bytes.decode("utf-8")
 
 
 def set_up() -> None:

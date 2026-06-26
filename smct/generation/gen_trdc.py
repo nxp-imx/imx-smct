@@ -4,7 +4,7 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module for generating file config_trdc.h"""
+"""Module for generating file config_trdc.h."""
 
 import logging
 import math
@@ -65,8 +65,11 @@ def _generate_mbc_dcd_write_internal(dcd: GenDcdInit, trdc: TrdcModel, block: Mb
     # Register was not yet configured
     if register_name not in dcd:
         dcd.set_key_name(register_name, trdc.get_register_offset(register_name))
-        dcd.add_key_comment(register_name, block.get_name())
         dcd[register_name] = 0
+    if block.is_dom_clearing():
+        dcd.add_key_comment(register_name, block.get_name() + "=clearing")
+    else:
+        dcd.add_key_comment(register_name, block.get_name() + "=" + trdc.get_perm_string(permission))
     # nse 1bit, permIndex 3bit - 4 times in register
     nse_bit = 1 if permission & 0xFF != 0 else 0
     clear_mask = ~(0xF << offset)
@@ -74,7 +77,9 @@ def _generate_mbc_dcd_write_internal(dcd: GenDcdInit, trdc: TrdcModel, block: Mb
     dcd[register_name] = (dcd[register_name] & clear_mask) | (data << offset)
 
 
-def _create_mrc_region(trdc: TrdcModel, mrc: MrcResource, assigned_resource: AssignedResource, did: int, permission: int) -> MrcRegion | None:
+def _create_mrc_region(
+    trdc: TrdcModel, mrc: MrcResource, assigned_resource: AssignedResource, did: int, permission: int, clearing: bool = False
+) -> MrcRegion | None:
     """Creates MRC generation region from assigned resource.
 
     Args:
@@ -116,10 +121,12 @@ def _create_mrc_region(trdc: TrdcModel, mrc: MrcResource, assigned_resource: Ass
         validation_id = ".".join([assigned_resource.get_owner().get_id(), "RESOURCES", assigned_resource.get_resource().get_name()])
         logger.error("Invalid domain id %i requested for '%s'", did, mrc, extra={"source": source, "validation_id": validation_id})
         return None
-    return MrcRegion(did, memory_begin, memory_end, permission)
+    return MrcRegion(did, memory_begin, memory_end, permission, clearing)
 
 
-def _create_mbc_block(trdc: TrdcModel, mbc: MbcResource, did: int, permission: int, assigned_resource: AssignedResource | None = None) -> MbcBlock | None:
+def _create_mbc_block(
+    trdc: TrdcModel, mbc: MbcResource, did: int, permission: int, assigned_resource: AssignedResource | None = None, clearing: bool = False
+) -> MbcBlock | None:
     """Creates MBC block from the given parameters.
 
     Args:
@@ -160,7 +167,7 @@ def _create_mbc_block(trdc: TrdcModel, mbc: MbcResource, did: int, permission: i
         if block_range is None:
             return None
 
-    return MbcBlock(did, mbc, block_range, permission)
+    return MbcBlock(did, mbc, block_range, permission, clearing)
 
 
 def _create_default_mrc_regions(trdc: TrdcModel, mrc: MrcResource) -> List[MrcRegion]:
@@ -250,7 +257,7 @@ def _generate_mrc_global_access_control_registers_from_model(
         reg = f"TRDC_{trdc.get_id()}_MRC{mrc_index}_GLBAC{previous_counter}"
         register_offset = trdc.get_register_offset(reg)
         dcd.set_key_name(reg, register_offset)
-        dcd.add_key_comment(reg, mrc.get_name())
+        dcd.add_key_comment(reg, trdc.get_perm_string(permission))
         dcd.set_value_alignment_for_address(register_offset, 4)
         dcd[reg] = permission
 
@@ -278,6 +285,7 @@ def _generate_mbc_global_access_control_registers_from_model(
         reg = f"TRDC_{trdc.get_id()}_MBC{mbc_index}_MEMN_GLBAC{previous_counter}"
         register_offset = trdc.get_register_offset(reg)
         dcd.set_key_name(reg, register_offset)
+        dcd.add_key_comment(reg, trdc.get_perm_string(permission))
         dcd.set_value_alignment_for_address(register_offset, 4)
         dcd[reg] = permission
 
@@ -334,6 +342,7 @@ def _generate_mrc_model(dcd: GenDcdInit, trdc: TrdcModel, mrc: MrcResource, mode
             end_register = mrc.get_end_register_name(region.get_domain(), region_counter)
             block_begin = region.get_start_address() >> MrcModel.strt_addr_offset
             block_end = region.get_end_address() >> MrcModel.end_addr_offset
+            comment = mrc.get_name() + "=clearing" if region.is_dom_clearing() else mrc.get_name() + "=" + trdc.get_perm_string(permission)
             vld = 1
 
             data_start = 0
@@ -350,11 +359,11 @@ def _generate_mrc_model(dcd: GenDcdInit, trdc: TrdcModel, mrc: MrcResource, mode
 
             if block_end != 0:  # Generate the start only if end is not zero (taken from legacy CLI app)
                 dcd.set_key_name(start_register, trdc.get_register_offset(start_register))
-                dcd.add_key_comment(start_register, mrc.get_name())
+                dcd.add_key_comment(start_register, comment)
                 dcd[start_register] = data_start
 
             dcd.set_key_name(end_register, trdc.get_register_offset(end_register))
-            dcd.add_key_comment(end_register, mrc.get_name())
+            dcd.add_key_comment(end_register, comment)
             dcd[end_register] = data_end
 
             region_counter += 1
@@ -399,13 +408,21 @@ def _process_mbc_assignments(
                 continue
             mbc_generation_model = mbc_generation_models.setdefault(mbc_index, MbcGenerationModel())
             for assigned_resource in resources["MBC"][trdc_resource]:
-                block = _create_mbc_block(trdc, mbc, assigned_resource.get_owner().get_did(), _get_permission(trdc, assigned_resource), assigned_resource)
-                if block is not None:
-                    mbc_generation_model.add_block(block)
+                # create perm for each defined did and debug, setting clearing for others if needed
+                is_clearing = "dom_clr_unused" in assigned_resource.get_params()
+                dids: List[tuple[int, int, AssignedResource | None, bool]]
+                dids = [(assigned_resource.get_owner().get_did(), _get_permission(trdc, assigned_resource), assigned_resource, False)]
                 for debug_domain in ConfigurationProvider.get_configuration().get_all_debug_domains():
-                    debug_block = _create_mbc_block(trdc, mbc, debug_domain.get_did(), trdc.DEBUG_DOMAIN_PERMISSION)
-                    if debug_block is not None:
-                        mbc_generation_model.add_block(debug_block)
+                    # Bugfix: pass assigned_resource to ensure debug domains inherit same begin/size sub-range for MEM-type MBC resources
+                    dids.append((debug_domain.get_did(), trdc.DEBUG_DOMAIN_PERMISSION, assigned_resource, False))
+                if is_clearing:
+                    existing_dids = {d for (d, _, __, ___) in dids}
+                    dids.extend((did, 0, assigned_resource, True) for did in range(trdc.get_domains_count()) if did not in existing_dids)
+                # create mbc blocks
+                for did, perm, resource, clearing in dids:
+                    block = _create_mbc_block(trdc, mbc, did, perm, resource, clearing)
+                    if block is not None:
+                        mbc_generation_model.add_block(block)
 
     mbcs_to_be_generated = []
     # Add default configuration
@@ -430,7 +447,7 @@ def _process_mbc_assignments(
 
 def _process_mrc_assignments(
     dcd: GenDcdInit, trdc: TrdcModel, resources: Dict[str, Dict[TrdcResource, List[AssignedResource]]]
-) -> Dict[int, MrcGenerationModel]:
+) -> Tuple[Dict[int, MrcGenerationModel], Dict[int, MrcResource]]:
     """Processes MRC assignments and generates MRC configuration.
 
     Args:
@@ -439,7 +456,7 @@ def _process_mrc_assignments(
         resources: Dictionary of resources organized by type
 
     Returns:
-        Dictionary mapping MRC indices to their generation models
+        Tuple of dictionary mapping MRC indices to their generation models and dictionary mapping MRC indices to MrcResource objects
     """
     mrc_generation_models: Dict[int, MrcGenerationModel] = {}
     # Create MRC regions from default configuration
@@ -467,16 +484,20 @@ def _process_mrc_assignments(
             continue
         mrc_generation_model = mrc_generation_models.setdefault(mrc_index, MrcGenerationModel(trdc_mrc_model.get_model_number_of_regions()))
         for assigned_resource in resources["MRC"][trdc_resource]:
-
-            region = _create_mrc_region(trdc, mrc, assigned_resource, assigned_resource.get_owner().get_did(), _get_permission(trdc, assigned_resource))
-            if region is not None:
-                mrc_generation_model.add_region(region)
-
+            # create perm for each defined did and debug, setting clearing for others if needed
+            is_clearing = "dom_clr_unused" in assigned_resource.get_params()
+            dids = [(assigned_resource.get_owner().get_did(), _get_permission(trdc, assigned_resource), False)]
             if assigned_resource.should_generate_debug():
                 for debug_domain in ConfigurationProvider.get_configuration().get_all_debug_domains():
-                    region = _create_mrc_region(trdc, mrc, assigned_resource, debug_domain.get_did(), trdc.DEBUG_DOMAIN_PERMISSION)
-                    if region is not None:
-                        mrc_generation_model.add_region(region)
+                    dids.append((debug_domain.get_did(), trdc.DEBUG_DOMAIN_PERMISSION, False))
+            if is_clearing:
+                existing_dids = {d for d, _, __ in dids}
+                dids.extend((did, 0, True) for did in range(trdc.get_domains_count()) if did not in existing_dids)
+            # create mrc regions
+            for did, perm, clearing in dids:
+                region = _create_mrc_region(trdc, mrc, assigned_resource, did, perm, clearing)
+                if region is not None:
+                    mrc_generation_model.add_region(region)
 
     mrcs_to_be_generated = []
     # Add default configuration
@@ -525,7 +546,8 @@ def _process_mrc_assignments(
         _generate_mrc_model(dcd, trdc, mrc, mrc_model)
         _generate_mrc_global_access_control_registers_from_model(dcd, trdc, mrc, mrc_model, 1, 7)
 
-    return mrc_generation_models
+    mrc_resources: Dict[int, MrcResource] = {mrc.get_index(): mrc for mrc in mrcs_to_be_generated}
+    return mrc_generation_models, mrc_resources
 
 
 def _generate_mbc_mem_range_registers(trdc: TrdcModel, mbc: MbcResource, begin: int, size: int) -> Tuple[int, int] | None:
@@ -677,7 +699,7 @@ def _generate_mdac_registers(dcd: GenDcdInit, trdc: TrdcModel, mdac: MdacResourc
 
 
 class GeneratorTRDC(GeneratorBase):
-    """Generator of config_trdc.h"""
+    """Generator of config_trdc.h."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Returns information about this generator.
@@ -686,6 +708,20 @@ class GeneratorTRDC(GeneratorBase):
             Dict[str, Any]: Dictionary containing the generator name and required includes.
         """
         return {"name": "TRDC", "incl": ["config_user.h"]}
+
+    def _generate_empty_trdc_configuration(self, trdc: TrdcModel) -> None:
+        """Generates a minimal configuration for a TRDC with no assignments.
+
+        Emits only the TRDC enable register to match Perl configtool behavior.
+
+        Args:
+            trdc (TrdcModel): The TRDC model to generate configuration for.
+        """
+        self.print_generator(GenHeading(f"TRDC {trdc.get_id()} Config"))
+        dcd = GenDcdInit(f"SM_{trdc.get_name()}_CONFIG", f"Config for TRDC {trdc.get_id()}")
+        dcd.set_sort(False)
+        dcd[0x00000000] = 0x0000C001
+        self.print_generator(dcd)
 
     def _generate_trdc_configuration(self, trdc: TrdcModel, assigned_resources: List[AssignedResource]) -> None:
         """Generates the configuration for given TRDC.
@@ -728,23 +764,17 @@ class GeneratorTRDC(GeneratorBase):
                 _generate_mdac_registers(dcd, trdc, mdac, assigned_resource)
 
         mbc_generation_models = _process_mbc_assignments(dcd, trdc, resources)
-        mrc_generation_models = _process_mrc_assignments(dcd, trdc, resources)
+        mrc_generation_models, mrc_resources = _process_mrc_assignments(dcd, trdc, resources)
 
         dcd.sort_keys()
 
         # Generate the GLBAC0 writes at the end to mimic legacy CLI application
-        if len(resources["MBC"]) > 0:
-            mbc_resources = typing.cast(List[MbcResource], resources["MBC"])
-            ordered_mbcs = sorted(mbc_resources, key=lambda mbc_resource: mbc_resource.get_index())
-            for trdc_resource in ordered_mbcs:
-                mbc = typing.cast(MbcResource, trdc_resource)
-                _generate_mbc_global_access_control_registers_from_model(dcd, trdc, mbc.get_index(), mbc_generation_models[mbc.get_index()], 0, 0)
-        if len(resources["MRC"]) > 0:
-            mrc_resources = typing.cast(List[MrcResource], resources["MRC"])
-            ordered_mrcs = sorted(mrc_resources, key=lambda mrc_resource: mrc_resource.get_index())
-            for trdc_resource in ordered_mrcs:
-                mrc = typing.cast(MrcResource, trdc_resource)
-                _generate_mrc_global_access_control_registers_from_model(dcd, trdc, mrc, mrc_generation_models[mrc.get_index()], 0, 0)
+        if mbc_generation_models:
+            for mbc_index in sorted(mbc_generation_models.keys()):
+                _generate_mbc_global_access_control_registers_from_model(dcd, trdc, mbc_index, mbc_generation_models[mbc_index], 0, 0)
+        if mrc_generation_models:
+            for mrc_index in sorted(mrc_generation_models.keys()):
+                _generate_mrc_global_access_control_registers_from_model(dcd, trdc, mrc_resources[mrc_index], mrc_generation_models[mrc_index], 0, 0)
 
         dcd[0x00000000] = 0x0000C001  # This turns on the TRDC and must be generated last
         self.print_generator(dcd)
@@ -774,6 +804,7 @@ class GeneratorTRDC(GeneratorBase):
             except KeyError:
                 source = "/".join(["cfg", "mixes", trdc.get_name()])
                 logger.info("TRDC '%s' has no assignments", trdc.get_id(), extra={"source": source})
+                self._generate_empty_trdc_configuration(trdc)
                 continue
             self._generate_trdc_configuration(trdc, trdc_assignments)
 

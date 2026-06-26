@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module for generating configuration file in backward-compatible .cfg format"""
+"""Module for generating configuration file in backward-compatible .cfg format."""
 
 import os
 from typing import Dict, List
@@ -19,7 +19,7 @@ from smct.resources.resource_database_provider import ResourceDatabaseProvider
 
 
 class GenCfgHeading(GenHeading):
-    """Headings in .cfg syntax"""
+    """Headings in .cfg syntax."""
 
     def __init__(self, comment: str):
         """Initialize a .cfg format heading.
@@ -31,7 +31,7 @@ class GenCfgHeading(GenHeading):
 
 
 class CfgExporter(GeneratorBase):
-    """Exporting native cfg file"""
+    """Exporting native cfg file."""
 
     def __init__(self, filename: str):
         """Initialize the cfg file exporter.
@@ -51,7 +51,7 @@ class CfgExporter(GeneratorBase):
         return self._filename
 
     def _get_copyright_comment_beginning(self) -> str:
-        """Returns the copyright comment beginning
+        """Returns the copyright comment beginning.
 
         Returns:
             Empty string for cfg format
@@ -59,7 +59,7 @@ class CfgExporter(GeneratorBase):
         return ""
 
     def _get_copyright_comment_prefix(self) -> str:
-        """Returns the copyright comment line prefix
+        """Returns the copyright comment line prefix.
 
         Returns:
             Hash character for cfg format comments
@@ -67,7 +67,7 @@ class CfgExporter(GeneratorBase):
         return "##"
 
     def _get_copyright_comment_ending(self) -> str:
-        """Returns the copyright comment ending
+        """Returns the copyright comment ending.
 
         Returns:
             Empty string for cfg format
@@ -328,6 +328,8 @@ class CfgExporter(GeneratorBase):
         agent_macro.append(f'name="{agent.get_name()}"')
         if agent.get_secure():
             agent_macro.append("secure")
+        if agent.get_dup() is not None:
+            agent_macro.append(f"dup={agent.get_dup()}")
         self._print(agent_macro.get())
         self._print("")
         self.print_defines(agent.get_defines())
@@ -340,7 +342,9 @@ class CfgExporter(GeneratorBase):
             self.print_mailbox(mailbox)
             for ch in agent.get_all_scmi_channels():
                 self.print_scmi_channel(ch)
-        self.print_resource_assignments(agent)
+
+        if agent.get_dup() is None:
+            self.print_resource_assignments(agent)
 
     def print_mailbox(self, mailbox: Mailbox) -> None:
         """Print Mailbox settings.

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to validation entry"""
+"""Module related to validation entry."""
 
 from builtins import str
 from typing import Any, Dict

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module related to MBC blocks generation model"""
+"""Module related to MBC blocks generation model."""
 
 import functools
 import logging
@@ -18,7 +18,7 @@ logger = logging.getLogger()
 
 
 def _compare_blocks_legacy(block1: MbcBlock, block2: MbcBlock) -> int:
-    """Compares two regions by start and end addresses
+    """Compares two regions by start and end addresses.
 
     Args:
         block1: First MBC block to compare
@@ -46,13 +46,13 @@ def _compare_blocks_legacy(block1: MbcBlock, block2: MbcBlock) -> int:
 
 
 class MbcGenerationModel:
-    """Model for generation of MBC"""
+    """Model for generation of MBC."""
 
     def __init__(self) -> None:
         self._blocks: Dict[int, List[MbcBlock]] = {}
 
     def add_block(self, block: MbcBlock) -> None:
-        """Add block to the model
+        """Add block to the model.
 
         Args:
             block: MBC block to add to the model
@@ -60,10 +60,24 @@ class MbcGenerationModel:
         domain = block.get_domain()
         if domain not in self._blocks:
             self._blocks[domain] = []
+        for existing_block in self._blocks[domain]:
+            if block.overwrites(existing_block):
+                if block.is_dom_clearing() and not existing_block.is_dom_clearing():
+                    return
+                if not block.is_dom_clearing() and existing_block.is_dom_clearing():
+                    self._blocks[domain].remove(existing_block)
+                    break
+                # Two real (non-clearing) blocks at same location
+                if not block.is_dom_clearing() and not existing_block.is_dom_clearing():
+                    if block.get_permission() == existing_block.get_permission():
+                        return  # Deduplicate: same permission, skip (idempotent)
+                    # Different permission: OR permissions together, matching Perl |= behavior
+                    existing_block.merge_permission(block.get_permission())
+                    return
         self._blocks[domain].append(block)
 
     def get_permissions(self) -> List[int]:
-        """Returns permissions in order in which the regions are stored in the model
+        """Returns permissions in order in which the regions are stored in the model.
 
         Returns:
             List[int]: List of permissions for the regions
@@ -82,12 +96,12 @@ class MbcGenerationModel:
         return result
 
     def sort_blocks(self) -> None:
-        """Sort the blocks in all domains"""
+        """Sort the blocks in all domains."""
         for domain in self._blocks:
             self._blocks[domain].sort(key=functools.cmp_to_key(_compare_blocks_legacy))
 
     def get_blocks(self) -> Dict[int, List[MbcBlock]]:
-        """Return list of all blocks in the MBC model
+        """Return list of all blocks in the MBC model.
 
         Returns:
             Dict[int, List[MbcBlock]]: Dictionary mapping domain IDs to lists of MBC blocks

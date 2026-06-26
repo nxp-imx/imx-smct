@@ -4,7 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module implementing FUSA-related subset of user configuration"""
+"""Module implementing FUSA-related subset of user configuration."""
 
 import logging
 from typing import Any, Dict, List
@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 
 class FusaDefine:
-    """Object representing FUSA macro value"""
+    """Object representing FUSA macro value."""
 
     def __init__(self, name: str, value: Any, comment: str | None = None) -> None:
         self._name: str = name
@@ -23,15 +23,15 @@ class FusaDefine:
         self._comment: str = comment if comment else ""
 
     def get_name(self) -> str:
-        """Returns Define Name"""
+        """Returns Define Name."""
         return self._name
 
     def get_value(self) -> Any:
-        """Returns Define value"""
+        """Returns Define value."""
         return self._value
 
     def get_comment(self) -> str:
-        """Returns Define comment"""
+        """Returns Define comment."""
         return self._comment
 
     def get_assignment_json(self) -> object:
@@ -41,7 +41,7 @@ class FusaDefine:
 
 
 class FusaTask:
-    """Object representing FUSA periodic task"""
+    """Object representing FUSA periodic task."""
 
     # dict of allowed fusa task types assignment
     task_types: Dict[str, str]
@@ -71,24 +71,24 @@ class FusaTask:
         self._comment: str = comment if comment else ""
 
     def get_name(self) -> str:
-        """Returns Task name"""
+        """Returns Task name."""
         return self._name
 
     def get_period(self) -> Any:
-        """Returns Task period string specification (known to be valid)"""
+        """Returns Task period string specification (known to be valid)."""
         return self._period
 
     def get_period_ms(self) -> int:
-        """Returns Task period in milliseconds"""
+        """Returns Task period in milliseconds."""
         ms = utils.parse_time_to_ms(str(self._period), throw=True)
         return ms if ms else 0
 
     def get_task_type(self) -> str:
-        """Returns Task type string (one of FusaTask.Types)"""
+        """Returns Task type string (one of FusaTask.Types)."""
         return self._type
 
     def get_comment(self) -> str:
-        """Returns Task's comment"""
+        """Returns Task's comment."""
         return self._comment
 
     def get_assignment_json(self) -> object:
@@ -103,7 +103,7 @@ class FusaTask:
 
 
 class FusaConfigurationData:
-    """FUSA-related user configuration data"""
+    """FUSA-related user configuration data."""
 
     def __init__(self) -> None:
         self._config: Dict[str, FusaDefine] = {}
@@ -152,11 +152,11 @@ class FusaConfigurationData:
         return list(self._tasks.values())
 
     def get_config(self, name: str) -> FusaDefine | None:
-        """Returns FUSA Define by name or None if it does not exist"""
+        """Returns FUSA Define by name or None if it does not exist."""
         return self._config.get(name)
 
     def get_task(self, name: str) -> FusaTask | None:
-        """Returns FUSA Task by name or None if it does not exist"""
+        """Returns FUSA Task by name or None if it does not exist."""
         return self._tasks.get(name)
 
     def get_assignment_json(self) -> object:

@@ -4,6 +4,6 @@
 # Copyright 2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Version information for SMCT CLI"""
+"""Version information for SMCT CLI."""
 
-__version__: str = "26.03.00"
+__version__: str = "26.06.00"

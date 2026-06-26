@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with resource database"""
+"""Module with resource database."""
 
 import json
 import logging
@@ -24,7 +24,7 @@ logger = logging.getLogger()
 
 
 class ResourceDbException(CfgToolException):
-    """Exception used to indicate problem with resource database of the System manager config tool"""
+    """Exception used to indicate problem with resource database of the System manager config tool."""
 
     def __init__(self, message: str) -> None:
         if not message:
@@ -34,7 +34,7 @@ class ResourceDbException(CfgToolException):
 
 
 class ResourceDb:
-    """Resource database that stores all atomic and macro resources"""
+    """Resource database that stores all atomic and macro resources."""
 
     def __init__(self) -> None:
         self._atomic_resources: List[AtomicResource] = []
@@ -46,7 +46,7 @@ class ResourceDb:
         self._indexes: Dict[str, Dict[Any, List[AtomicResource]]] = {}
 
     def is_empty(self) -> bool:
-        """Returns True when there are no atomic nor macro resources
+        """Returns True when there are no atomic nor macro resources.
 
         Returns:
             bool: True if there are no atomic resources or no macro/user resources
@@ -54,7 +54,7 @@ class ResourceDb:
         return len(self._atomic_resources) == 0 or (len(self._macro_resources) == 0 and len(self._user_resources) == 0)
 
     def atomic_resources(self) -> Generator[AtomicResource, None, None]:
-        """Returns generator object that iterates over all atomic resources
+        """Returns generator object that iterates over all atomic resources.
 
         Returns:
             Generator[AtomicResource, None, None]: Generator yielding all atomic resources including automatic ones
@@ -62,7 +62,7 @@ class ResourceDb:
         yield from self._atomic_resources + self._automatic_resources
 
     def macro_resources(self) -> Generator[MacroResource, None, None]:
-        """Returns generator object that iterates over all macro resources
+        """Returns generator object that iterates over all macro resources.
 
         Returns:
             Generator[MacroResource, None, None]: Generator yielding all macro resources including user resources
@@ -70,7 +70,7 @@ class ResourceDb:
         yield from self._macro_resources + self._user_resources
 
     def macro_resources_list(self) -> List[MacroResource]:
-        """Returns all macro resources
+        """Returns all macro resources.
 
         Returns:
             List[MacroResource]: Copy of all macro resources including user resources
@@ -78,7 +78,7 @@ class ResourceDb:
         return self._macro_resources.copy() + self._user_resources.copy()
 
     def user_resources_list(self) -> List[MacroResource]:
-        """Returns all user resources
+        """Returns all user resources.
 
         Returns:
             List[MacroResource]: Copy of all user resources
@@ -86,7 +86,7 @@ class ResourceDb:
         return self._user_resources.copy()
 
     def _add_to_index(self, index: Dict[Any, List[AtomicResource]], property_name: str, atomic_resource: AtomicResource) -> None:
-        """Adds the atomic resource to the index by given property value
+        """Adds the atomic resource to the index by given property value.
 
         Args:
             index: Dictionary index to add the resource to
@@ -103,7 +103,7 @@ class ResourceDb:
             pass
 
     def _build_index(self, property_name: str) -> None:
-        """Builds index based on property of all the atomic resources
+        """Builds index based on property of all the atomic resources.
 
         Args:
             property_name: Name of the property to build index for
@@ -114,7 +114,7 @@ class ResourceDb:
         self._indexes[property_name] = index
 
     def _get_index(self, property_name: str) -> Dict[Any, List[AtomicResource]]:
-        """Returns index dictionary based on given property name
+        """Returns index dictionary based on given property name.
 
         Args:
             property_name: Name of the property to get index for
@@ -128,7 +128,7 @@ class ResourceDb:
         return index
 
     def add_atomic_resource(self, atomic_resource: AtomicResource) -> None:
-        """Adds the atomic resource to the database
+        """Adds the atomic resource to the database.
 
         Args:
             atomic_resource: The atomic resource to add to the database
@@ -141,7 +141,7 @@ class ResourceDb:
             self._add_to_index(index, key, atomic_resource)
 
     def add_macro_resource(self, macro_resource: MacroResource) -> None:
-        """Adds the macro resource to the database
+        """Adds the macro resource to the database.
 
         Args:
             macro_resource: The macro resource to add to the database
@@ -149,7 +149,7 @@ class ResourceDb:
         self._macro_resources.append(macro_resource)
 
     def add_user_resource(self, user_resource: MacroResource) -> None:
-        """Adds the user resource to the database
+        """Adds the user resource to the database.
 
         Args:
             user_resource: The user resource to add to the database
@@ -157,7 +157,7 @@ class ResourceDb:
         self._user_resources.append(user_resource)
 
     def add_define(self, assigned_define: AssignedDefine) -> None:
-        """Adds the user resource to the database
+        """Adds the user resource to the database.
 
         Args:
             assigned_define: The assigned define to add to the database
@@ -165,7 +165,7 @@ class ResourceDb:
         self._defines[assigned_define.get_name()] = assigned_define
 
     def get_define(self, define_name: str) -> AssignedDefine | None:
-        """Returns define with given name if it exists. For DFMT0 and DFMT1 default values are created
+        """Returns define with given name if it exists. For DFMT0 and DFMT1 default values are created.
 
         Args:
             define_name: Name of the define to retrieve
@@ -186,7 +186,7 @@ class ResourceDb:
         return None
 
     def add_automatic_resource(self, auto_resource: AtomicResource) -> None:
-        """Adds the user resource to the database
+        """Adds the user resource to the database.
 
         Args:
             auto_resource: The automatic resource to add to the database
@@ -201,7 +201,7 @@ class ResourceDb:
                 self._add_to_index(self._get_index(key), key, auto_resource)
 
     def find_atomic_resource_by(self, property_name: str, property_value: Any) -> List[AtomicResource]:
-        """Finds atomic resource by given property name and value
+        """Finds atomic resource by given property name and value.
 
         Args:
             property_name: Name of the property to search by
@@ -224,7 +224,7 @@ class ResourceDb:
         return items
 
     def find_macro_resource(self, name: str) -> MacroResource | None:
-        """Searches for macro resource with given name. Returns None when no such macro resource exist
+        """Searches for macro resource with given name. Returns None when no such macro resource exist.
 
         Args:
             name: Name of the macro resource to find
@@ -238,7 +238,7 @@ class ResourceDb:
         return None
 
     def get_atomic_resources_json(self) -> object:
-        """Returns raw JSON dictionary with all the data in the database
+        """Returns raw JSON dictionary with all the data in the database.
 
         Returns:
             object: JSON dictionary containing atomic resources organized by type
@@ -256,7 +256,7 @@ class ResourceDb:
         return ret
 
     def get_macro_resources_json(self) -> object:
-        """Returns raw JSON dictionary with all the macro resources in the database
+        """Returns raw JSON dictionary with all the macro resources in the database.
 
         Returns:
             object: JSON dictionary containing all macro resources
@@ -265,7 +265,7 @@ class ResourceDb:
         return ret
 
     def get_user_resources_json(self) -> Dict[str, Any]:
-        """Returns raw JSON dictionary with all the user resources in the database
+        """Returns raw JSON dictionary with all the user resources in the database.
 
         Returns:
             Dict[str, Any]: JSON dictionary containing all user resources
@@ -274,7 +274,7 @@ class ResourceDb:
         return ret
 
     def get_automatic_resources_json(self) -> Dict[str, Any]:
-        """Returns raw JSON dictionary with all the automatic resources in the database
+        """Returns raw JSON dictionary with all the automatic resources in the database.
 
         Returns:
             Dict[str, Any]: JSON dictionary containing all automatic resources
@@ -283,7 +283,7 @@ class ResourceDb:
         return ret
 
     def _parse_auto_resources(self, autos: List[Any]) -> None:
-        """Parses automatic resources from given JSON object
+        """Parses automatic resources from given JSON object.
 
         Args:
             autos: List of automatic resource data from JSON
@@ -293,7 +293,7 @@ class ResourceDb:
             self.add_automatic_resource(automatic_resource)
 
     def _parse_atoms(self, atoms: Dict[str, Any]) -> None:
-        """Parses atomic resources from given JSON object
+        """Parses atomic resources from given JSON object.
 
         Args:
             atoms: Dictionary of atomic resource data organized by type
@@ -306,7 +306,7 @@ class ResourceDb:
                 self.add_atomic_resource(atomic)
 
     def _parse_macros(self, macros: Any, user_defined: bool = False) -> None:
-        """Parses macro resources from given JSON object
+        """Parses macro resources from given JSON object.
 
         Args:
             macros: List of macro resource data from JSON
@@ -330,7 +330,7 @@ class ResourceDb:
                 self.add_macro_resource(macro)
 
     def load_from_json(self, smct_configs_folder: str) -> bool:
-        """Loads the resource database from JSON file
+        """Loads the resource database from JSON file.
 
         Args:
             smct_configs_folder: Path to the folder containing configuration JSON files

@@ -1,41 +1,24 @@
-/smct/__pycache__/
-/smct/configuration/__pycache__/
-/smct/exceptions/__pycache__/
-/smct/model/__pycache__/
-/smct/owners/__pycache__/
-/smct/parsers/__pycache__/
-/smct/resources/__pycache__/
-/smct/smct/__pycache__/
-/smct/generation/__pycache__/
-/smct/generation/trdc/__pycache__/
-/smct/validation/__pycache__/
-/smct/validation/formatters/__pycache__/
-/smct/validation/validators/__pycache__/
-/tests/__pycache__/
-/tests/utils/__pycache__/
-/tests/regression_tests/__pycache__/
-/tests/unit_tests/__pycache__/
-/tests/unit_tests/cli_tests/__pycache__/
-/tests/unit_tests/owner_tests/__pycache__/
-/tests/unit_tests/validator_tests/__pycache__/
-/tests/unit_tests/model_tests/__pycache__/
-/tests/unit_tests/generation_tests/__pycache__/
-/tests/unit_tests/resource_tests/__pycache__/
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
 
+# Test results / coverage / reports
 /test_results/
+/reports/
+.coverage*
 
-# Environments
+# Virtual environments
 .env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
 env*
-*env/
 venv*
-*venv/
+*env/
+ENV/
 .pyenv*
 .pyvenv*
-reports
+
+# Editor / packaging
+.vscode/
+smct.egg-info/
+
+# Agent session memory
+.github/memories/

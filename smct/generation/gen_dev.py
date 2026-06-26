@@ -5,16 +5,17 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_dev.h"""
+"""Module for generating file config_dev.h."""
 
 from typing import Any, Dict, List
 
 from smct import utils
 from smct.generation.generator import GeneratorBase, GenMacroList
+from smct.owners.owner_agent import ScmiAgent
 
 
 class GeneratorDev(GeneratorBase):
-    """Generator for config_dev.h file"""
+    """Generator for config_dev.h file."""
 
     def _get_generator_info(self) -> Dict[str, Any]:
         """Gets generator information dictionary.
@@ -47,6 +48,9 @@ class GeneratorDev(GeneratorBase):
         parts = ["{", " \\\n"]
         for lm in self._get_configuration().get_all_lms():
             for assr in lm.get_all_assignments():
+                owner = assr.get_owner()
+                if isinstance(owner, ScmiAgent) and owner.get_dup() is not None:
+                    continue
                 for cpu_resource in assr.get_cpu_resources():
                     cpu_name = "DEV_SM_" + cpu_resource.get_name().upper()
                     if "sema" in assr.get_params():

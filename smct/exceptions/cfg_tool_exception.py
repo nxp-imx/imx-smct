@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2025 NXP
+# Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
-"""Module with Configuration tool exceptions"""
+
+"""Module with Configuration tool exceptions."""
 
 
 class CfgToolException(Exception):
-    """Config tool base exception"""
+    """Config tool base exception."""
 
     def __init__(self, message: str) -> None:
         """Initialize CfgToolException.

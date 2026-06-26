@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module with base implementation of resource owner, assigned resource and assigned permissions"""
+"""Module with base implementation of resource owner, assigned resource and assigned permissions."""
 
 import logging
 import typing
@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 
 class AssignedPermissions:
-    """This class represents pair of: 'perm' and 'api' permissions"""
+    """This class represents pair of: 'perm' and 'api' permissions."""
 
     def __init__(self, perm: str, api: str) -> None:
         self._perm: str = perm
@@ -80,7 +80,7 @@ class AssignedPermissions:
 
 
 class AssignedDefine:
-    """This class represents user defined macro value"""
+    """This class represents user defined macro value."""
 
     def __init__(self, name: str, params: str):
         self._name = name
@@ -129,7 +129,7 @@ class AssignedDefine:
 
 
 class AssignedResource:
-    """This class represents one atomic resource assigned to ResourceOwner with some parameters"""
+    """This class represents one atomic resource assigned to ResourceOwner with some parameters."""
 
     # dict of allowed LMM react types
     react_types: Dict[str, str]
@@ -369,6 +369,14 @@ class AssignedResource:
         """
         return self._owner
 
+    def set_owner(self, owner: "ResourceOwner") -> None:
+        """Sets the owner of this resource.
+
+        Args:
+            owner: The ResourceOwner that owns this resource.
+        """
+        self._owner = owner
+
     def set_params(self, params: Dict[str, Any]) -> None:
         """Sets parameters of this resource.
 
@@ -439,7 +447,7 @@ class AssignedResource:
 
 
 class ResourceOwner:
-    """Base for DOM, LM or SCMI_AGENT which can hold assigned resources"""
+    """Base for DOM, LM or SCMI_AGENT which can hold assigned resources."""
 
     def __init__(self, owner_id: str):
         self._id: str = owner_id
@@ -468,7 +476,7 @@ class ResourceOwner:
         """Sets name of the resource owner.
 
         Args:
-            The name of the resource owner
+            name: The name of the resource owner
         """
         self._name = name
 
@@ -542,7 +550,6 @@ class ResourceOwner:
         Returns:
             The AssignedResource object if successful, None if resource denied assignment.
         """
-
         # resource may deny assignment by returning None
         assr_params = res.get_assignment_parameters(params)
         automatic_api_assignment = isinstance(res, ApiResource) and ignore_api_check
@@ -630,5 +637,5 @@ class ResourceOwner:
         return None
 
     def get_defines(self) -> Dict[str, AssignedDefine]:
-        """Returns all our define names as a list"""
+        """Returns all our define names as a list."""
         return self._defines

@@ -5,7 +5,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Module for generating file config_scmi.h"""
+"""Module for generating file config_scmi.h."""
 
 import logging
 from typing import Any, Dict, List
@@ -21,7 +21,7 @@ logger = logging.getLogger()
 
 
 class GeneratorSCMI(GeneratorBase):
-    """Generator of config_scmi.h"""
+    """Generator of config_scmi.h."""
 
     def _get_doxygen_file_name(self) -> str:
         return ""
@@ -144,11 +144,10 @@ class GeneratorSCMI(GeneratorBase):
         self.print_generator(GenHeading("SCMI Agent Config"))
         self.print_generator(GenMacroValue("SM_SCMI_NUM_AGNT", agents_len, "Config for number of SCMI agents"))
 
-        if agents_len:
-            s = GenMacroList("SM_SCMI_AGNT_CONFIG_DATA", "Config data array for SCMI agents")
-            for i in range(0, agents_len):
-                s.add_value(f"SM_SCMI_AGNT{i}_CONFIG")
-            self.print_generator(s)
+        s = GenMacroList("SM_SCMI_AGNT_CONFIG_DATA", "Config data array for SCMI agents")
+        for i in range(0, agents_len):
+            s.add_value(f"SM_SCMI_AGNT{i}_CONFIG")
+        self.print_generator(s)
 
     def _print_channels_summary(self) -> None:
         """Generates summary of SCMI channels."""
@@ -157,11 +156,10 @@ class GeneratorSCMI(GeneratorBase):
         self.print_generator(GenHeading("SCMI Channel Config"))
         self.print_generator(GenMacroValue("SM_SCMI_NUM_CHN", chans_len, "Config for number of SCMI channels"))
 
-        if chans_len:
-            s = GenMacroList("SM_SCMI_CHN_CONFIG_DATA", "Config data array for SCMI channels")
-            for i in range(0, chans_len):
-                s.add_value(f"SM_SCMI_CHN{i}_CONFIG")
-            self.print_generator(s)
+        s = GenMacroList("SM_SCMI_CHN_CONFIG_DATA", "Config data array for SCMI channels")
+        for i in range(0, chans_len):
+            s.add_value(f"SM_SCMI_CHN{i}_CONFIG")
+        self.print_generator(s)
 
     def _print_scmi_summary(self) -> None:
         """Generates summary of SCMI configuration."""
@@ -170,17 +168,17 @@ class GeneratorSCMI(GeneratorBase):
         self.print_generator(GenHeading("SCMI Config"))
         self.print_generator(GenMacroValue("SM_NUM_SCMI", scmi_len, "Config for number of SCMI instances"))
 
-        if scmi_len:
-            s = GenMacroList("SM_SCMI_CONFIG_DATA", "Config data array for SCMI instances")
-            for i in range(0, scmi_len):
-                s.add_value(f"SM_SCMI{i}_CONFIG")
-            self.print_generator(s)
+        s = GenMacroList("SM_SCMI_CONFIG_DATA", "Config data array for SCMI instances")
+        for i in range(0, scmi_len):
+            s.add_value(f"SM_SCMI{i}_CONFIG")
+        self.print_generator(s)
 
         self.print_generator(
             GenMacroValue("SM_SCMI_MAX_NOTIFY", self._get_configuration().get_max_scmi_channel_notify(), "Max words to buffer for notification messages")
         )
 
     def print_content(self) -> None:
+        """Emit per-agent and per-LM SCMI sections followed by summary blocks."""
         conf = self._get_configuration()
 
         for lm in conf.get_all_lms():
