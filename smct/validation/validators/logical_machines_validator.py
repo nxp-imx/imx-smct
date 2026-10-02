@@ -8,7 +8,7 @@
 
 import logging
 import re
-from typing import List
+from typing import Dict, List
 
 from smct import utils
 from smct.configuration.confdata import ConfigurationData
@@ -35,10 +35,9 @@ def _validate_lm0(logical_machine: LM, result: List[ValidationEntry]) -> None:
         validation_id = ".".join([logical_machine.get_id(), "NAME"])
         result.append(ValidationEntry(logging.ERROR, source, f"LM0 does not have required name '{expected_name}'", validation_id))
     expected_safe = "feenv"
-    safe = logical_machine.get_safe()
-    if safe != expected_safe:
+    if logical_machine.get_safe() != expected_safe:
         validation_id = ".".join([logical_machine.get_id(), "SAFE"])
-        result.append(ValidationEntry(logging.ERROR, source, f"LM0 does not have required safety type '{expected_safe}'", validation_id))
+        result.append(ValidationEntry(logging.WARNING, source, f"LM0 does not have required safety type '{expected_safe}'", validation_id))
     expected_boot = 1
     boot = logical_machine.get_boot()
     if boot != expected_boot:
@@ -56,7 +55,7 @@ def _validate_lm0(logical_machine: LM, result: List[ValidationEntry]) -> None:
         validation_id = ".".join([logical_machine.get_id(), "RPC"])
         result.append(ValidationEntry(logging.ERROR, source, f"LM0 does not have required RPC type '{expected_rpc}'", validation_id))
     else:
-        start_stops = logical_machine.get_all_start_stops(start=True) + logical_machine.get_all_start_stops(start=False)
+        start_stops = logical_machine.get_all_start_stops(is_start=True) + logical_machine.get_all_start_stops(is_start=False)
         if not logical_machine.get_assigned_resources() and not logical_machine.get_all_agents() and not start_stops:
             result.append(ValidationEntry(logging.WARNING, source, "LM0 has no configuration"))
 
@@ -124,7 +123,7 @@ def _validate_lm_ids(logical_machines: List[LM], result: List[ValidationEntry]) 
 
 
 def _validate_lm_msels(logical_machines: List[LM], result: List[ValidationEntry]) -> None:
-    """Checks msels for re-definition of the same resource with different start/stop value.
+    """Checks msels for duplicate start/stop orders and same-resource multi-order definitions.
 
     Args:
         logical_machines: List of logical machines to validate.
@@ -132,16 +131,64 @@ def _validate_lm_msels(logical_machines: List[LM], result: List[ValidationEntry]
     """
     for logical_machine in logical_machines:
         for msel in logical_machine.get_all_msels():
-            for start_stops in [msel.get_all_start_stops(start=True), msel.get_all_start_stops(start=False)]:
-                start_stops_filtered = [ss for ss in start_stops if ss is not None]
-                for index, start_stop in enumerate(start_stops_filtered):
-                    res = start_stop.get_resources().get_name()
-                    count = len([ss for ss in start_stops_filtered[index:] if ss.get_resources().get_name() == res])
-                    if count > 1:
-                        source = "/".join(["user_config", logical_machine.get_name(), f"MSEL{msel.get_msel()}", res])
-                        validation_id = ".".join([logical_machine.get_id(), f"SS{index}", res])
-                        msg = f"Redefinition of Start/Stop order for resource '{res}'"
+            for is_start in (True, False):
+                direction = "START" if is_start else "STOP"
+                buckets = msel.get_start_stop_buckets(is_start)
+                source = "/".join(["user_config", logical_machine.get_name(), f"MSEL{msel.get_msel()}", direction])
+
+                # A. Duplicate order: two or more resources share the same order slot.
+                for order_idx, bucket in enumerate(buckets):
+                    if len(bucket) > 1:  # includes same resource repeated within one bucket
+                        order = order_idx + 1
+                        names = ", ".join(ss.get_resources().get_name() for ss in bucket)
+                        validation_id = ".".join([logical_machine.get_id(), f"MSEL{msel.get_msel()}", direction, "DUP_ORDER", str(order)])
+                        msg = (
+                            f"Duplicate {direction.lower()} order {order} in {logical_machine.get_id()} MSEL{msel.get_msel()} — "
+                            f"resources [{names}] all share order number {order}. "
+                            f"Firmware executes them sequentially; verify if this is intentional."
+                        )
                         result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
+
+                # B. Same resource at multiple distinct orders (a single bucket repeat is left to DUP_ORDER).
+                rsrc_orders: Dict[str, List[int]] = {}
+                for order_idx, bucket in enumerate(buckets):
+                    for ss in bucket:
+                        name = ss.get_resources().get_name()
+                        if name not in rsrc_orders:
+                            rsrc_orders[name] = []
+                        rsrc_orders[name].append(order_idx + 1)
+                for rsrc_name, orders in rsrc_orders.items():
+                    unique_orders = sorted(set(orders))  # set() drops same-bucket repeats (handled by DUP_ORDER)
+                    if len(unique_orders) > 1:
+                        validation_id = ".".join([logical_machine.get_id(), f"MSEL{msel.get_msel()}", direction, "DUP_RSRC", rsrc_name])
+                        msg = (
+                            f"Resource '{rsrc_name}' appears in the {direction.lower()} sequence of "
+                            f"{logical_machine.get_id()} MSEL{msel.get_msel()} at orders {unique_orders} — typically a typo."
+                        )
+                        result.append(ValidationEntry(logging.ERROR, source, msg, validation_id))
+
+
+def _validate_lm_start_stop_non_consecutive(logical_machines: List[LM], result: List[ValidationEntry]) -> None:
+    """Checks start/stop sequences for non-consecutive positions.
+
+    Args:
+        logical_machines: List of logical machines to validate.
+        result: List to append validation entries to.
+    """
+    for logical_machine in logical_machines:
+        for msel in logical_machine.get_all_msels():
+            for is_start in (True, False):
+                buckets = msel.get_start_stop_buckets(is_start)
+                gap_positions = [i + 1 for i, bucket in enumerate(buckets) if not bucket]
+                if gap_positions:
+                    mode = "start" if is_start else "stop"
+                    source = "/".join(["user_config", logical_machine.get_name(), f"MSEL{msel.get_msel()}"])
+                    validation_id = ".".join([logical_machine.get_id(), f"MSEL{msel.get_msel()}", mode.upper(), "NON_CONSECUTIVE"])
+                    msg = (
+                        f"Non-consecutive {mode} sequence in {logical_machine.get_id()} mSel={msel.get_msel()}: "
+                        f"positions {gap_positions} are unused — use consecutive indices starting from 1"
+                    )
+                    result.append(ValidationEntry(logging.WARNING, source, msg, validation_id))
 
 
 def _validate_lm_default_option(logical_machines: List[LM], result: List[ValidationEntry]) -> None:
@@ -178,6 +225,7 @@ class LogicalMachinesValidator(ValidatorBase):
         _validate_lm_names_uniqueness(logical_machines, result)
         _validate_lm_default_option(logical_machines, result)
         _validate_lm_msels(logical_machines, result)
+        _validate_lm_start_stop_non_consecutive(logical_machines, result)
         for logical_machine in logical_machines:
             if logical_machine.get_id() == "LM0":
                 _validate_lm0(logical_machine, result)

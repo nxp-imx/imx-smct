@@ -14,7 +14,7 @@ from typing import Any
 
 import pytest
 
-from smct import utils
+from tests.regression_tests.regression_device_test_base import find_firmware_root
 from tests.test_utils import execute_cli, get_smct_root
 
 
@@ -33,11 +33,7 @@ def test_fusa_generation_mx95evk(capsys: Any) -> None:
 
     with TemporaryDirectory() as test_dir:
         # Find firmware root
-        firmware_root_temp = utils.find_firmware_root_dir(os.path.join(get_smct_root(), ".."))
-        if firmware_root_temp is None:
-            pytest.fail("Could not find firmware root directory")
-            return
-        firmware_root = os.path.abspath(firmware_root_temp)
+        firmware_root = find_firmware_root()
 
         # Run SMCT
         code, _, _ = execute_cli(capsys, ["-c", config, "-o", test_dir, "--sm_dir", firmware_root])
@@ -57,7 +53,7 @@ def test_fusa_generation_mx95evk(capsys: Any) -> None:
         assert "#define CONFIG_FUSA_H" in content, "Missing #define CONFIG_FUSA_H include guard"
 
         # Assertion 3: Has #include "config_user.h"
-        assert '#include "config_user.h"' in content, "Missing #include \"config_user.h\""
+        assert '#include "config_user.h"' in content, 'Missing #include "config_user.h"'
 
         # Assertion 4: Contains expected defines
         assert re.search(r"#define\s+FUSA_WATCHDOG_TIMEOUT\s+5000U", content), "Missing FUSA_WATCHDOG_TIMEOUT define"

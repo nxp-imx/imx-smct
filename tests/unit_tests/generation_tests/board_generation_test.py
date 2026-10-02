@@ -4,18 +4,19 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring, missing-function-docstring
 
 import os
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_board import GeneratorBoard
 from smct.utils import FormatedInt
 
 
-def test_board_defines() -> None:
+def test_board_defines(tmp_path: Path) -> None:
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorBoard()
     conf = ConfigurationData()
 
@@ -39,10 +40,10 @@ def test_board_defines() -> None:
     conf.set_pmic_i2c_baudrate(FormatedInt(i2c_baudrate))
 
     # Act
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_board.h")
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config_board.h")
     content = ""
-    with open(file_name, "r") as file:
+    with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
 
     # Assert

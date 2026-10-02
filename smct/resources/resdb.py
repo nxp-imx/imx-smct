@@ -133,6 +133,17 @@ class ResourceDb:
         Args:
             atomic_resource: The atomic resource to add to the database
         """
+        name = atomic_resource.get_name()
+        if "name" in self._indexes:
+            existing = self._indexes["name"].get(name)
+            if existing:
+                logger.warning(
+                    "Duplicate atomic resource name '%s' (already %d in DB)",
+                    name,
+                    len(existing),
+                    extra={"source": "resdb/add_atomic_resource"},
+                )
+
         self._atomic_resources.append(atomic_resource)
 
         # add to all indexes which were created so far

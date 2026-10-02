@@ -6,4 +6,4 @@
 # SPDX-License-Identifier: BSD-3-Clause
 """Version information for SMCT CLI."""
 
-__version__: str = "26.06.00"
+__version__: str = "26.09.00"

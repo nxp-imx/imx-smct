@@ -3,6 +3,11 @@
         "soc_model": "simu.json",
         "sm_model": "sm_model_0.json"
     },
+    "MIMX937": {
+        "soc_model": "MIMX937.json",
+        "sm_model": "sm_model_0.json",
+        "sm_component": "system_manager_0"
+    },
     "MIMX94": {
         "soc_model": "MIMX94.json",
         "sm_model": "sm_model_0.json",

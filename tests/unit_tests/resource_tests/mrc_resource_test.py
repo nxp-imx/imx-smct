@@ -4,10 +4,12 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring, missing-function-docstring
 from typing import Any
 
 from smct.resources.res_mrc import MrcResource
 from smct.utils import FormatedInt
+from tests import test_utils
 
 
 def test_get_json() -> None:
@@ -17,12 +19,7 @@ def test_get_json() -> None:
     assert mbc.get_raw_json() == expected_json
     begin = FormatedInt(0xFF)
     size = FormatedInt(0xFF)
-    mbc.add_default_permission(begin, size, (2, 12), "none", True)
-    expected_json["default_permissions"] = []
-    expected_json["default_permissions"].append({"begin": begin, "size": size, "domains": {"from": 2, "to": 12}, "permission": "none"})
-    mbc.add_default_permission(begin, size, (2, 12), "none", False)
-    expected_json["default_permissions"].append({"begin": begin, "size": size, "domains": {"from": 2, "to": 12}, "permission": "none", "no_debug": True})
-
+    test_utils.add_initial_default_permissions(mbc, expected_json, begin, size)
     assert mbc.get_raw_json() == expected_json
     begin = FormatedInt(0xFFFF)
     mbc.add_default_permission(begin, size, (0, 1), "all", True)

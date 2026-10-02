@@ -8,7 +8,7 @@
 """Unit tests for Makefile generation"""
 
 import os.path
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_mak import GeneratorMakeFile
@@ -17,9 +17,9 @@ from smct.owners.owner_lm import LM
 from tests import test_utils
 
 
-def test_board_device_build() -> None:
+def test_board_device_build(tmp_path: Path) -> None:
     """Tests that config.mak will contain board define, and device and build makefile includes"""
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -29,8 +29,8 @@ def test_board_device_build() -> None:
     conf.set_build_tool(build)
     conf.set_device(device, board)
     # Test
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config.mak")
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config.mak")
     content = ""
     with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
@@ -42,9 +42,9 @@ def test_board_device_build() -> None:
     assert "include ./sm/rpc/mb_loopback/Makefile" not in content
 
 
-def test_mu() -> None:
+def test_mu(tmp_path: Path) -> None:
     """Tests that config.mak will contain only mu makefile include"""
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -58,8 +58,8 @@ def test_mu() -> None:
     mailbox.set_doorbell_channel(42, channel)
     agent.add_channel(channel)
     # Test
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config.mak")
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config.mak")
     content = ""
     with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
@@ -68,9 +68,9 @@ def test_mu() -> None:
     assert "include ./sm/rpc/mb_loopback/Makefile" not in content
 
 
-def test_loopback() -> None:
+def test_loopback(tmp_path: Path) -> None:
     """Tests that config.mak will contain only loopback makefile include"""
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -84,8 +84,8 @@ def test_loopback() -> None:
     mailbox.set_doorbell_channel(42, channel)
     agent.add_channel(channel)
     # Test
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config.mak")
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config.mak")
     content = ""
     with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()
@@ -94,9 +94,9 @@ def test_loopback() -> None:
     assert "include ./sm/rpc/mb_mu/Makefile" not in content
 
 
-def test_mu_loopback() -> None:
+def test_mu_loopback(tmp_path: Path) -> None:
     """Tests that config.mak will contain both mu and loopback makefile includes"""
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMakeFile()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -117,8 +117,8 @@ def test_mu_loopback() -> None:
     agent1.add_channel(channel1)
     agent2.add_channel(channel2)
     # Test
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config.mak")
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config.mak")
     content = ""
     with open(file_name, "r", encoding="utf-8") as file:
         content = file.read()

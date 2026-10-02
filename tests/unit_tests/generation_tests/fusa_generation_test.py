@@ -4,27 +4,26 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring
 import os
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from smct.configuration.confdata import ConfigurationData
 from smct.configuration.confdata_fusa import FusaDefine, FusaTask
 from smct.generation.gen_fusa import GeneratorFusa
+from tests import test_utils
 
 
-def _generate_and_read(conf: ConfigurationData, generator: GeneratorFusa, directory: TemporaryDirectory) -> str:
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_fusa.h")
-    content = ""
-    with open(file_name, "r") as file:
-        content = file.read()
-    return content
+def _generate_and_read(conf: ConfigurationData, generator: GeneratorFusa, directory: Path) -> str:
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config_fusa.h")
+    return test_utils.read_generated_file(file_name)
 
 
-def test_basic_fusa_def() -> None:
+def test_basic_fusa_def(tmp_path: Path) -> None:
     """Test basic FUSA definition generation."""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorFusa()
     conf = ConfigurationData()
 
@@ -45,10 +44,10 @@ def test_basic_fusa_def() -> None:
     assert actual_fusa_object.get_comment() == expected_fusa_object.get_comment()
 
 
-def test_various_fusa_def_types() -> None:
+def test_various_fusa_def_types(tmp_path: Path) -> None:
     """Test various FUSA definition value types."""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorFusa()
     conf = ConfigurationData()
 
@@ -71,10 +70,10 @@ def test_various_fusa_def_types() -> None:
     assert expected_ull in content
 
 
-def test_basic_fusa_task() -> None:
+def test_basic_fusa_task(tmp_path: Path) -> None:
     """Test basic FUSA task generation."""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorFusa()
     conf = ConfigurationData()
     FusaTask.task_types = {"handler": "handler", "thread": "thread"}
@@ -106,10 +105,10 @@ def test_basic_fusa_task() -> None:
     assert actual_fusa_object.get_comment() == expected_fusa_object.get_comment()
 
 
-def test_various_fusa_task_types() -> None:
+def test_various_fusa_task_types(tmp_path: Path) -> None:
     """Test various FUSA task types (handler and thread)."""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorFusa()
     conf = ConfigurationData()
     FusaTask.task_types = {"handler": "handler", "thread": "thread"}
@@ -190,10 +189,10 @@ def test_various_fusa_task_types() -> None:
     assert len(conf.get_fusa_tasks()) == 4
 
 
-def test_fusa_scheduler_time_conversion() -> None:
+def test_fusa_scheduler_time_conversion(tmp_path: Path) -> None:
     """Test FUSA scheduler generation with different time suffixes and invalid periods."""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorFusa()
     conf = ConfigurationData()
     FusaTask.task_types = {"handler": "handler", "thread": "thread"}

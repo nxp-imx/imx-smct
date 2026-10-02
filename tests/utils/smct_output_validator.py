@@ -51,7 +51,7 @@ class SmctOutputValidator:
             try:
                 with open(h_file, "r", encoding="utf-8") as f:
                     content = f.read()
-            except Exception as e:
+            except OSError as e:
                 issues.append(f"{rel_path}: Failed to read file: {e}")
                 continue
 
@@ -67,10 +67,7 @@ class SmctOutputValidator:
             if ifndef_matches and not endif_matches:
                 issues.append(f"{rel_path}: Has #ifndef but missing closing #endif")
             elif len(ifndef_matches) != len(endif_matches):
-                issues.append(
-                    f"{rel_path}: Mismatched header guards "
-                    f"(#ifndef: {len(ifndef_matches)}, #endif: {len(endif_matches)})"
-                )
+                issues.append(f"{rel_path}: Mismatched header guards " f"(#ifndef: {len(ifndef_matches)}, #endif: {len(endif_matches)})")
 
             # Check 3: No duplicate #define names within a single file
             define_names = self._re_define.findall(content)
@@ -83,9 +80,6 @@ class SmctOutputValidator:
             open_braces = content.count("{")
             close_braces = content.count("}")
             if open_braces != close_braces:
-                issues.append(
-                    f"{rel_path}: Unbalanced braces "
-                    f"({{ : {open_braces}, }} : {close_braces})"
-                )
+                issues.append(f"{rel_path}: Unbalanced braces " f"({{ : {open_braces}, }} : {close_braces})")
 
         return len(issues) == 0, issues

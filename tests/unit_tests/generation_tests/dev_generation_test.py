@@ -4,9 +4,10 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring
 
 import os
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_dev import GeneratorDev
@@ -15,19 +16,16 @@ from smct.resources.res_api import ApiResource
 from tests import test_utils
 
 
-def _generate_and_read(conf: ConfigurationData, generator: GeneratorDev, directory: TemporaryDirectory) -> str:
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_dev.h")
-    content = ""
-    with open(file_name, "r") as file:
-        content = file.read()
-    return content
+def _generate_and_read(conf: ConfigurationData, generator: GeneratorDev, directory: Path) -> str:
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config_dev.h")
+    return test_utils.read_generated_file(file_name)
 
 
-def test_dev_structures_empty() -> None:
+def test_dev_structures_empty(tmp_path: Path) -> None:
     """Test DEV generation with empty configuration data"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorDev()
     conf = ConfigurationData()
 
@@ -41,10 +39,10 @@ def test_dev_structures_empty() -> None:
     assert ".cpuSemaAddr" not in content
 
 
-def test_dev_structures_single() -> None:
+def test_dev_structures_single(tmp_path: Path) -> None:
     """Test DEV generation with a single CPU resource configuration"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorDev()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -64,10 +62,10 @@ def test_dev_structures_single() -> None:
     assert f".cpuSemaAddr[DEV_SM_{res_name}] = {sema_val_hex}U" in content
 
 
-def test_dev_structures_only_cpu() -> None:
+def test_dev_structures_only_cpu(tmp_path: Path) -> None:
     """Test DEV generation with multiple CPU resources and filtering of non-CPU resources"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorDev()
     conf = ConfigurationData()
     test_utils.set_up()

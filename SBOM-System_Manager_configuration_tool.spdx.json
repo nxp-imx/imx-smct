@@ -2,20 +2,20 @@
   "SPDXID": "SPDXRef-DOCUMENT",
   "spdxVersion": "SPDX-2.3",
   "creationInfo": {
-    "created": "2026-06-02T12:26:47Z",
+    "created": "2026-09-07T14:04:04Z",
     "creators": [
       "Organization: NXP"
     ],
-    "licenseListVersion": "3.26"
+    "licenseListVersion": "3.28"
   },
-  "name": "System Manager Config Tool CLI-26.06",
+  "name": "System Manager Config Tool CLI-26.09.00",
   "dataLicense": "CC0-1.0",
-  "documentNamespace": "https://nxp.com/spdx/88795f4c-d613-4e24-907d-e03b6eb2c708",
+  "documentNamespace": "https://nxp.com/spdx/f53d62e0-c684-4fdc-a6a5-7b4762d0b006",
   "packages": [
     {
-      "SPDXID": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708",
+      "SPDXID": "SPDXRef-package-f53d62e0-c684-4fdc-a6a5-7b4762d0b006",
       "name": "System Manager Config Tool CLI",
-      "versionInfo": "26.06",
+      "versionInfo": "26.09.00",
       "licenseConcluded": "(BSD-3-Clause)",
       "licenseDeclared": "(BSD-3-Clause)",
       "downloadLocation": "github.com/nxp-imx/imx-smct",
@@ -25,27 +25,16 @@
       "filesAnalyzed": false
     },
     {
-      "SPDXID": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708---8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
+      "SPDXID": "SPDXRef-package-f53d62e0-c684-4fdc-a6a5-7b4762d0b006---8c03ebd5-ee97-4207-a7a6-f95706cd27a7",
       "name": "fastjsonschema",
       "versionInfo": "2.21.2",
       "licenseConcluded": "BSD-3-Clause",
       "licenseDeclared": "BSD-3-Clause",
       "homepage": "https://github.com/seznam/python-fastjsonschema",
       "downloadLocation": "NOASSERTION",
-      "originator": "Organization: pypi",
+      "originator": "Organization: unknown",
       "supplier": "NOASSERTION",
-      "externalRefs": [
-        {
-          "referenceCategory": "OTHER",
-          "referenceLocator": "2741b088-7f99-4e2b-a3cd-ba75389f2e77",
-          "referenceType": "BlackDuck-ComponentOrigin"
-        },
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
-          "referenceLocator": "pkg:pypi/fastjsonschema@2.21.2",
-          "referenceType": "purl"
-        }
-      ],
+      "externalRefs": [],
       "filesAnalyzed": false
     }
   ],
@@ -53,12 +42,12 @@
     {
       "spdxElementId": "SPDXRef-DOCUMENT",
       "relationshipType": "DESCRIBES",
-      "relatedSpdxElement": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708"
+      "relatedSpdxElement": "SPDXRef-package-f53d62e0-c684-4fdc-a6a5-7b4762d0b006"
     },
     {
-      "spdxElementId": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708",
+      "spdxElementId": "SPDXRef-package-f53d62e0-c684-4fdc-a6a5-7b4762d0b006",
       "relationshipType": "DYNAMIC_LINK",
-      "relatedSpdxElement": "SPDXRef-package-88795f4c-d613-4e24-907d-e03b6eb2c708---8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
+      "relatedSpdxElement": "SPDXRef-package-f53d62e0-c684-4fdc-a6a5-7b4762d0b006---8c03ebd5-ee97-4207-a7a6-f95706cd27a7"
     }
   ]
 }

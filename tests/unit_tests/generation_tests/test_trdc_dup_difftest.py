@@ -42,9 +42,7 @@ def test_trdc_dup_difftest(capsys: Any, caplog: Any) -> None:
         caplog: Pytest caplog fixture for capturing log messages
     """
     # Arrange
-    config_file = os.path.join(
-        get_smct_root(), "test_resources", "configs_test", "trdc_dup_difftest.cfg"
-    )
+    config_file = os.path.join(get_smct_root(), "test_resources", "configs_test", "trdc_dup_difftest.cfg")
     root_dir = os.path.join(get_smct_root(), "test_resources")
 
     with TemporaryDirectory() as output_dir:
@@ -56,10 +54,7 @@ def test_trdc_dup_difftest(capsys: Any, caplog: Any) -> None:
         assert code == 0, f"SMCT execution failed with code {code}\nstdout: {stdout}\nstderr: {stderr}"
 
         # Verify MDAC conflict was detected and logged
-        assert "already defined" in caplog.text, (
-            f"MDAC conflict error not logged. Expected 'already defined' in logs.\n"
-            f"Captured logs:\n{caplog.text}"
-        )
+        assert "already defined" in caplog.text, f"MDAC conflict error not logged. Expected 'already defined' in logs.\n" f"Captured logs:\n{caplog.text}"
 
         # Read the generated config_trdc.h
         trdc_header_path = os.path.join(output_dir, "config_trdc.h")
@@ -73,30 +68,21 @@ def test_trdc_dup_difftest(capsys: Any, caplog: Any) -> None:
         # Should result in deduplicated MBC block config entries
         mbc_pattern = r"DOM3_MEM"
         mbc_matches = re.findall(mbc_pattern, trdc_content)
-        assert len(mbc_matches) > 0, (
-            "MBC deduplication: No DOM3_MEM entries found in config_trdc.h\n"
-            "Expected MBC block entries for deduped resources"
-        )
+        assert len(mbc_matches) > 0, "MBC deduplication: No DOM3_MEM entries found in config_trdc.h\n" "Expected MBC block entries for deduped resources"
 
         # Verification 2: MRC deduplication - verify DOM3 RGD entries exist
         # Both agents assign DDR memory regions
         # Should result in deduplicated MRC region entries
         mrc_pattern = r"DOM3_RGD"
         mrc_matches = re.findall(mrc_pattern, trdc_content)
-        assert len(mrc_matches) > 0, (
-            "MRC deduplication: No DOM3_RGD entries found in config_trdc.h\n"
-            "Expected MRC region entries for deduped DDR ranges"
-        )
+        assert len(mrc_matches) > 0, "MRC deduplication: No DOM3_RGD entries found in config_trdc.h\n" "Expected MRC region entries for deduped DDR ranges"
 
         # Verification 3: MDAC entry exists despite conflict
         # The NPU MDAC assignment should be written to the output
         # even though there was a conflict logged
         mdac_pattern = r"(MDAC_NPU|MDA_W[0-9]+.*DFMT)"
         mdac_matches = re.findall(mdac_pattern, trdc_content)
-        assert len(mdac_matches) > 0, (
-            "MDAC entry: No NPU MDAC entries found in config_trdc.h\n"
-            "Expected MDAC entry to be written despite conflict"
-        )
+        assert len(mdac_matches) > 0, "MDAC entry: No NPU MDAC entries found in config_trdc.h\n" "Expected MDAC entry to be written despite conflict"
 
         # Success - deduplication works and conflict was detected
         print(f"\n✓ MBC DOM3 entries: {len(mbc_matches)}")

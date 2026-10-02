@@ -4,9 +4,10 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring
 
 import os
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 from smct.configuration.confdata import ConfigurationData
 from smct.generation.gen_mb_mu import GeneratorMBMU
@@ -15,64 +16,44 @@ from smct.owners.owner_lm import LM
 from tests import test_utils
 
 
-def _generate_and_read(conf: ConfigurationData, generator: GeneratorMBMU, directory: TemporaryDirectory) -> str:
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_mb_mu.h")
-    content = ""
-    with open(file_name, "r") as file:
-        content = file.read()
-    return content
+def _generate_and_read(conf: ConfigurationData, generator: GeneratorMBMU, directory: Path) -> str:
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config_mb_mu.h")
+    return test_utils.read_generated_file(file_name)
 
 
-def test_mb_mu_structures_empty() -> None:
+def test_mb_mu_structures_empty(tmp_path: Path) -> None:
     """Test MB MU generation with empty configuration data"""
-    # Arrange
-    directory = TemporaryDirectory()
-    generator = GeneratorMBMU()
-    conf = ConfigurationData()
-
-    # Act
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_mb_mu.h")
-
-    # Assert
-    assert not os.path.exists(file_name)
+    directory = tmp_path
+    GeneratorMBMU().generate(ConfigurationData(), str(directory))
+    assert not os.path.exists(os.path.join(str(directory), "config_mb_mu.h"))
 
 
-def test_mb_mu_structures_single() -> None:
+def test_mb_mu_structures_single(tmp_path: Path) -> None:
     """Test MB MU generation with a single MU mailbox configuration"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMBMU()
-    conf = ConfigurationData()
-    test_utils.set_up()
-
-    lm = LM("id", 0, "name", None, None, None, None, None, True)
-    conf.add_lm(lm)
-    agent = ScmiAgent("id", lm, "name", True)
-    lm.add_agent(agent)
+    conf, _lm, agent = test_utils.build_conf_with_lm_and_agent()
     mu_num = 0
-    mb = MailboxMu(mu_num, None, None, None)
-    agent.add_mailbox(mb)
+    agent.add_mailbox(MailboxMu(mu_num, None, None, None))
 
     # Act
     content = _generate_and_read(conf, generator, directory)
 
-    # Assert
-    config_data_array = "#define SM_MB_MU_CONFIG_DATA \\\n" + f"    SM_MB_MU{mu_num}_CONFIG\n" + "\n"
-    config_instance = "#define SM_MB_MU0_CONFIG \\\n" + "    { \\\n" + f"        .mu = {mu_num}U, \\\n" + "    }\n" + "\n"
-    config_mb_count = "#define SM_NUM_MB_MU  1U\n"
+    # Assert — header inclusions
     assert '#include "config_user.h"' in content
     assert '#include "mb_mu_config.h"' in content
-    assert config_data_array in content
-    assert config_instance in content
-    assert config_mb_count in content
+    assert "#define SM_NUM_MB_MU  1U\n" in content
+    # Assert — array and instance defines
+    assert f"#define SM_MB_MU_CONFIG_DATA \\\n    SM_MB_MU{mu_num}_CONFIG\n\n" in content
+    assert f"#define SM_MB_MU0_CONFIG \\\n    {{ \\\n        .mu = {mu_num}U, \\\n    }}\n\n" in content
 
 
-def test_mb_mu_structures_multiple() -> None:
+def test_mb_mu_structures_multiple(tmp_path: Path) -> None:
     """Test MB MU generation with multiple MU mailboxes and different configurations"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorMBMU()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -151,7 +132,7 @@ def test_mb_mu_structures_multiple() -> None:
         "    }\n"
     )
     expected_mb_count = "#define SM_NUM_MB_MU  2U\n"
-    expected_config_array = "#define SM_MB_MU_CONFIG_DATA \\\n" "    SM_MB_MU1_CONFIG, \\\n" "    SM_MB_MU3_CONFIG\n"
+    expected_config_array = "#define SM_MB_MU_CONFIG_DATA \\\n" + "    SM_MB_MU1_CONFIG, \\\n" + "    SM_MB_MU3_CONFIG\n"
 
     assert expected_mb1_config in content
     assert expected_mb3_config in content

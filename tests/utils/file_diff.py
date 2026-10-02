@@ -208,7 +208,8 @@ class FileDiffer:
         )
 
 
-if __name__ == "__main__":
+def _main() -> None:
+    """Entry point for command-line usage."""
     parser = ArgumentParser(description="Diffs the current build with the last archived in artifactory")
     parser.add_argument("filefilter", metavar="filefilter", help="path to files in glob wildcard format. Multiple can be given separated in semicolons")
     parser.add_argument("-b", "--basepath", help="Basepath from which the filter is considered. Working directory is default", default=None)
@@ -221,3 +222,7 @@ if __name__ == "__main__":
     if not differences and args.diffdir is not None:
         differ.store_differences_to_disk(args.diffdir)
     sys.exit(0 if differences else 1)
+
+
+if __name__ == "__main__":
+    _main()

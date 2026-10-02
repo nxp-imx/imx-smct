@@ -8,14 +8,14 @@
 
 from typing import Tuple
 
-from smct._version import __version__
+from ._version import __version__
 
 
 class ProductInfo:
     """Class containing information about the product."""
 
     _smct_version = __version__
-    _sm_fw_compatibility_version = 2
+    _sm_fw_compatibility_version = 3
 
     @classmethod
     def get_smct_version(cls) -> Tuple[int, int, int]:

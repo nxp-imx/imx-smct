@@ -4,9 +4,10 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring
 
 import os
-from tempfile import TemporaryDirectory
+from pathlib import Path
 
 import pytest
 
@@ -17,25 +18,22 @@ from smct.owners.owner_lm import LM
 from tests import test_utils
 
 
-def _generate_and_read(conf: ConfigurationData, generator: GeneratorSMT, directory: TemporaryDirectory) -> str:
-    generator.generate(conf, directory.name)
-    file_name = os.path.join(directory.name, "config_smt.h")
-    content = ""
-    with open(file_name, "r") as file:
-        content = file.read()
-    return content
+def _generate_and_read(conf: ConfigurationData, generator: GeneratorSMT, directory: Path) -> str:
+    generator.generate(conf, str(directory))
+    file_name = os.path.join(str(directory), "config_smt.h")
+    return test_utils.read_generated_file(file_name)
 
 
-def test_smt_structures_empty() -> None:
+def test_smt_structures_empty(tmp_path: Path) -> None:
     """Test SMT generation with empty configuration data"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorSMT()
     conf = ConfigurationData()
 
     # Act
     content = _generate_and_read(conf, generator, directory)
-    file_name = os.path.join(directory.name, "config_smt.h")
+    file_name = os.path.join(str(directory), "config_smt.h")
 
     # Assert
     assert os.path.exists(file_name)
@@ -44,10 +42,10 @@ def test_smt_structures_empty() -> None:
     assert "#define SM_NUM_SMT_CHN  0U" in content
 
 
-def test_smt_structures_single() -> None:
+def test_smt_structures_single(tmp_path: Path) -> None:
     """Test SMT generation with a single SMT channel configuration"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorSMT()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -88,10 +86,10 @@ def test_smt_structures_single() -> None:
     assert config_instance in content
 
 
-def test_smt_structures_multiple() -> None:
+def test_smt_structures_multiple(tmp_path: Path) -> None:
     """Test SMT generation with multiple SMT channels and different configurations"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorSMT()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -200,10 +198,10 @@ def test_smt_structures_multiple() -> None:
         ("j1850", "SM_SMT_CRC_J1850"),
     ],
 )
-def test_smt_structures_crc_types(crc_type: str, expected_define: str) -> None:
+def test_smt_structures_crc_types(crc_type: str, expected_define: str, tmp_path: Path) -> None:
     """Test SMT with different CRC configurations"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorSMT()
     conf = ConfigurationData()
     test_utils.set_up()
@@ -250,10 +248,11 @@ def test_smt_structures_mailbox_types(
     mailbox_type: str,
     expected_define: str,
     mb_type: str,
+    tmp_path: Path,
 ) -> None:
     """Test SMT with different mailbox configurations"""
     # Arrange
-    directory = TemporaryDirectory()
+    directory = tmp_path
     generator = GeneratorSMT()
     conf = ConfigurationData()
     test_utils.set_up()

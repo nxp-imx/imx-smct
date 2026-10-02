@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
-  "description": "Generic schema for SoC configuration with enhanced flexibility",
+  "description": "Schema for SoC configuration (sm_model/soc.json)",
   "definitions": {
     "model_reference": {
       "type": "string",
-      "description": "Reference to a model file",
-      "pattern": "^[A-Za-z0-9_\\-]+\\.(json|yaml|yml)$"
+      "description": "Reference to a model JSON file",
+      "pattern": "^[A-Za-z0-9_\\-]+\\.json$"
     },
     "component_identifier": {
       "type": "string",
@@ -25,57 +25,37 @@
           "description": "Security Monitor model file reference"
         }
       },
-      "required": ["soc_model", "sm_model"]
+      "required": ["soc_model", "sm_model"],
+      "additionalProperties": false
     },
     "soc_config_extended": {
-      "allOf": [
-        {"$ref": "#/definitions/soc_config_base"},
-        {
-          "properties": {
-            "sm_component": {
-              "$ref": "#/definitions/component_identifier",
-              "description": "Security Monitor component identifier"
-            },
-            "version": {
-              "type": "string",
-              "description": "SoC configuration version",
-              "pattern": "^\\d+\\.\\d+\\.\\d+$"
-            },
-            "features": {
-              "type": "array",
-              "description": "List of enabled features",
-              "items": {
-                "type": "string"
-              }
-            },
-            "metadata": {
-              "type": "object",
-              "description": "Additional metadata",
-              "additionalProperties": true
-            }
-          },
-          "required": ["sm_component"]
+      "type": "object",
+      "properties": {
+        "soc_model": {
+          "$ref": "#/definitions/model_reference",
+          "description": "SoC model file reference"
+        },
+        "sm_model": {
+          "$ref": "#/definitions/model_reference",
+          "description": "Security Monitor model file reference"
+        },
+        "sm_component": {
+          "$ref": "#/definitions/component_identifier",
+          "description": "Security Monitor component identifier"
         }
-      ]
+      },
+      "required": ["soc_model", "sm_model", "sm_component"],
+      "additionalProperties": false
     }
   },
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "Schema reference"
-    },
-    "version": {
-      "type": "string",
-      "description": "Configuration file version",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$"
-    },
     "simu": {
       "$ref": "#/definitions/soc_config_base",
       "description": "Simulation configuration (required)"
     }
   },
   "patternProperties": {
-    "^(?!simu$|version$|\\$schema$)[A-Za-z0-9_]+$": {
+    "^(?!simu$)[A-Za-z0-9_]+$": {
       "$ref": "#/definitions/soc_config_extended",
       "description": "Configuration for a specific SoC"
     }

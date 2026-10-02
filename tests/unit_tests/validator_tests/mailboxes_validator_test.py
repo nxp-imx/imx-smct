@@ -34,7 +34,7 @@ def test_validate_no_mu_mailboxes() -> None:
     result = validator.validate(mock_config)
 
     # Assert
-    assert result == []
+    assert not result
 
 
 def test_validate_single_mu_mailbox() -> None:
@@ -62,7 +62,7 @@ def test_validate_single_mu_mailbox() -> None:
     result = validator.validate(mock_config)
 
     # Assert
-    assert result == []
+    assert not result
 
 
 def test_validate_duplicate_mu_mailboxes() -> None:

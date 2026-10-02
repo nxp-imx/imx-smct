@@ -58,11 +58,13 @@
  * @name Board redirection defines
  * @{
  */
+#define SM_CONTROLATTR         BRD_SM_ControlAttributes   /*!< Control attributes */
 #define SM_CONTROLSET          BRD_SM_ControlSet          /*!< Control set */
 #define SM_CONTROLGET          BRD_SM_ControlGet          /*!< Control get */
 #define SM_CONTROLEXTSET       BRD_SM_ControlExtSet       /*!< Extended control set */
 #define SM_CONTROLEXTGET       BRD_SM_ControlExtGet       /*!< Extended control get */
 #define SM_CONTROLACTION       BRD_SM_ControlAction       /*!< Control action */
+#define SM_CONTROLFLAGSSET     BRD_SM_ControlFlagsSet     /*!< Control flags */
 /** @} */
 
 /*! Number of board controls */
@@ -89,6 +91,27 @@
  * @name Board control functions
  * @{
  */
+
+/*!
+ * Get board control attributes.
+ *
+ * @param[in]     ctrlId   Index of control
+ * @param[out]    get      True if get supported
+ * @param[out]    set      True if set supported
+ * @param[out]    extGet   True if extended get supported
+ * @param[out]    extSet   True if extended set supported
+ * @param[out]    action   True if action supported
+ * @param[out]    notify   True if notify supported
+ *
+ * This function allows a caller to get control attributes.
+ *
+ * @return Returns the status (::SM_ERR_SUCCESS = success).
+ *
+ * Return errors (see @ref STATUS "SM error codes"):
+ * - ::SM_ERR_NOT_FOUND: if ctrlId is not valid.
+ */
+int32_t BRD_SM_ControlAttributes(uint32_t ctrlId, bool *get, bool *set,
+    bool *extGet, bool *extSet, bool *action, bool *notify);
 
 /*!
  * Set a board control value.
@@ -188,6 +211,21 @@ int32_t BRD_SM_ControlExtGet(uint32_t ctrlId, uint32_t addr,
  */
 int32_t BRD_SM_ControlAction(uint32_t ctrlId, uint32_t action,
     uint32_t numArg, const uint32_t *arg, uint32_t *numRtn, uint32_t *rtn);
+
+/*!
+ * Configure notification flags for a control.
+ *
+ * @param[in]     ctrlId   Control identifier
+ * @param[in]     flags    Notification flags to configure
+ *
+ * This function configures notification flags for the specified control..
+ *
+ * @return Returns the status (::SM_ERR_SUCCESS = success).
+ *
+ * Return errors (see @ref STATUS "SM error codes"):
+ * - ::SM_ERR_NOT_FOUND: if \a ctrlId is not valid.
+ */
+int32_t BRD_SM_ControlFlagsSet(uint32_t ctrlId, uint32_t flags);
 
 /** @} */
 

@@ -7,6 +7,8 @@
 
 """Unit tests for ScmiAgent and related classes"""
 
+# pylint: disable=protected-access
+
 from unittest.mock import Mock, patch
 
 import pytest
@@ -62,7 +64,7 @@ def test_scmi_agent_get_all_scmi_channels_empty() -> None:
 
     channels = agent.get_all_scmi_channels()
 
-    assert channels == []
+    assert not channels
 
 
 def test_scmi_agent_get_all_xport_channels_empty() -> None:
@@ -72,7 +74,7 @@ def test_scmi_agent_get_all_xport_channels_empty() -> None:
 
     channels = agent.get_all_xport_channels()
 
-    assert channels == []
+    assert not channels
 
 
 def test_scmi_agent_get_all_channels_empty() -> None:
@@ -82,7 +84,7 @@ def test_scmi_agent_get_all_channels_empty() -> None:
 
     channels = agent.get_all_channels()
 
-    assert channels == []
+    assert not channels
 
 
 def test_scmi_agent_get_mailbox_none() -> None:

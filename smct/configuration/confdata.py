@@ -170,12 +170,15 @@ class ConfigurationData:
             dom: Domain to add.
 
         Raises:
-            CfgToolException: If domain ID is already used by another domain.
+            CfgToolException: If domain ID is out of the valid range or already used by another domain.
         """
-        existing = self.get_by_did(dom.get_did())
+        did = dom.get_did()
+        if not 0 <= did < len(self._domains):
+            raise CfgToolException(f"{dom.get_id()} uses did={did} which is out of the valid range (0-{len(self._domains) - 1})")
+        existing = self.get_by_did(did)
         if existing:
-            raise CfgToolException(f"{dom.get_id()} uses did={dom.get_did()} which is already used by {existing.get_id()}")
-        self._domains[dom.get_did()] = dom
+            raise CfgToolException(f"{dom.get_id()} uses did={did} which is already used by {existing.get_id()}")
+        self._domains[did] = dom
 
     def add_lm(self, lm: LM) -> None:
         """Adds logical machine to this configuration.
@@ -356,11 +359,11 @@ class ConfigurationData:
             result = max(result, maximal_msels)
         return result
 
-    def get_all_lm_start_stops(self, start: bool) -> List[StartStop]:
+    def get_all_lm_start_stops(self, is_start: bool) -> List[StartStop]:
         """Returns all logical machine MSEL start-stops.
 
         Args:
-            start: If True, returns start sequences; if False, returns stop sequences.
+            is_start: If True, returns start sequences; if False, returns stop sequences.
 
         Returns:
             List of start-stop sequences.
@@ -368,15 +371,15 @@ class ConfigurationData:
         result = []
         for msel in self.get_all_lm_msels():
             if msel:
-                result += msel.get_start() if start else msel.get_stop()
-        return [start_stop for start_stop in result if start_stop is not None]
+                result += msel.get_all_start_stops(is_start)
+        return result
 
-    def get_lm_start_stop_index(self, start_stop: StartStop, start: bool) -> int:
+    def get_lm_start_stop_index(self, start_stop: StartStop, is_start: bool) -> int:
         """Returns index of given start-stop.
 
         Args:
             start_stop: Start-stop sequence to find index for.
-            start: If True, searches in start sequences; if False, searches in stop sequences.
+            is_start: If True, searches in start sequences; if False, searches in stop sequences.
 
         Returns:
             Index of the start-stop sequence.
@@ -384,7 +387,7 @@ class ConfigurationData:
         Raises:
             CfgToolException: If start-stop index cannot be determined.
         """
-        all_lm_start_stops = self.get_all_lm_start_stops(start)
+        all_lm_start_stops = self.get_all_lm_start_stops(is_start)
         if start_stop in all_lm_start_stops:
             return all_lm_start_stops.index(start_stop)
         msel = start_stop.get_msel()
@@ -434,14 +437,14 @@ class ConfigurationData:
             agent: SCMI agent to get SEENV index for.
 
         Returns:
-            SEENV index of the agent (1-based).
+            SEENV index of the agent (zero-based).
 
         Raises:
             CfgToolException: If SEENV index cannot be determined.
         """
         all_seenv_agents = self.get_all_seenv_agents()
         if agent in all_seenv_agents:
-            return all_seenv_agents.index(agent) + 1
+            return all_seenv_agents.index(agent)
         raise CfgToolException(f"Cannot determine SCMI Agent's SEENV instance index for {agent.get_id()}")
 
     def get_channel_inst(self, searched_channel: Channel) -> int:

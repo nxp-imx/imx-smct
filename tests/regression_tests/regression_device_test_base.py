@@ -56,6 +56,23 @@ logger = logging.getLogger()
 SM_FW_CONFIGS_DIR = os.path.abspath(os.path.join(get_smct_root(), "test_resources", "configs"))
 SMCT_CONFIGS_DIR = os.path.abspath(os.path.join(get_smct_root(), "test_resources", "configs_test"))
 
+# Perl configtool subprocess timeout, with headroom for concurrent runs under xdist worksteal.
+PERL_TIMEOUT_SECONDS = 600
+
+
+def find_firmware_root() -> str:
+    """Locate and return the absolute firmware root directory.
+
+    Calls pytest.fail() if the directory cannot be found.
+
+    Returns:
+        Absolute path to the firmware root directory.
+    """
+    firmware_root_temp = utils.find_firmware_root_dir(os.path.join(get_smct_root(), ".."))
+    if firmware_root_temp is None:
+        pytest.fail("Could not find firmware root directory")
+    return os.path.abspath(firmware_root_temp)  # type: ignore[arg-type]
+
 
 def run_device_regression_test(capsys: Any, config: str, expected_diff_files: Set[str] | None = None) -> None:
     """Run regression test comparing Perl configtool vs SMCT output for a device.
@@ -80,12 +97,7 @@ def run_device_regression_test(capsys: Any, config: str, expected_diff_files: Se
         logger.info("SMCT root: %s", get_smct_root())
 
         # Locate firmware root directory
-        firmware_root_temp = utils.find_firmware_root_dir(os.path.join(get_smct_root(), ".."))
-        if firmware_root_temp is None:
-            pytest.fail("Could not find firmware root directory")
-            return
-
-        firmware_root = os.path.abspath(firmware_root_temp)
+        firmware_root = find_firmware_root()
         config_tool = os.path.join(firmware_root, "configs", "configtool.pl")
         diff_folder = os.path.join(get_smct_root(), "test_results", "test_regression_cfgs", config_stem)
 
@@ -104,7 +116,7 @@ def run_device_regression_test(capsys: Any, config: str, expected_diff_files: Se
         if not os.path.isfile(config_tool):
             pytest.skip(f"Perl configtool not found at {config_tool}, skipping comparison")
 
-        perl_code, _, perl_stderr = execute_binary("perl", [config_tool, "-i", config, "-o", golden])
+        perl_code, _, perl_stderr = execute_binary("perl", [config_tool, "-i", config, "-o", golden], timeout=PERL_TIMEOUT_SECONDS)
 
         if perl_code != 0:
             logger.warning(

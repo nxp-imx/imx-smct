@@ -12,22 +12,22 @@ import os.path
 import sys
 from typing import List, Optional
 
-from smct import utils
-from smct.configuration.configuration_provider import ConfigurationProvider
-from smct.exceptions.cfg_tool_exception import CfgToolException
-from smct.generation.config_generator import ConfigGenerator
-from smct.generation.export_cfg import CfgExporter
-from smct.model.chip_model_provider import ChipModelProvider
-from smct.parsers.cfg_parser import CfgFileParser
-from smct.parsers.command_parser import CfgCommandParser, CfgPreprocessor
-from smct.parsers.hdr_parser import ApiResourceParser
-from smct.parsers.resource_parser import ResourceParser
-from smct.product_info import ProductInfo
-from smct.resources.resdump import dump_configuration, generate_database
-from smct.resources.resource_database_provider import ResourceDatabaseProvider
-from smct.validation.configuration_validator import ConfigurationValidator
-from smct.validation.formatters.console_formatter import ConsoleFormatter
-from smct.validation.formatters.json_formatter import JsonFormatter, JsonMemoryHandler
+from . import utils
+from .configuration.configuration_provider import ConfigurationProvider
+from .exceptions.cfg_tool_exception import CfgToolException
+from .generation.config_generator import ConfigGenerator
+from .generation.export_cfg import CfgExporter
+from .model.chip_model_provider import ChipModelProvider
+from .parsers.cfg_parser import CfgFileParser
+from .parsers.command_parser import CfgCommandParser, CfgPreprocessor
+from .parsers.hdr_parser import ApiResourceParser
+from .parsers.resource_parser import ResourceParser
+from .product_info import ProductInfo
+from .resources.resdump import dump_configuration, generate_database
+from .resources.resource_database_provider import ResourceDatabaseProvider
+from .validation.configuration_validator import ConfigurationValidator
+from .validation.formatters.console_formatter import ConsoleFormatter
+from .validation.formatters.json_formatter import JsonFormatter, JsonMemoryHandler
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger()

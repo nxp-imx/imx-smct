@@ -95,10 +95,10 @@ class StartStop:
 class StartStopSequence:
     """Sequence of starts/stops in one LM."""
 
-    def __init__(self, ss_index: int, lm_name: str, start_stops: List[StartStop | None]):
+    def __init__(self, ss_index: int, lm_name: str, ordered_pairs: List[Tuple[int, StartStop]]):
         self._ss_index: int = ss_index
         self._ss_name: str = lm_name + " start stop " + str(ss_index)
-        self._ss_resources: List[StartStop] = [startstop for startstop in start_stops if startstop is not None]
+        self._ss_resources: List[Tuple[int, StartStop]] = list(ordered_pairs)
 
     def get_assignment_json(self) -> object:
         """Returns JSON object with raw data.
@@ -106,7 +106,11 @@ class StartStopSequence:
         Returns:
             JSON object containing sequence index, name, and resources.
         """
-        ret = {"ss": self._ss_index, "ss_name": self._ss_name, "resources": [start_stop.get_assignment_json() for start_stop in self._ss_resources]}
+        ret = {
+            "ss": self._ss_index,
+            "ss_name": self._ss_name,
+            "resources": [{**start_stop.get_assignment_json(), "order": order} for order, start_stop in self._ss_resources],
+        }
         return ret
 
 
@@ -118,8 +122,8 @@ class MSEL:
         self._msel: int = msel  # index of operation mode
         self._boot: int | None = boot  # 0=no-boot, >0 means LM boot order number
         self._skip: bool | None = skip  # when True, silently ignore missing code image
-        self._start: List[StartStop | None] = []
-        self._stop: List[StartStop | None] = []
+        self._start: List[List[StartStop]] = []
+        self._stop: List[List[StartStop]] = []
         self._start_sequence_index: int | None = None
         self._stop_sequence_index: int | None = None
 
@@ -139,16 +143,16 @@ class MSEL:
         """
         self._stop_sequence_index = index
 
-    def get_all_start_stops(self, start: bool) -> List[StartStop | None]:
+    def get_all_start_stops(self, is_start: bool) -> List[StartStop]:
         """Returns list of all start or stop information.
 
         Args:
-            start (bool): If True, returns start operations; if False, returns stop operations.
+            is_start (bool): If True, returns start operations; if False, returns stop operations.
 
         Returns:
-            List[StartStop | None]: List of start or stop operations.
+            List[StartStop]: Flattened list of start or stop operations in insertion order.
         """
-        return self._start if start else self._stop
+        return [ss for bucket in (self._start if is_start else self._stop) for ss in bucket]
 
     def get_all_test_start_stops(self) -> List[Tuple[bool, AtomicResource]]:
         """Returns list of all start or stop information with test argument.
@@ -156,7 +160,7 @@ class MSEL:
         Returns:
             List[Tuple[bool, AtomicResource]]: List of tuples containing test flag and atomic resource.
         """
-        start_stops = [x for x in (self._start + self._stop) if x is not None]
+        start_stops = [ss for bucket in (self._start + self._stop) for ss in bucket]
         return list(set(map(lambda start_stop: (start_stop.get_test(), start_stop.get_resources()), start_stops)))
 
     def add_start_stop(self, is_start: bool, has_test: bool, res: AtomicResource, value: str) -> None:
@@ -175,54 +179,13 @@ class MSEL:
         if order <= 0 or order > 100:
             mode = "Start" if is_start else "Stop"
             raise CfgToolException(f"Invalid {mode} order number({order}) for mSel mode")
-        order -= 1  # make order zero-based
+        order_idx = order - 1  # make order zero-based
 
         ss = StartStop(self, res, has_test, args)
         dest = self._start if is_start else self._stop
-        while len(dest) <= order:
-            dest.append(None)
-        if not dest[order]:
-            dest[order] = ss
-        else:
-            source = "/".join(["user_config", self._lm.get_id(), "MSEL" + str(self._msel)])
-            validation_id = ".".join([self._lm.get_id(), "MSEL" + str(self._msel)])
-            logger.error(
-                "Resource command '%s' is called multiple times in start/stop sequence of %s in MSEL%s",
-                res.get_name(),
-                self._lm.get_id(),
-                self._msel,
-                extra={"source": source, "validation_id": validation_id},
-            )
-
-    def get_start_stop_list_json(self, is_start: bool) -> List[object]:
-        """Returns JSON list of all start or stop information.
-
-        Args:
-            is_start (bool): True for start operations, False for stop operations.
-
-        Returns:
-            List[object]: JSON list of start or stop operations.
-        """
-        src = self._start if is_start else self._stop
-        ret: List[Any] = []
-        i = 0
-        for ss in src:
-            if ss:
-                ret.append(ss.get_assignment_json())
-            else:
-                start_stop_str = "Start" if is_start else "Stop"
-                source = "/".join(["user_config", self._lm.get_id(), "MSEL" + str(self._msel)])
-                validation_id = ".".join([self._lm.get_id(), "MSEL" + str(self._msel)])
-                logger.warning(
-                    "Unused index %i in %s operation for LM %s, mSel=%s",
-                    i,
-                    start_stop_str,
-                    self._lm.get_id(),
-                    self._msel,
-                    extra={"source": source, "validation_id": validation_id},
-                )
-            i += 1
-        return ret
+        while len(dest) <= order_idx:
+            dest.append([])
+        dest[order_idx].append(ss)
 
     def get_assignment_json(self) -> Dict[str, Any]:
         """Returns JSON object with raw data.
@@ -239,21 +202,40 @@ class MSEL:
         }
         return ret
 
-    def get_start(self) -> List[StartStop | None]:
-        """Returns list of all start information.
+    def get_start_stop_buckets(self, is_start: bool) -> List[List[StartStop]]:
+        """Returns per-order bucket list for start or stop operations.
+
+        Args:
+            is_start (bool): If True, returns start buckets; if False, returns stop buckets.
 
         Returns:
-            List[StartStop | None]: List of start operations.
+            List[List[StartStop]]: Shallow copy of the bucket list; empty inner list = gap, len > 1 = duplicate order.
         """
-        return self._start
+        return list(self._start if is_start else self._stop)
 
-    def get_stop(self) -> List[StartStop | None]:
-        """Returns list of all stop information.
+    def get_flat_index(self, ss: StartStop, is_start: bool) -> int:
+        """Returns the 0-based position of ``ss`` in the flattened bucket list, matched by identity.
+
+        Uses ``is`` because ``StartStop`` equality compares by resource/args/test and cannot
+        distinguish two entries of the same resource at different orders.
+
+        Args:
+            ss: The StartStop instance to locate.
+            is_start: True to search the start buckets, False to search the stop buckets.
 
         Returns:
-            List[StartStop | None]: List of stop operations.
+            0-based flat position.
+
+        Raises:
+            ValueError: If ``ss`` is not present in the requested buckets.
         """
-        return self._stop
+        pos = 0
+        for bucket in self._start if is_start else self._stop:
+            for entry in bucket:
+                if entry is ss:
+                    return pos
+                pos += 1
+        raise ValueError("StartStop instance not found in the requested buckets")
 
     def get_skip(self) -> bool | None:
         """Returns True for silently ignore missing code image or False otherwise.
@@ -422,11 +404,11 @@ class LM(DOM):
                     result.append(atomic_resource)
         return result
 
-    def get_all_start_stops(self, start: bool) -> List[StartStop]:
+    def get_all_start_stops(self, is_start: bool) -> List[StartStop]:
         """Returns list of all starts or stops in this logical machine.
 
         Args:
-            start (bool): If True, returns start operations; if False, returns stop operations.
+            is_start (bool): If True, returns start operations; if False, returns stop operations.
 
         Returns:
             List[StartStop]: List of start or stop operations.
@@ -434,8 +416,8 @@ class LM(DOM):
         result = []
         for msel in self._msels:
             if msel:
-                result += msel.get_all_start_stops(start)
-        return [start_stop for start_stop in result if start_stop is not None]
+                result += msel.get_all_start_stops(is_start)
+        return result
 
     def is_scmi(self) -> bool:
         """Returns True if this logical machine is set to work with SCMI protocol.
@@ -501,27 +483,31 @@ class LM(DOM):
                 return True
         return False
 
+    @staticmethod
+    def _msel_pairs(msel: MSEL, is_start: bool) -> List[Tuple[int, StartStop]]:
+        """Returns (order, StartStop) pairs flattened from the MSEL's buckets, preserving insertion order."""
+        return [(bucket_idx + 1, ss) for bucket_idx, bucket in enumerate(msel.get_start_stop_buckets(is_start)) for ss in bucket]
+
     def _collect_start_stop_sequences(self) -> List[StartStopSequence]:
-        result = []
-        # collect set of start stop lists
+        result: List[List[Tuple[int, StartStop]]] = []
+        # collect unique (order, StartStop) pair-lists across all MSELs; value-equal sequences
+        # share one C-level array (intentional dedup via list.__eq__ / StartStop.__eq__).
         for msel in self._msels:
-            starts = msel.get_all_start_stops(start=True)
-            if starts and starts not in result:
-                result.append(starts)
-            stops = msel.get_all_start_stops(start=False)
-            if stops and stops not in result:
-                result.append(stops)
+            for is_start in (True, False):
+                pairs = self._msel_pairs(msel, is_start)
+                if pairs and pairs not in result:
+                    result.append(pairs)
 
-        # add to msel
+        # assign sequence indices to MSELs
         for msel in self._msels:
-            starts = msel.get_all_start_stops(start=True)
-            stops = msel.get_all_start_stops(start=False)
-            if starts:
-                msel.set_start_sequence_index(result.index(starts))
-            if stops:
-                msel.set_stop_sequence_index(result.index(stops))
+            start_pairs = self._msel_pairs(msel, True)
+            stop_pairs = self._msel_pairs(msel, False)
+            if start_pairs:
+                msel.set_start_sequence_index(result.index(start_pairs))
+            if stop_pairs:
+                msel.set_stop_sequence_index(result.index(stop_pairs))
 
-        return list(map(lambda start_stop: StartStopSequence(start_stop[0], self.get_name(), start_stop[1]), enumerate(result)))
+        return list(map(lambda item: StartStopSequence(item[0], self.get_name(), item[1]), enumerate(result)))
 
     def get_assignment_json(self) -> Dict[str, Any]:
         """Returns JSON object with raw data.

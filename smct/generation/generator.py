@@ -416,8 +416,7 @@ class GenMacroList(CDefineGeneratorBase):
         Args:
             value: The value to add to the macro list.
         """
-        if value not in self._values:
-            self._values.append(value)
+        self._values.append(value)
 
     def set_values(self, values: List[str]) -> None:
         """Sets the values list directly.

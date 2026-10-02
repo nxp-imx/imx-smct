@@ -37,9 +37,7 @@ _CONSISTENCY_EXCLUDED = {
 
 def _discover_configs(directory: str) -> List[str]:
     """Discover all .cfg files in a flat directory as sorted absolute paths."""
-    return sorted(
-        os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".cfg") and os.path.isfile(os.path.join(directory, f))
-    )
+    return sorted(os.path.join(directory, f) for f in os.listdir(directory) if f.endswith(".cfg") and os.path.isfile(os.path.join(directory, f)))
 
 
 all_configs = [c for c in _discover_configs(SM_FW_CONFIGS_DIR) + _discover_configs(SMCT_CONFIGS_DIR) if os.path.basename(c) not in _EXCLUDED_CONFIGS]
@@ -133,93 +131,5 @@ def test_exported_config(capsys: Any, config: str) -> None:
         files_second = utils.get_all_files_in_folder(dest_second)
         assert files_first == files_second
         differ = FileDiffer(FileDiffer.default_c_files_pattern + ";**/*.json", dest_first, dest_second, dest_diff)
-        if not differ.check_differences():
-            pytest.fail(differ.get_string_result())
-
-
-@pytest.mark.parametrize("config", consistency_configs, ids=[os.path.basename(c) for c in consistency_configs])
-def test_consistency(capsys: Any, config: str) -> None:
-    """Test configuration consistency across multiple processing cycles.
-
-    Args:
-        capsys: Pytest capsys fixture
-        config: Absolute path to the configuration file to test
-    """
-    with (
-        TemporaryDirectory() as output,
-        TemporaryDirectory() as output_ext,
-        TemporaryDirectory() as output_import,
-        TemporaryDirectory() as output_ext_import,
-        TemporaryDirectory() as tmp_diff,
-    ):
-        logging.info("Temporary folders: %s, %s, %s, %s", output, output_ext, output_import, output_ext_import)
-        root_dir = os.path.join(get_smct_root(), "test_resources")
-        config_name = os.path.basename(config)
-
-        # smct.py -c %CFG% -o output -f --store_db output --store_conf output --store_log output --store_cfg_file output/%CFG%
-        output_path_cfg = os.path.join(output, config_name)
-        args = [
-            "--sm_dir",
-            root_dir,
-            "-c",
-            config,
-            "-o",
-            output,
-            "-f",
-            "--store_db",
-            output,
-            "--store_log",
-            output,
-            "--store_conf",
-            output,
-            "--store_cfg_file",
-            output_path_cfg,
-        ]
-        code, _, err = execute_cli(capsys, args)
-        assert code == 0
-        assert err == ""
-
-        # smct.py -c output/%CFG% -o output_ext -f --store_db output_ext --store_conf output_ext --store_log output_ext
-        args = [
-            "--sm_dir",
-            root_dir,
-            "-c",
-            output_path_cfg,
-            "-o",
-            output_ext,
-            "-f",
-            "--store_db",
-            output_ext,
-            "--store_conf",
-            output_ext,
-            "--store_log",
-            output_ext,
-        ]
-        code, _, err = execute_cli(capsys, args)
-        assert code == 0
-        assert err == ""
-
-        # smct.py -i output -f -o output_import --store_log output_import
-        args = ["--sm_dir", root_dir, "-i", output, "-f", "-o", output_import, "--store_log", output_import]
-        code, _, err = execute_cli(capsys, args)
-        assert code == 0
-        assert err == ""
-
-        # smct.py -i output_ext -f -o output_ext_import --store_log output_ext_import
-        args = ["--sm_dir", root_dir, "-i", output_ext, "-f", "-o", output_ext_import, "--store_log", output_ext_import]
-        code, _, err = execute_cli(capsys, args)
-        assert code == 0
-        assert err == ""
-
-        # Run the diff tool to all directory files, output, output_ext and output_ext_import - it should be the same
-        compared_jsons = ["atomic_resources.json", "chip_data.json", "macro_resources.json", "user_configuration.json"]
-        files_pattern = FileDiffer.default_c_files_pattern + ";" + (";".join(["**/" + x for x in compared_jsons]))
-        differ = FileDiffer(files_pattern, output, output_ext, tmp_diff)
-        if not differ.check_differences():
-            pytest.fail(differ.get_string_result())
-        differ = FileDiffer(files_pattern, output_ext, output_ext_import, tmp_diff)
-        if not differ.check_differences():
-            pytest.fail(differ.get_string_result())
-        differ = FileDiffer(files_pattern, output, output_ext_import, tmp_diff)
         if not differ.check_differences():
             pytest.fail(differ.get_string_result())

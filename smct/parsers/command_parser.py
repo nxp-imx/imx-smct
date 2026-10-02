@@ -122,7 +122,7 @@ class CfgCommandParser(CommandParser):
 
     @classmethod
     def parse_command_trdc_config_a(cls, first: re.Match, atoms: List[str], _: CfgFileParser) -> None:
-        """Parses command TRDC_CONFIG_a and stores the information obout the TRDC to the chip model.
+        """Parses command TRDC_CONFIG_a and stores the information about the TRDC to the chip model.
 
         Args:
             first: The regex match object for the command.
@@ -209,7 +209,7 @@ class CfgCommandParser(CommandParser):
         atoms.pop(0)
         name = utils.get_attribute_value_from_list(atoms, "name", remove=True)
         did_str = utils.get_attribute_value_from_list(atoms, "did", remove=True)
-        did = utils.parse_int(did_str) if did_str is not None else -1
+        did = utils.parse_int(did_str) if did_str is not None else int(first.group(1))
         boot_str = utils.get_attribute_value_from_list(atoms, "boot", remove=True)
         boot = utils.parse_int(boot_str) if boot_str is not None else None
         skip_str = utils.get_attribute_value_from_list(atoms, "skip", remove=True)

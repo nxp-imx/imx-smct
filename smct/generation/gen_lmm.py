@@ -36,7 +36,9 @@ def _group_start_stops(conf: ConfigurationData, start_stops_input: List[StartSto
         result[lm_id].append(start_stop)
 
     for lm in result:
-        result[lm] = sorted(result[lm], key=lambda ss: (ss.get_msel().get_all_start_stops(starts).index(ss), ss.get_msel().get_msel()))
+        # StartStop.__eq__ compares by value, so list.index() would collapse duplicate resources;
+        # use identity-based get_flat_index to keep author input order (Perl parity).
+        result[lm] = sorted(result[lm], key=lambda ss: (ss.get_msel().get_flat_index(ss, starts), ss.get_msel().get_msel()))
     return result
 
 

@@ -68,6 +68,23 @@ def _expand_resource_to_atoms(resource: AtomicResource | MacroResource) -> List[
     return []
 
 
+def _build_start_stop_value(entry: Any) -> str:
+    """Returns the order|args string for a single start/stop JSON entry.
+
+    Args:
+        entry: One resource entry from an ss_sequences ``resources`` list.
+            Must contain an ``order`` key.
+
+    Returns:
+        Order/args string accepted by :meth:`MSEL.add_start_stop` (e.g. ``"3"`` or ``"3|1"``).
+    """
+    value = str(entry["order"])
+    if "args" in entry:
+        for arg in entry["args"]:
+            value += "|" + str(arg)
+    return value
+
+
 class ConfigLoader:
     """Loader class that parses JSON to objects stored in configuration data."""
 
@@ -92,16 +109,21 @@ class ConfigLoader:
             logger.error("Start sequence '%s' for MSEL%s is not initialized", start, msel.get_msel(), extra={"source": source, "validation_id": validation_id})
         for start in starts:
             resource_name = start["rsrc"]
+            if "order" not in start:
+                validation_id = ".".join([msel.get_lm().get_id(), f"SS{json_msel['start']}", resource_name])
+                logger.error(
+                    "Start sequence entry '%s' for MSEL%s is missing required 'order' field",
+                    resource_name,
+                    msel.get_msel(),
+                    extra={"source": source, "validation_id": validation_id},
+                )
+                continue
             resources = _find_resources(resource_name)
             if not resources:
                 validation_id = ".".join([msel.get_lm().get_id(), f"SS{json_msel['start']}", resource_name])
                 logger.warning("Macro '%s' was not found.", resource_name, extra={"source": source, "validation_id": validation_id})
                 continue
-            start_value = str(starts.index(start) + 1)
-            if "args" in start:
-                args = start["args"]
-                for arg in args:
-                    start_value += "|" + str(arg)
+            start_value = _build_start_stop_value(start)
             test = start["test"] if "test" in start else False
             for resource in resources:
                 expanded_resource = _expand_resource_to_atoms(resource)
@@ -120,16 +142,21 @@ class ConfigLoader:
             logger.error("Stop sequence '%s' for MSEL%s is not initialized", stop, msel.get_msel(), extra={"source": source, "validation_id": validation_id})
         for stop in stops:
             resource_name = stop["rsrc"]
+            if "order" not in stop:
+                validation_id = ".".join([msel.get_lm().get_id(), f"SS{json_msel['stop']}", resource_name])
+                logger.error(
+                    "Stop sequence entry '%s' for MSEL%s is missing required 'order' field",
+                    resource_name,
+                    msel.get_msel(),
+                    extra={"source": source, "validation_id": validation_id},
+                )
+                continue
             resources = _find_resources(resource_name)
             if not resources:
                 validation_id = ".".join([msel.get_lm().get_id(), f"SS{json_msel['stop']}", resource_name])
                 logger.warning("Macro '%s' was not found.", resource_name, extra={"source": source, "validation_id": validation_id})
                 continue
-            stop_value = str(stops.index(stop) + 1)
-            if "args" in stop:
-                args = stop["args"]
-                for arg in args:
-                    stop_value += "|" + str(arg)
+            stop_value = _build_start_stop_value(stop)
             test = stop["test"] if "test" in stop else False
             for resource in resources:
                 expanded_resource = _expand_resource_to_atoms(resource)

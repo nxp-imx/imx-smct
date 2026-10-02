@@ -17,7 +17,7 @@ from smct.owners.owner_agent import Channel, Mailbox, ScmiChannel, SmtChannel
 from smct.owners.owner_base import AssignedResource
 from smct.owners.owner_lm import LM
 from smct.resources.res_api import ApiResource
-from smct.utils import make_enum_int_dictionary, make_enum_str_dictionary
+from smct.utils import make_enum_int_dictionary, make_enum_str_dictionary, validate_json
 
 logger = logging.getLogger()
 
@@ -46,6 +46,7 @@ class ResourceParser:
             return
         with open(soc_json_path, "r", encoding="utf-8") as file:
             soc_json = json.load(file)
+            validate_json(soc_json, soc_json_path, "soc_schema.json", "warning")
             if device not in soc_json:
                 device = "simu"
             self._soc_model = soc_json[device]["soc_model"]
@@ -64,6 +65,7 @@ class ResourceParser:
             return
         with open(soc_models_path, "r", encoding="utf-8") as file:
             model_json = json.load(file)
+            validate_json(model_json, soc_models_path, "mpu_schema.json", "warning")
 
             # SM DID
             LM.sm_did = model_json["sm_did"]
@@ -163,6 +165,7 @@ class ResourceParser:
             return
         with open(sm_models_path, "r", encoding="utf-8") as file:
             model_json = json.load(file)
+            validate_json(model_json, sm_models_path, "sm_model_schema.json", "warning")
 
             # protocols types and tests
             tests_protocols = []

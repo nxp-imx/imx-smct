@@ -13,7 +13,6 @@ import re
 from tempfile import TemporaryDirectory
 from typing import Any
 
-
 from tests.test_utils import execute_cli, get_smct_root
 
 

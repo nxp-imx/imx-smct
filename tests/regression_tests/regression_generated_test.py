@@ -33,6 +33,7 @@ from smct.resources.res_mdac import MdacResource
 from smct.resources.res_mrc import MrcResource
 from smct.resources.resource_base import MacroResource
 from smct.resources.resource_database_provider import ResourceDatabaseProvider
+from tests.regression_tests.regression_device_test_base import PERL_TIMEOUT_SECONDS
 from tests.test_utils import execute_binary, execute_cli, get_smct_root
 from tests.utils.cfg_file_generator import (
     AccessRight,
@@ -50,8 +51,8 @@ from tests.utils.file_diff import FileDiffer
 from tests.utils.perl_output_classifier import PerlFileStatus, PerlOutputClassifier
 from tests.utils.smct_output_validator import SmctOutputValidator
 
-TEST_BOARDS: Dict[str, List[str]] = {"MIMX95": ["mcimx95evk"], "MIMX952": ["mcimx952evk"], "MIMX94": ["mcimx94evk"]}
-_TEST_BOARD_IDS: List[str] = ["generated_mx95", "generated_mx952", "generated_mx94"]
+TEST_BOARDS: Dict[str, List[str]] = {"MIMX95": ["mcimx95evk"], "MIMX952": ["mcimx952evk"], "MIMX94": ["mcimx94evk"], "MIMX937": ["mcimx937evk"]}
+_TEST_BOARD_IDS: List[str] = ["generated_mx95", "generated_mx952", "generated_mx94", "generated_mx937"]
 _MU_CONFIGS: List[Tuple[int, int]] = [(9, 8), (1, 0), (3, 2), (5, 4), (7, 6)]
 
 
@@ -116,6 +117,8 @@ def _get_sm_lm_config(access_templates: List[AccessRight], assigned_resources: L
 
 
 @pytest.mark.regression
+@pytest.mark.generated
+@pytest.mark.xdist_group("generated")
 def test_1(capsys: Any) -> None:
     """Test basic configuration generation and validation.
 
@@ -588,6 +591,8 @@ _FUZZ_SEEDS = [42, 123, 456, 789, 1024]
 
 
 @pytest.mark.regression
+@pytest.mark.generated
+@pytest.mark.xdist_group("generated")
 @pytest.mark.parametrize("config_dict", _TYPICAL_CONFIGS, ids=_TYPICAL_CONFIG_IDS)
 def test_typical_configs(capsys: Any, config_dict: Dict[str, Any]) -> None:
     """Test typical configuration patterns that SMCT must handle.
@@ -773,7 +778,7 @@ def test_generated(capsys: Any, device_board_pair: Tuple[str, str], seed: int) -
             generator = CfgFileGenerator(test_dictionary)
             generator.generate()
             result = generator.get_result()
-        except Exception as ex:  # pylint: disable=broad-exception-caught
+        except KeyError as ex:
             pytest.fail(f"Failed to generate content due to exception: {str(ex)}")
         _save_generated_configuration(board, device, result)
         _test_cfg(capsys, temp, sm_fw_root, result)
@@ -930,7 +935,7 @@ def _test_cfg(capsys: Any, test_directory: str, sm_fw_root: str, configuration_c
     if not os.path.isfile(config_tool):
         pytest.skip(f"Perl configtool not found at {config_tool}, skipping comparison")
 
-    perl_code, _, perl_stderr = execute_binary("perl", [config_tool, "-i", file_path, "-o", output_path_golden])
+    perl_code, _, perl_stderr = execute_binary("perl", [config_tool, "-i", file_path, "-o", output_path_golden], timeout=PERL_TIMEOUT_SECONDS)
 
     if perl_code != 0:
         logging.warning(

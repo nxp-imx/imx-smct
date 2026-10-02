@@ -4,7 +4,9 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=protected-access, missing-module-docstring
 
+from typing import Iterator
 from unittest.mock import Mock, patch
 
 import pytest
@@ -12,9 +14,17 @@ import pytest
 from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.owners.owner_agent import Channel, ScmiAgent
 from smct.owners.owner_base import AssignedResource
-from smct.owners.owner_lm import LM
+from smct.owners.owner_lm import LM, StartStop
 from smct.resources.res_api import ApiResource
-from smct.resources.resource_base import MacroResource
+from smct.resources.resource_base import AtomicResource, MacroResource
+from tests import test_utils
+
+
+@pytest.fixture(autouse=True)
+def setup_owner_class_attrs() -> Iterator[None]:
+    """Restore LM/Channel class-level type-mapping attributes after each test."""
+    with test_utils.restore_owner_class_attrs():
+        yield
 
 
 def test_lm_init_valid_parameters() -> None:
@@ -284,3 +294,115 @@ def test_lm_get_define_methods() -> None:
     assert lm.get_safe_define() == "NSEENV_DEFINE"
     assert lm.get_rpc_define() == "SCMI_DEFINE"
     assert lm.get_auto_define() == "AUTO_DEFINE"
+
+
+def test_msel_add_start_stop_duplicate_start_keeps_both_entries() -> None:
+    """Duplicate start order number keeps both entries (Perl-parity); no logger.error called."""
+    LM.safety_types = {"nseenv": "NSEENV"}
+    LM.auto_boot_types = {"none": "NONE"}
+    Channel.rpc_types = {"none": "NONE"}
+
+    lm = LM("lm1", 1, "TestLM", "none", None, "nseenv", None, None, False)
+    msel = lm.get_msel(0)
+    res_a = Mock(spec=AtomicResource)
+    res_b = Mock(spec=AtomicResource)
+
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
+        msel.add_start_stop(True, False, res_a, "2")
+        msel.add_start_stop(True, False, res_b, "2")
+        mock_logger.error.assert_not_called()
+
+    starts = msel.get_all_start_stops(True)
+    assert len(starts) == 2
+    assert starts[0].get_resources() is res_a
+    assert starts[1].get_resources() is res_b
+
+
+def test_msel_add_start_stop_duplicate_stop_keeps_both_entries() -> None:
+    """Duplicate stop order number keeps both entries (Perl-parity); no logger.error called."""
+    LM.safety_types = {"nseenv": "NSEENV"}
+    LM.auto_boot_types = {"none": "NONE"}
+    Channel.rpc_types = {"none": "NONE"}
+
+    lm = LM("lm1", 1, "TestLM", "none", None, "nseenv", None, None, False)
+    msel = lm.get_msel(0)
+    res_a = Mock(spec=AtomicResource)
+    res_b = Mock(spec=AtomicResource)
+
+    with patch("smct.owners.owner_lm.logger") as mock_logger:
+        msel.add_start_stop(False, False, res_a, "3")
+        msel.add_start_stop(False, False, res_b, "3")
+        mock_logger.error.assert_not_called()
+
+    stops = msel.get_all_start_stops(False)
+    assert len(stops) == 2
+    assert stops[0].get_resources() is res_a
+    assert stops[1].get_resources() is res_b
+
+
+def test_msel_get_start_stop_buckets_shape() -> None:
+    """Buckets for orders 1,2,2,5 have the right structure: gap at 3,4 and duplicate at 2."""
+    LM.safety_types = {"nseenv": "NSEENV"}
+    LM.auto_boot_types = {"none": "NONE"}
+    Channel.rpc_types = {"none": "NONE"}
+
+    lm = LM("lm1", 1, "TestLM", "none", None, "nseenv", None, None, False)
+    msel = lm.get_msel(0)
+    res_1 = Mock(spec=AtomicResource)
+    res_2a = Mock(spec=AtomicResource)
+    res_2b = Mock(spec=AtomicResource)
+    res_5 = Mock(spec=AtomicResource)
+
+    msel.add_start_stop(True, False, res_1, "1")
+    msel.add_start_stop(True, False, res_2a, "2")
+    msel.add_start_stop(True, False, res_2b, "2")
+    msel.add_start_stop(True, False, res_5, "5")
+
+    buckets = msel.get_start_stop_buckets(True)
+    assert len(buckets) == 5
+    assert len(buckets[0]) == 1 and buckets[0][0].get_resources() is res_1
+    assert len(buckets[1]) == 2
+    assert buckets[1][0].get_resources() is res_2a
+    assert buckets[1][1].get_resources() is res_2b
+    assert len(buckets[2]) == 0  # gap at order 3
+    assert len(buckets[3]) == 0  # gap at order 4
+    assert len(buckets[4]) == 1 and buckets[4][0].get_resources() is res_5
+
+
+def test_msel_add_start_stop_out_of_range_still_raises() -> None:
+    """Orders 0 and 101 continue to raise CfgToolException."""
+    LM.safety_types = {"nseenv": "NSEENV"}
+    LM.auto_boot_types = {"none": "NONE"}
+    Channel.rpc_types = {"none": "NONE"}
+
+    lm = LM("lm1", 1, "TestLM", "none", None, "nseenv", None, None, False)
+    msel = lm.get_msel(0)
+    res = Mock(spec=AtomicResource)
+
+    with pytest.raises(CfgToolException):
+        msel.add_start_stop(True, False, res, "0")
+    with pytest.raises(CfgToolException):
+        msel.add_start_stop(True, False, res, "101")
+
+
+def test_msel_get_flat_index_raises_when_ss_not_present() -> None:
+    """get_flat_index raises ValueError when the requested StartStop instance is not stored."""
+    LM.safety_types = {"nseenv": "NSEENV"}
+    LM.auto_boot_types = {"none": "NONE"}
+    Channel.rpc_types = {"none": "NONE"}
+
+    lm = LM("lm1", 1, "TestLM", "none", None, "nseenv", None, None, False)
+    msel = lm.get_msel(0)
+    res = Mock(spec=AtomicResource)
+    msel.add_start_stop(True, False, res, "1")
+
+    stored = msel.get_start_stop_buckets(True)[0][0]
+    assert msel.get_flat_index(stored, True) == 0
+
+    with pytest.raises(ValueError):
+        msel.get_flat_index(stored, False)  # not in stop buckets
+
+    other_res = Mock(spec=AtomicResource)
+    foreign_ss = StartStop(msel, other_res, False, [])
+    with pytest.raises(ValueError):
+        msel.get_flat_index(foreign_ss, True)

@@ -208,25 +208,29 @@
          "required": [
           "cpu",
           "offset"
-         ]
+         ],
+         "additionalProperties": false
         }
        }
       },
       "required": [
        "IPG_DEBUG"
-      ]
+      ],
+      "additionalProperties": false
      }
     },
     "required": [
      "bctrl",
      "name",
      "regs"
-    ]
+    ],
+    "additionalProperties": false
    }
   },
   "Mixes": {
    "type": "array",
    "description": "List of mix configurations (required)",
+   "uniqueItems": true,
    "items": {
     "type": "string",
     "description": "Mix identifier"

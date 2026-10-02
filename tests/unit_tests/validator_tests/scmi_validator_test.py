@@ -10,34 +10,29 @@
 import logging
 from unittest.mock import Mock
 
-from smct.configuration.confdata import ConfigurationData
+import pytest
+
 from smct.owners.owner_lm import LM
 from smct.validation.validators.scmi_validator import ScmiValidator
-
-
-def setup_test_data() -> tuple[ScmiValidator, ConfigurationData]:
-    """Set up test fixtures"""
-    validator = ScmiValidator()
-    config = ConfigurationData()
-    return validator, config
+from tests import test_utils
 
 
 def test_validate_empty_configuration() -> None:
     """Test validation with no SCMI agents"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     # Act
     result = validator.validate(config)
 
     # Assert
-    assert len(result) == 0
+    assert not result
 
 
-def test_validate_agent_ids_not_starting_from_zero_error() -> None:
+def test_validate_agent_ids_not_starting_from_zero_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when SCMI agent IDs don't start from 0"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     agent1 = Mock()
     agent1.get_id.return_value = "SCMI_AGENT1"  # Starting from 1 instead of 0
@@ -53,9 +48,9 @@ def test_validate_agent_ids_not_starting_from_zero_error() -> None:
     agent2.get_all_scmi_channels.return_value = []
     agent2.get_assigned_resources.return_value = ["resource2"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1, agent2])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1, agent2]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -67,10 +62,10 @@ def test_validate_agent_ids_not_starting_from_zero_error() -> None:
     assert "Agent IDs must start from 0, but there is no AGENT0 in the configuration. Lowest ID is 1" in error_messages
 
 
-def test_validate_agent_ids_higher_than_total_amount_error() -> None:
+def test_validate_agent_ids_higher_than_total_amount_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent ID is higher than total amount"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     agent1 = Mock()
     agent1.get_id.return_value = "SCMI_AGENT0"
@@ -86,9 +81,9 @@ def test_validate_agent_ids_higher_than_total_amount_error() -> None:
     agent2.get_all_scmi_channels.return_value = []
     agent2.get_assigned_resources.return_value = ["resource2"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1, agent2])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1, agent2]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -100,10 +95,10 @@ def test_validate_agent_ids_higher_than_total_amount_error() -> None:
     assert "Agent 5 has higher ID than there is amount of agents in total (2)" in error_messages
 
 
-def test_validate_agent_ids_with_gaps_error() -> None:
+def test_validate_agent_ids_with_gaps_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent IDs have gaps"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     agent1 = Mock()
     agent1.get_id.return_value = "SCMI_AGENT0"
@@ -119,9 +114,9 @@ def test_validate_agent_ids_with_gaps_error() -> None:
     agent2.get_all_scmi_channels.return_value = []
     agent2.get_assigned_resources.return_value = ["resource2"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1, agent2])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1, agent2]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -133,10 +128,10 @@ def test_validate_agent_ids_with_gaps_error() -> None:
     assert "Agent IDs contain a gap: [0, 2]" in error_messages
 
 
-def test_validate_agent_ids_not_consecutive_error() -> None:
+def test_validate_agent_ids_not_consecutive_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent IDs are not consecutive"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     agent1 = Mock()
     agent1.get_id.return_value = "SCMI_AGENT2"
@@ -152,9 +147,9 @@ def test_validate_agent_ids_not_consecutive_error() -> None:
     agent2.get_all_scmi_channels.return_value = []
     agent2.get_assigned_resources.return_value = ["resource2"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1, agent2])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1, agent2]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -171,10 +166,10 @@ def test_validate_agent_ids_not_consecutive_error() -> None:
 # ============================================================================
 
 
-def test_validate_channels_no_a2p_channel_error() -> None:
+def test_validate_channels_no_a2p_channel_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent has no A2P channel"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     channel1 = Mock()
     channel1.get_channel_type.return_value = "p2a_notify"
@@ -190,9 +185,9 @@ def test_validate_channels_no_a2p_channel_error() -> None:
     agent1.get_all_scmi_channels.return_value = [channel1]
     agent1.get_assigned_resources.return_value = ["resource1"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -204,10 +199,10 @@ def test_validate_channels_no_a2p_channel_error() -> None:
     assert "There must be at least one A2P channel in agent 'agent1'" in error_messages
 
 
-def test_validate_channels_wrong_p2a_notify_count_error() -> None:
+def test_validate_channels_wrong_p2a_notify_count_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent doesn't have exactly one P2A_NOTIFY channel"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     channel1 = Mock()
     channel1.get_channel_type.return_value = "a2p"
@@ -229,9 +224,9 @@ def test_validate_channels_wrong_p2a_notify_count_error() -> None:
     agent1.get_all_scmi_channels.return_value = [channel1, channel2, channel3]
     agent1.get_assigned_resources.return_value = ["resource1"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -243,10 +238,10 @@ def test_validate_channels_wrong_p2a_notify_count_error() -> None:
     assert "There must be exactly one P2A_NOTIFY channel in agent 'agent1'" in error_messages
 
 
-def test_validate_channels_multiple_p2a_priority_error() -> None:
+def test_validate_channels_multiple_p2a_priority_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when agent has more than one P2A_PRIORITY channel"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     channel1 = Mock()
     channel1.get_channel_type.return_value = "a2p"
@@ -271,9 +266,9 @@ def test_validate_channels_multiple_p2a_priority_error() -> None:
     agent1.get_all_scmi_channels.return_value = [channel1, channel2, channel3, channel4]
     agent1.get_assigned_resources.return_value = ["resource1"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[]))
 
     # Act
     result = validator.validate(config)
@@ -285,10 +280,10 @@ def test_validate_channels_multiple_p2a_priority_error() -> None:
     assert "There must be maximally one P2A_PRIORITY channel in agent 'agent1'" in error_messages
 
 
-def test_validate_channels_no_default_test_channel_error() -> None:
+def test_validate_channels_no_default_test_channel_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation error when there's no default test channel"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     channel1 = Mock()
     channel1.get_channel_type.return_value = "a2p"
@@ -303,9 +298,9 @@ def test_validate_channels_no_default_test_channel_error() -> None:
     agent1.get_all_scmi_channels.return_value = [channel1, channel2]
     agent1.get_assigned_resources.return_value = ["resource1"]
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1])
-    config.get_default_test_channel = Mock(return_value=-1)
-    config.get_all_channels = Mock(return_value=[channel1])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=-1))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[channel1]))
 
     # Act
     result = validator.validate(config)
@@ -317,10 +312,10 @@ def test_validate_channels_no_default_test_channel_error() -> None:
     assert "There must be at least one channel with parameter test=default" in error_messages
 
 
-def test_validate_scmi_agents_no_resources_warning() -> None:
+def test_validate_scmi_agents_no_resources_warning(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test validation warning when agent has no assigned resources"""
     # Arrange
-    validator, config = setup_test_data()
+    validator, config = test_utils.make_validator_and_config(ScmiValidator)
 
     channel1 = Mock()
     channel1.get_channel_type.return_value = "a2p"
@@ -335,9 +330,9 @@ def test_validate_scmi_agents_no_resources_warning() -> None:
     agent1.get_all_scmi_channels.return_value = [channel1, channel2]
     agent1.get_assigned_resources.return_value = []
 
-    config.get_all_scmi_agents = Mock(return_value=[agent1])
-    config.get_default_test_channel = Mock(return_value=0)
-    config.get_all_channels = Mock(return_value=[channel1])
+    monkeypatch.setattr(config, "get_all_scmi_agents", Mock(return_value=[agent1]))
+    monkeypatch.setattr(config, "get_default_test_channel", Mock(return_value=0))
+    monkeypatch.setattr(config, "get_all_channels", Mock(return_value=[channel1]))
 
     # Act
     result = validator.validate(config)

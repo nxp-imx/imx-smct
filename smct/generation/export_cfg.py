@@ -290,11 +290,11 @@ class CfgExporter(GeneratorBase):
             msel_macro.append_json_values(msel.get_assignment_json(), keys_normal=["msel", "boot", "skip"])
             self._print(msel_macro.get())
 
-        if msel.get_start():
+        if msel.get_all_start_stops(True):
             self._print("")
             self._print("# Start sequence")
-            for index, ss in enumerate(msel.get_start(), 1):
-                if ss:
+            for index, bucket in enumerate(msel.get_start_stop_buckets(True), 1):
+                for ss in bucket:
                     start_macro = GenCfgMacro(ss.get_resources().get_name())
                     start_macro.append(f"msel={ss.get_msel().get_msel()}")
                     args = ""
@@ -305,11 +305,11 @@ class CfgExporter(GeneratorBase):
                         start_macro.append("test")
                     self._print(start_macro.get())
 
-        if msel.get_stop():
+        if msel.get_all_start_stops(False):
             self._print("")
             self._print("# Stop sequence")
-            for index, ss in enumerate(msel.get_stop(), 1):
-                if ss:
+            for index, bucket in enumerate(msel.get_start_stop_buckets(False), 1):
+                for ss in bucket:
                     stop_macro = GenCfgMacro(ss.get_resources().get_name())
                     stop_macro.append(f"msel={ss.get_msel().get_msel()}")
                     stop_macro.append(f"stop={index}")

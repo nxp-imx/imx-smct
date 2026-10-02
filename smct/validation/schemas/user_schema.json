@@ -124,8 +124,7 @@
          },
          "value": {
           "type": ["string", "integer"],
-          "description": "Define value (required)",
-          "minLength": 1
+          "description": "Define value (required)"
          },
          "comment": {
           "type": ["string", "null"],
@@ -149,8 +148,7 @@
          },
          "period": {
           "type": ["string", "integer"],
-          "description": "Task period (required)",
-          "minLength": 1
+          "description": "Task period (required)"
          },
          "type": {
           "type": "string",
@@ -247,8 +245,7 @@
      },
      "auto": {
       "type": ["string", "null"],
-      "description": "Auto-start configuration (required)",
-      "minimum": 0
+      "description": "Auto-start configuration (required)"
      },
      "default": {
       "type": "boolean",
@@ -353,9 +350,14 @@
            "test": {
             "type": "boolean",
             "description": "Test flag (optional)"
+           },
+           "order": {
+            "type": "integer",
+            "description": "1-based sequence position (required)",
+            "minimum": 1
            }
           },
-          "required": ["rsrc"],
+          "required": ["rsrc", "order"],
           "additionalProperties": false
          }
         }
@@ -495,11 +497,11 @@
            },
            "sequence": {
             "type": ["integer", "null"],
-            "description": "Sequence configuration (required)"
+            "description": "Sequence configuration (optional)"
            },
            "test": {
             "type": ["string", "null"],
-            "description": "Test configuration (required)"
+            "description": "Test configuration (optional)"
            },
            "notify": {
             "type": ["string", "integer"],
@@ -507,7 +509,7 @@
            },
            "xport": {
             "type": "object",
-            "description": "Transport configuration (required)",
+            "description": "Transport configuration (required for type=scmi)",
             "properties": {
              "type": {
               "type": "string",
@@ -528,8 +530,14 @@
             "additionalProperties": false
            }
           },
-          "required": ["chtype", "notify", "sequence", "test", "type", "xport"],
-          "additionalProperties": false
+          "required": ["chtype", "notify", "type"],
+          "additionalProperties": false,
+          "if": {
+           "properties": {"type": {"const": "scmi"}}
+          },
+          "then": {
+           "required": ["xport"]
+          }
          }
         },
         "mailbox": {
@@ -538,29 +546,41 @@
          "properties": {
           "type": {
            "type": "string",
-           "description": "Mailbox type (required)",
-           "minLength": 1
+           "enum": ["mu", "loopback"],
+           "description": "Mailbox type (required)"
           },
           "test": {
-           "type": "integer",
-           "description": "Test configuration (required)"
+           "type": ["integer", "null"],
+           "description": "Test configuration (optional)"
           },
           "priority": {
            "type": ["string", "null"],
-           "description": "Priority level (required)"
+           "description": "Priority level (optional)"
           },
           "mu": {
            "type": ["integer", "null"],
-           "description": "MU instance (required)",
+           "description": "MU instance (required for type=mu)",
            "minimum": 0
           },
           "sma": {
            "type": ["integer", "null", "string"],
-           "description": "SMA configuration (required)"
+           "description": "SMA configuration (optional)"
           }
          },
-         "required": ["mu", "priority", "sma", "test", "type"],
-         "additionalProperties": false
+         "required": ["type"],
+         "additionalProperties": false,
+         "if": {
+          "properties": {"type": {"const": "mu"}}
+         },
+         "then": {
+          "required": ["mu"],
+          "properties": {
+           "mu": {
+            "type": "integer",
+            "minimum": 0
+           }
+          }
+         }
         }
        },
        "required": ["channels", "defines", "mailbox", "name", "secure", "type"],
@@ -704,7 +724,7 @@
    "type": "array",
    "items": {
     "type": "object",
-    "additionalItems": true
+    "additionalProperties": true
    }
   }
  },

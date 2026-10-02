@@ -4,6 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring, missing-function-docstring
 
 from typing import List
 
@@ -243,4 +244,3 @@ def test_add_region_debug_domain_no_dedup() -> None:
     assert len(regions[9]) == 2
     assert region1 in regions[9]
     assert region2 in regions[9]
-

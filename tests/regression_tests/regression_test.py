@@ -17,32 +17,35 @@ from typing import Any
 import pytest
 
 from tests.regression_tests.regression_device_test_base import (
+    run_device_regression_test,
     SM_FW_CONFIGS_DIR,
     SMCT_CONFIGS_DIR,
-    run_device_regression_test,
 )
 
 FILES = [
     # MX94 — default runs
     pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx94evk.cfg"), id="mx94evk.cfg"),
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx94alt.cfg"), id="mx94alt.cfg"),
     # MX94 — extended (redundant / longest wall-clock)
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx94alt.cfg"), id="mx94alt.cfg", marks=pytest.mark.extended),
     pytest.param(os.path.join(SMCT_CONFIGS_DIR, "mx94netc.cfg"), id="mx94netc.cfg", marks=pytest.mark.extended),
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx94emul.cfg"), id="mx94emul.cfg", marks=pytest.mark.extended),
+    # MX937 — default runs
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx937frdm.cfg"), id="mx937frdm.cfg"),
+    # MX937 — extended
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx937alt.cfg"), id="mx937alt.cfg", marks=pytest.mark.extended),
     # MX95 — default runs
     pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx95evk.cfg"), id="mx95evk.cfg"),
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx95alt.cfg"), id="mx95alt.cfg"),
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx952evk.cfg"), id="mx952evk.cfg"),
     pytest.param(os.path.join(SMCT_CONFIGS_DIR, "mx95netc.cfg"), id="mx95netc.cfg"),
     # MX95 — extended (identical signature to EVK counterparts; mx952alt is redundant with mx95alt)
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx95emul.cfg"), id="mx95emul.cfg", marks=pytest.mark.extended),
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx95alt.cfg"), id="mx95alt.cfg", marks=pytest.mark.extended),
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx95frdm.cfg"), id="mx95frdm.cfg", marks=pytest.mark.extended),
+    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx952evk.cfg"), id="mx952evk.cfg", marks=pytest.mark.extended),
     pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx952alt.cfg"), id="mx952alt.cfg", marks=pytest.mark.extended),
-    pytest.param(os.path.join(SM_FW_CONFIGS_DIR, "mx952emul.cfg"), id="mx952emul.cfg", marks=pytest.mark.extended),
     # Shared / cross-device — default runs
     pytest.param(os.path.join(SMCT_CONFIGS_DIR, "24_12_LM0_no_config.cfg"), id="24_12_LM0_no_config.cfg"),
     pytest.param(os.path.join(SMCT_CONFIGS_DIR, "mx95evk_fusa.cfg"), id="mx95evk_fusa.cfg"),
-    pytest.param(os.path.join(SMCT_CONFIGS_DIR, "mx95_trdc_dedup.cfg"), id="mx95_trdc_dedup.cfg"),
-    pytest.param(os.path.join(SMCT_CONFIGS_DIR, "trdc_dup_difftest.cfg"), id="trdc_dup_difftest.cfg"),
+    # Shared / cross-device — extended (TRDC dedup; Perl diff excluded; correctness covered by unit tests)
+    pytest.param(os.path.join(SMCT_CONFIGS_DIR, "mx95_trdc_dedup.cfg"), id="mx95_trdc_dedup.cfg", marks=pytest.mark.extended),
+    pytest.param(os.path.join(SMCT_CONFIGS_DIR, "trdc_dup_difftest.cfg"), id="trdc_dup_difftest.cfg", marks=pytest.mark.extended),
 ]
 
 # Expected differences between Perl configtool and SMCT output.

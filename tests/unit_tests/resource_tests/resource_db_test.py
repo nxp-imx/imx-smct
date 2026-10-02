@@ -7,8 +7,11 @@
 """Unit tests for ResourceDb class"""
 
 import json
+import logging
 from typing import Any, cast
 from unittest.mock import Mock, mock_open, patch
+
+import pytest
 
 from smct.exceptions.cfg_tool_exception import CfgToolException
 from smct.resources.resdb import ResourceDb, ResourceDbException
@@ -20,7 +23,7 @@ def test_init_creates_empty_database() -> None:
     db = ResourceDb()
 
     assert db.is_empty() is True
-    assert db.macro_resources_list() == []
+    assert not db.macro_resources_list()
 
 
 def test_is_empty_with_atomic_resources_only() -> None:
@@ -282,6 +285,33 @@ def test_load_from_json_invalid_json(mock_json_load: Mock, mock_file: Mock) -> N
     db = ResourceDb()
 
     assert db.load_from_json("test_folder") is False
+
+
+def test_add_atomic_resource_warns_on_duplicate_name(caplog: pytest.LogCaptureFixture) -> None:
+    """Adding a second atomic resource with the same name logs a warning."""
+    db = ResourceDb()
+
+    mock_first = Mock(spec=AtomicResource)
+    mock_first.get_name.return_value = "DUPLICATE_RES"
+    mock_first.__getitem__ = Mock(return_value="DUPLICATE_RES")
+    mock_first.get_raw_json.return_value = {"name": "DUPLICATE_RES", "type": "API"}
+
+    mock_second = Mock(spec=AtomicResource)
+    mock_second.get_name.return_value = "DUPLICATE_RES"
+    mock_second.__getitem__ = Mock(return_value="DUPLICATE_RES")
+    mock_second.get_raw_json.return_value = {"name": "DUPLICATE_RES", "type": "API"}
+
+    with caplog.at_level(logging.WARNING):
+        db.add_atomic_resource(mock_first)
+        # Force-build the "name" index so the duplicate guard is active
+        db.find_atomic_resource_by("name", "DUPLICATE_RES")
+        db.add_atomic_resource(mock_second)
+
+    # Warning should mention the duplicate name on the second add
+    assert any("DUPLICATE_RES" in record.message for record in caplog.records if record.levelno == logging.WARNING)
+
+    # Both resources are still stored (append behavior unchanged)
+    assert len(list(db.atomic_resources())) == 2
 
 
 def test_exception_with_message() -> None:

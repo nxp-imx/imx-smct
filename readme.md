@@ -70,6 +70,14 @@ Alternatively, install dependencies:
 pip install -r requirements.txt
 ```
 
+### Running the tests
+Run the unit tests from the terminal (uses `pytest.ini`, runs in parallel via `pytest-xdist`):
+```bash
+pytest
+```
+
+> **VS Code Test Explorer note:** `.vscode/settings.json` is not version-controlled, so a fresh clone has no test configuration by default. If you enable the Python Test Explorer, it will pick up `-n auto` from `pytest.ini`; on Windows this breaks the extension's result IPC with a `named pipe ... No such file or directory` error. Disable xdist for Test Explorer runs only by adding `"-p", "no:xdist"` to `python.testing.pytestArgs` in your local `.vscode/settings.json`. Terminal, `codecheck`, and CI runs are unaffected and keep parallel execution.
+
 ## Quick start guide
 This section provides brief instructions for getting started with SMCT.
 

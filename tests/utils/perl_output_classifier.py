@@ -75,7 +75,7 @@ class PerlOutputClassifier:
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
-        except Exception:
+        except OSError:
             return PerlFileStatus.MISSING
 
         # Check for empty or whitespace-only files

@@ -5,11 +5,13 @@
   "properties": {
     "sm_did": {
       "type": "integer",
-      "description": "Security Monitor Domain ID (required)"
+      "description": "Security Monitor Domain ID (required)",
+      "minimum": 0
     },
     "MU_count": {
       "type": "integer", 
-      "description": "Number of Message Units (required)"
+      "description": "Number of Message Units (required)",
+      "minimum": 0
     },
     "security_peripherals": {
       "type": "array",
@@ -52,22 +54,27 @@
                           },
                           "offset": {
                             "type": "integer",
-                            "description": "Bit offset"
+                            "description": "Bit offset",
+                            "minimum": 0
                           },
                           "width": {
                             "type": "integer",
-                            "description": "Bitfield width"
+                            "description": "Bitfield width",
+                            "minimum": 1
                           }
                         },
-                        "required": ["name", "offset", "width"]
+                        "required": ["name", "offset", "width"],
+                        "additionalProperties": false
                       }
                     }
                   },
-                  "required": ["name", "bitfields"]
+                  "required": ["name", "bitfields"],
+                  "additionalProperties": false
                 }
               }
             },
-            "required": ["registers"]
+            "required": ["registers"],
+            "additionalProperties": false
           },
           "MBC": {
             "type": "object",
@@ -85,7 +92,8 @@
                     },
                     "width": {
                       "type": "integer",
-                      "description": "Register width in bits"
+                      "description": "Register width in bits",
+                      "minimum": 1
                     },
                     "bitfields": {
                       "type": "array",
@@ -99,22 +107,27 @@
                           },
                           "offset": {
                             "type": "integer",
-                            "description": "Bit offset"
+                            "description": "Bit offset",
+                            "minimum": 0
                           },
                           "width": {
                             "type": "integer",
-                            "description": "Bitfield width"
+                            "description": "Bitfield width",
+                            "minimum": 1
                           }
                         },
-                        "required": ["name", "offset", "width"]
+                        "required": ["name", "offset", "width"],
+                        "additionalProperties": false
                       }
                     }
                   },
-                  "required": ["name"]
+                  "required": ["name"],
+                  "additionalProperties": false
                 }
               }
             },
-            "required": ["registers"]
+            "required": ["registers"],
+            "additionalProperties": false
           },
           "MRC": {
             "type": "object",
@@ -142,22 +155,50 @@
                           },
                           "offset": {
                             "type": "integer",
-                            "description": "Bit offset"
+                            "description": "Bit offset",
+                            "minimum": 0
                           },
                           "width": {
                             "type": "integer",
-                            "description": "Bitfield width"
+                            "description": "Bitfield width",
+                            "minimum": 1
                           }
                         },
-                        "required": ["name", "offset", "width"]
+                        "required": ["name", "offset", "width"],
+                        "additionalProperties": false
                       }
                     }
                   },
-                  "required": ["name", "bitfields"]
+                  "required": ["name", "bitfields"],
+                  "additionalProperties": false
+                }
+              },
+              "configurations": {
+                "type": "array",
+                "description": "MRC memory region configurations (optional)",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "memory": {
+                      "type": "string",
+                      "description": "Memory region identifier (required)"
+                    },
+                    "origin": {
+                      "type": "string",
+                      "description": "Base address of the memory region (required)"
+                    },
+                    "size": {
+                      "type": "string",
+                      "description": "Size of the memory region (required)"
+                    }
+                  },
+                  "required": ["memory", "origin", "size"],
+                  "additionalProperties": false
                 }
               }
             },
-            "required": ["registers"]
+            "required": ["registers"],
+            "additionalProperties": false
           },
           "setting_types": {
             "type": "array",
@@ -209,7 +250,8 @@
                         "description": "Item value"
                       }
                     },
-                    "required": ["id", "label", "description", "value"]
+                    "required": ["id", "label", "description", "value"],
+                    "additionalProperties": false
                   }
                 }
               },
@@ -221,14 +263,16 @@
               },
               "then": {
                 "required": ["items"]
-              }
+              },
+              "additionalProperties": false
             }
           }
         },
         "required": [
           "peripheral",
           "debug_domain_permission"
-        ]
+        ],
+        "additionalProperties": false
       }
     }
   },

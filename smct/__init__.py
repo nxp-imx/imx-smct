@@ -9,7 +9,7 @@
 This module provides the main entry point and package metadata for SMCT.
 """
 
-from smct._version import __version__
+from ._version import __version__
 
 __title__: str = "smct"
 __author__: str = "NXP Semiconductors"

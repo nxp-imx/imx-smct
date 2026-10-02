@@ -1,6 +1,7 @@
 # Byte-compiled / cache
 __pycache__/
 *.py[cod]
+.cache
 
 # Test results / coverage / reports
 /test_results/
@@ -18,7 +19,9 @@ ENV/
 
 # Editor / packaging
 .vscode/
+.idea/
 smct.egg-info/
 
 # Agent session memory
 .github/memories/
+.verorules/memories/

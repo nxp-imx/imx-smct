@@ -4,6 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring, missing-function-docstring
 
 from typing import Any
 

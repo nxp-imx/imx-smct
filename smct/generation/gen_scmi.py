@@ -54,7 +54,7 @@ class GeneratorSCMI(GeneratorBase):
         s["domId"] = agent.get_did()
         s["secure"] = agent.get_secure()
 
-        if agent.get_safe_type() == "seenv":
+        if lm is not None and lm.get_safe() == "seenv":
             s["seenvId"] = conf.get_agent_seenv_id(agent)
 
         s.print_head()

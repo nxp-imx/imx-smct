@@ -71,7 +71,7 @@ class GeneratorFusa(GeneratorBase):
         # for now it is that easy (e.g. thread->THREAD, handler->HANDLER, but may get more complex later)
         def_word = task_type.upper()
 
-        # taks count
+        # task count
         task_count = len(tasks)
         self.print_generator(GenMacroValue(f"FUSA_NUM_SCHEDULER_{def_word}_TASKS", task_count, f"Config for number of {task_type} tasks"))
 

@@ -4,6 +4,7 @@
 # Copyright 2025-2026 NXP
 #
 # SPDX-License-Identifier: BSD-3-Clause
+# pylint: disable=missing-module-docstring, missing-function-docstring
 
 from typing import List
 
@@ -150,4 +151,3 @@ def test_add_block_clearing_behavior_unchanged() -> None:
     model2.add_block(clearing_block)
     assert len(model2.get_blocks()[1]) == 1
     assert model2.get_blocks()[1][0] == real_block
-

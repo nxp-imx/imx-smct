@@ -182,7 +182,7 @@ class MacroResource:
         return self._name
 
     def is_empty(self) -> bool:
-        """Returns True when this maro resource is not made of any atomic resources.
+        """Returns True when this macro resource is not made of any atomic resources.
 
         Returns:
             True if this macro resource contains no atomic resources, False otherwise

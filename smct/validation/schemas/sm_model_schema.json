@@ -9,12 +9,14 @@
    "properties": {
     "version": {
      "type": "integer",
-     "description": "Schema version number (required)"
+     "description": "Schema version number (required)",
+     "minimum": 0
     }
    },
    "required": [
     "version"
-   ]
+   ],
+   "additionalProperties": false
   },
   "param_types": {
    "type": "array",
@@ -83,7 +85,8 @@
       }
      }
     },
-    "required": ["key", "value", "params"]
+    "required": ["key", "value", "params"],
+    "additionalProperties": false
    }
   },
   "protocols": {
@@ -137,7 +140,8 @@
        "prefix",
        "static",
        "test"
-      ]
+      ],
+      "additionalProperties": false
      }
     }
    },
@@ -186,11 +190,12 @@
          "description": "Item description (required)"
         },
         "value": {
-         "type": "string",
+         "type": ["string", "integer"],
          "description": "Item value (required)"
         }
        },
-       "required": ["id", "label", "description", "value"]
+       "required": ["id", "label", "description", "value"],
+       "additionalProperties": false
       }
      }
     },
@@ -202,7 +207,8 @@
     },
     "then": {
      "required": ["items"]
-    }
+    },
+    "additionalProperties": false
    }
   }
  },
@@ -211,5 +217,6 @@
   "param_types",
   "protocols",
   "setting_types"
- ]
+ ],
+ "additionalProperties": false
 }

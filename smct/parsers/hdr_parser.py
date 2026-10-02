@@ -55,7 +55,7 @@ class HeaderParser:
                         if atom:
                             ResourceDatabaseProvider.get_database().add_atomic_resource(atom)
 
-    def parse_dir_or_file(self, file_path: str, file_name_pattern: str = r"*\.h") -> bool:
+    def parse_dir_or_file(self, file_path: str, file_name_pattern: str = r".*\.h$") -> bool:
         """Parses files in the given directory if they match the file name pattern.
 
         Args:
@@ -123,7 +123,7 @@ class ApiResourceParser:
         if not os.path.exists(path):
             logging.error("Invalid device name '%s', path '%s' does not exist", device_name, os.path.abspath(path), extra={"source": path})
             return False
-        return header_parser.parse_dir_or_file(path, r"dev_sm_.*\.h")
+        return header_parser.parse_dir_or_file(path, r"dev_sm_.*\.h$")
 
     def parse_board(self, root_directory: str, board_name: str) -> bool:
         """Parses files of given board.
@@ -146,4 +146,4 @@ class ApiResourceParser:
         if not os.path.exists(path):
             logging.error("Invalid board name '%s', path '%s' does not exist", board_name, os.path.abspath(path), extra={"source": path})
             return False
-        return header_parser.parse_dir_or_file(path, r"brd_sm_.*\.h")
+        return header_parser.parse_dir_or_file(path, r"brd_sm_.*\.h$")

@@ -38,3 +38,16 @@
 
 ### Bug Fixes
 - Fixed missing parser when loading device/board configurations
+
+## Version 26.09.00
+
+**Release Date:** 2026-09-25
+
+### Features
+- Support for i.MX 937 devices
+
+### Bug Fixes
+- Preserved duplicate `start=`/`stop=` order entries in LM start/stop sequences (Perl parity); duplicate entries are now reported as validation errors instead of being silently discarded.
+- Strengthened JSON schema validation and resolved false-positive validation errors for loopback mailboxes and non-SCMI channels.
+- Fixed an uncaught crash when a domain/LM uses an out-of-range `did`; the tool now reports a clear configuration error.
+- Fixed an issue where hdr_parser incorrectly identified editor backup files (.bak, .orig) as SM FW headers, resulting in duplicate resources and silent configuration symbol loss.
